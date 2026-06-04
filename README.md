@@ -1,30 +1,88 @@
 # KAH Ledger System
 
-A sanitized public slice of the Kitsune Agent Harness control plane.
+A ledger-first coordination layer for Hermes Agent workflows.
 
-KAH started as a small internal mod to my agent harness. The problem was volume: too many agents, lanes, invariants, proof ideas, dead ends, and duplicate hypotheses moving at the same time. Without a shared memory layer, agents would rediscover the same idea, spend proof time twice, or lose the reason a lane had already been killed.
+KAH started as an internal mod to the Kitsune Agent Harness. The original problem was volume: many agents were exploring lanes, hypotheses, invariants, proof ideas, and dead ends at the same time. Without a shared operational memory layer, agents could repeat the same work, lose why a lane had already been killed, or promote an idea before checking prior context.
 
-This repo shows the core technical decision I made: keep the system ledger-first.
+This repository is a sanitized public slice of that system. It shows the core pattern without private targets, bounty evidence, exploit code, vendor communications, credentials, or unpublished vulnerability details.
 
-Instead of starting with a database or dashboard, every agent writes normalized lane records to append-only JSONL ledgers. The system derives fingerprints from the economic sink, invariant, surface, and root-cause shape. Agents can then check whether a new idea is actually new, related to an existing lane, or already dead.
+## What KAH does
 
-That trade-off made the tool useful fast:
+KAH gives agents a simple operating memory:
 
-- JSONL is easy for humans and agents to write.
-- Append-only records preserve the audit trail.
-- Fingerprints reduce duplicate work without needing perfect semantic search.
-- Derived indexes can be rebuilt, so the ledger stays the source of truth.
-- The system works locally and does not need a live service to be valuable.
+- record work as structured append-only ledger entries;
+- derive stable fingerprints for duplicate-family detection;
+- preserve status, evidence notes, and kill reasons;
+- generate compact digests that can be injected into future Hermes prompts;
+- rebuild indexes from the ledger instead of trusting fragile local state.
 
-This public version is intentionally sanitized. It does not include private targets, bounty evidence, exploit code, vendor messages, credentials, or unpublished vulnerability details.
+The current public version is intentionally small. It is a reference implementation of the pattern, not the full private control plane.
 
-## What it does
+## How it fits with Hermes Agent
 
-- Records security research lanes as structured ledger entries.
-- Generates stable fingerprints for duplicate detection.
-- Builds a small index of lane families.
-- Produces a digest agents can paste into prompts before doing new work.
-- Keeps the design simple enough to run from a terminal or agent wrapper.
+Hermes Agent already provides the execution environment: tools, skills, profiles, memory, cron jobs, messaging gateways, and terminal/file access.
+
+KAH sits on top as a workflow control layer. It gives Hermes agents a shared source of truth for repeated multi-agent work. Before an agent spends time on a task, it can check the ledger, see related lanes, and decide whether the work is new, already dead, or supporting evidence for an existing thread.
+
+In practice:
+
+```text
+Hermes Agent = agent runtime and tool access
+KAH          = structured operational memory for high-volume agent work
+```
+
+## Why not just use an Obsidian brain?
+
+Obsidian is a strong human knowledge base. KAH is an operational state layer.
+
+I still like Obsidian for narrative notes, long-form thinking, and human review. The problem is that Markdown notes do not reliably enforce workflow when multiple agents are running. Agents need a smaller, stricter format they can read and write without guessing.
+
+| Need | Obsidian brain | KAH ledger system |
+| --- | --- | --- |
+| Human notes | Excellent | Basic |
+| Agent-readable state | Inconsistent Markdown | Structured JSONL records |
+| Duplicate detection | Search-dependent | Stable lane fingerprints |
+| Workflow status | Usually manual | Explicit states like `candidate`, `dead`, `proved` |
+| Audit trail | Depends on note discipline | Append-only by default |
+| Prompt injection | Large vault context or manual excerpts | Compact generated digests |
+| Automation | Possible, but loose | Designed for agents and scripts |
+
+Short version:
+
+> Obsidian stores what we know. KAH operationalizes what we know.
+
+Or even simpler:
+
+> Obsidian is the library. KAH is air traffic control.
+
+## Why ledger-first?
+
+I chose append-only JSONL ledgers over a mutable task database for the first version.
+
+That was deliberate. The expensive failure mode was not an ugly UI. The expensive failure mode was losing context, repeating dead work, or letting an agent act on an idea that had already failed. JSONL gave me a cheap source of truth that agents could update, humans could inspect, and scripts could rebuild into better views later.
+
+A lane fingerprint is derived from the stable parts of the work:
+
+```text
+surface + invariant + impact sink + root-cause shape -> fingerprint
+```
+
+That means two agents can describe the same idea differently but still collide if the underlying lane is the same.
+
+## Non-security uses
+
+KAH is not limited to cybersecurity. The same pattern works anywhere agents explore many possibilities and need shared memory.
+
+Examples:
+
+- sales research: track accounts, outreach angles, dead leads, and duplicate company research;
+- recruiting: track candidates, role fit, rejection reasons, and outreach history;
+- product operations: collect feature requests, group duplicates, and preserve decision history;
+- customer support: track recurring issues, attempted fixes, and escalation paths;
+- software engineering: record flaky tests, refactor lanes, failed fixes, and architectural risks;
+- market research: preserve hypotheses, source trails, confidence, and dead ends.
+
+The common problem is not the domain. It is agent coordination under volume.
 
 ## Quick start
 
@@ -35,18 +93,28 @@ pip install -e . pytest
 pytest -q
 
 kah-ledger init --root /tmp/kah-demo
-kah-ledger add-lane --root /tmp/kah-demo   --agent scout-1   --surface "state variable reads"   --invariant "state derived from invalidated writes must not authorize value movement"   --sink "direct loss of funds"   --root-cause "missing freshness check"   --hypothesis "downstream component may trust stale state"
+
+kah-ledger add-lane --root /tmp/kah-demo \
+  --agent scout-1 \
+  --surface "state variable reads" \
+  --invariant "state derived from invalidated writes must not authorize value movement" \
+  --sink "direct loss of funds" \
+  --root-cause "missing freshness check" \
+  --hypothesis "downstream component may trust stale state"
 
 kah-ledger digest --root /tmp/kah-demo
 ```
 
-## One technical decision
+Example digest:
 
-I chose append-only ledgers over a mutable task database for the first version.
-
-That was deliberate. In bug hunting, the expensive failure mode is not an ugly UI. The expensive failure mode is repeating the same lane, losing the kill reason, or letting an agent promote a proof idea that already failed. Append-only JSONL gave me a cheap source of truth that agents could update, humans could inspect, and scripts could rebuild into better views later.
-
-Once the ledgers started paying for themselves, I added stricter schema checks, digest generation, and duplicate-family lookup. I did not try to make the system perfect first. I made it hard to lose the truth.
+```text
+KAH_LEDGER_DIGEST:
+  lanes: 1
+  families: 1
+  status_counts: candidate=1
+  recent_lanes:
+    - lane_... [candidate] fp=... sink=direct loss of funds; surface=state variable reads; root=missing freshness check
+```
 
 ## Repository map
 
@@ -59,10 +127,28 @@ kah_ledger/
 examples/
   sanitized_lanes.jsonl
   agent_prompt_context.md
+docs/
+  answer-to-dan.md
+  obsidian-vs-kah.md
+  applications-beyond-security.md
 tests/
   test_ledger.py
 ```
 
-## Safety boundary
+## Design boundaries
 
-This repo is a workflow/tooling artifact. It is not a target repository, not a vulnerability report, and not a PoC release. The examples are generic by design.
+This repository is a workflow/tooling artifact.
+
+It is not:
+
+- a vulnerability report;
+- an exploit release;
+- a target repository;
+- a replacement for human review;
+- a full replica of the private Kitsune system.
+
+The examples are generic by design.
+
+## License
+
+MIT

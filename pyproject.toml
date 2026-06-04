@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kah-ledger-system"
 version = "0.1.0"
-description = "Sanitized ledger-first control plane for multi-agent security research lanes"
+description = "Ledger-first coordination layer for Hermes Agent workflows"
 requires-python = ">=3.10"
 authors = [{ name = "Jimmy Dinh" }]
 readme = "README.md"

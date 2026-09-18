@@ -1,47 +1,78 @@
-/* Small DOM-generating components. Images are decoration; labels/actions remain live HTML. */
+/* Eutrya Studio: dependency-free, accessible presentation components. */
 (() => {
-  const U=window.EutryaUI,{icon,logo}=U;
-  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const PAGES=['dashboard','swarm','library','memory','tools','settings'];
-  const title=p=>p.charAt(0).toUpperCase()+p.slice(1);
-  const asset = file => './assets/' + file;
-  const portrait=id=>asset(`agent-${({admin:'admin',engineer:'engineer',legal:'lawyer',lawyer:'lawyer',finance:'finance',researcher:'researcher'})[id]||'researcher'}.jpg`);
-  const roleIcon=id=>({legal:'lawyer'})[id]||id;
-  const num=n=>Number.isFinite(Number(n))?Number(n):0;
-  const time=value=>{const d=new Date(value);return Number.isFinite(+d)?d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'—'};
-  const date=value=>{const d=new Date(value);return Number.isFinite(+d)?d.toLocaleDateString([],{month:'short',day:'numeric'}):'—'};
-  const pill=(label,tone='neutral')=>`<span class="pill ${esc(tone)}">${esc(label)}</span>`;
-  const status=s=>{const v=String(s||'offline').toLowerCase();return `<span class="status ${['online','idle','ready','live','enabled'].includes(v)?'ok':['working','thinking','reviewing','demo'].includes(v)?'blue':['blocked','error','offline','disabled'].includes(v)?'muted':'amber'}"><i></i>${esc(v)}</span>`};
-  const button=(label,action='',options={})=>`<button class="btn ${options.primary?'primary':''} ${options.cls||''}" ${action?`data-action="${esc(action)}"`:''} ${options.attrs||''} ${options.disabled?'disabled':''}>${options.icon?icon(options.icon):''}<span>${esc(label)}</span></button>`;
-  const miniButton=(label,action,name,attrs='')=>`<button class="icon-btn" title="${esc(label)}" aria-label="${esc(label)}" data-action="${esc(action)}" ${attrs}>${icon(name)}</button>`;
-  const frame=(name,meta,content,cls='',actions='')=>`<section class="frame ${cls}"><header class="frame-heading"><h2>${esc(name)}</h2>${meta?`<span class="frame-meta">${esc(meta)}</span>`:''}<div class="frame-actions">${actions}</div></header>${content}</section>`;
-  const empty=(heading,text,action='')=>`<div class="empty"><span class="empty-symbol">${icon('plus')}</span><strong>${esc(heading)}</strong><p>${esc(text)}</p>${action}</div>`;
-  const field=(label,name,value,options={})=>`<label class="field"><span>${esc(label)}</span><input name="${esc(name)}" value="${esc(value)}" ${options.type?`type="${options.type}"`:''} ${options.attrs||''} ${options.placeholder?`placeholder="${esc(options.placeholder)}"`:''}>${options.help?`<small>${esc(options.help)}</small>`:''}</label>`;
-  const select=(label,name,value,choices)=>`<label class="field"><span>${esc(label)}</span><select name="${esc(name)}">${choices.map(c=>{const [v,l]=Array.isArray(c)?c:[c,c];return `<option value="${esc(v)}" ${v===value?'selected':''}>${esc(l)}</option>`}).join('')}</select></label>`;
-  const toggle=(label,help,name,checked)=>`<label class="toggle-row"><span><strong>${esc(label)}</strong><small>${esc(help)}</small></span><input class="switch" type="checkbox" name="${esc(name)}" ${checked?'checked':''}></label>`;
-  const art=(cls='',variant='hero')=>`<svg class="botanical ${cls}" viewBox="${variant==='hero'?'945 145 465 650':'152 250 470 1050'}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><image href="${asset(variant==='hero'?'dashboard-hero.jpg':'sidebar-botanical.jpg')}" width="${variant==='hero'?1672:941}" height="${variant==='hero'?941:1672}"/></svg>`;
-  const descriptions={dashboard:['Eutrya','A durable mind for a more intelligent tomorrow.','A more capable you,\nfor a more interesting future.','PLAN · REASON · EXECUTE'],swarm:['Swarm','Many minds. A higher purpose.','Intelligence multiplies\nwhen minds work together.','COORDINATE · SYNTHESIZE · PROGRESS'],library:['Agent Library','Discover. Configure. Deploy.','Better questions\nbuild a brighter tomorrow.','SPECIALIZED MINDS · SHARED CONTEXT'],memory:['Memory','Capture. Connect. Reason. Evolve.','The more we remember,\nthe more we can become.','KNOWLEDGE GROWS · CONTEXT PERSISTS'],tools:['Tools','Build higher capabilities through intelligent tools.','Better tools\ncreate braver thinkers.','OBSERVE · REASON · ACT'],settings:['Settings','Configure today for a more intelligent tomorrow.','Better systems\nmake intelligence durable.','CONFIGURE · PROTECT · EVOLVE']};
-  function hero(page,metrics=''){
-    const [heading,sub,quote,steps]=descriptions[page];
-    return `<section class="hero-group ${page==='dashboard'?'dashboard-hero':''}"><div class="hero-plate"><div class="registration" aria-hidden="true">+<br>■<br>■<br>✦<br>+<br>■</div>${art()}<div class="hero-copy"><p class="eyebrow">${page==='dashboard'?'NATIVE SWARM HARNESS':`${page.toUpperCase()} / EUTRYA`}</p><h1>${heading}</h1><p class="hero-subtitle">${sub}</p><div class="hero-folio"><span>${steps}</span><span>v0.2.0</span></div></div><span class="crosshair cross-one" aria-hidden="true"></span></div><div class="hero-aside"><div class="quote-plate">${art()}<span class="quote-mark">“</span><blockquote>${quote.replace('\n','<br>')}</blockquote><cite>— EUTRYA</cite></div>${metrics}</div></section>`;
+  'use strict';
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const paths = {
+    dashboard:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+    swarm:'M12 9V5M9 12H5m10 0h4m-7 3v4M9 9l-3-3m9 9 3 3M9 15l-3 3m9-9 3-3',
+    library:'M4 3h4v18H4zM11 3h4v18h-4zM18 4l3 16M5 7h2m5 0h2',
+    memory:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10z',
+    tools:'m3 13 4-4 4 7 4-11 3 6h3',
+    settings:'M10 3h4l1 3 3 1 3 3v4l-3 1-1 3-3 3h-4l-1-3-3-1-3-3v-4l3-1 1-3z',
+    search:'M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm5 12 6 6',
+    plus:'M12 5v14M5 12h14', arrow:'M4 12h16m-6-6 6 6-6 6',
+    chevron:'m9 5 7 7-7 7', close:'m6 6 12 12M6 18 18 6', minus:'M5 12h14',
+    maximize:'M4 4h16v16H4z', reload:'M20 8a9 9 0 1 0 0 8M20 3v5h-5',
+    send:'m3 3 18 9-18 9 4-9-4-9zm4 9h14', stop:'M6 6h12v12H6z',
+    check:'m5 12 4 4 10-10', clock:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 4v5l3 2',
+    code:'m8 6-6 6 6 6m8-12 6 6-6 6m-3-15-2 18',
+    file:'M5 2h9l5 5v15H5zm9 0v6h5M8 12h8m-8 4h8',
+    folder:'M3 5h7l2 3h9v12H3z', globe:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 0c5 5 5 13 0 18-5-5-5-13 0-18zM3 12h18',
+    lock:'M5 10h14v11H5zm3 0V7a4 4 0 0 1 8 0v3m-4 5v2',
+    grid:'M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z',
+    list:'M8 5h13M8 12h13M8 19h13M3 5h1M3 12h1M3 19h1',
+    info:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 7v7m0-11v1',
+    trash:'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7',
+    copy:'M8 8h13v13H8zM16 8V3H3v13h5',
+    admin:'m3 7 4 4 5-7 5 7 4-4-2 12H5L3 7zm2 15h14',
+    engineer:'m4 4 16 16m-3-17 4 4-7 7M3 17l4 4 6-6M3 3l2 6 4-4-6-2z',
+    lawyer:'M12 3v18M5 21h14M4 7h16M6 7l-4 8h8L6 7zm12 0-4 8h8l-4-8z',
+    finance:'M4 20V12h3v8zm7 0V4h3v16zm7 0V8h3v12z',
+    researcher:'M9 3h6m-4 0v6l-7 11h16L13 9V3M8 14h8',
+    database:'M3 6c0-5 18-5 18 0s-18 5-18 0zm0 0v12c0 5 18 5 18 0V6M3 12c0 5 18 5 18 0',
+    terminal:'m4 6 6 6-6 6m9 0h7', download:'M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4'
+  };
+  const icon = (name, cls='') => `<svg class="icon ${esc(cls)}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.file}"/>${name==='swarm'?'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="3" r="1.5"/><circle cx="3" cy="12" r="1.5"/><circle cx="21" cy="12" r="1.5"/><circle cx="12" cy="21" r="1.5"/>':''}${name==='settings'?'<circle cx="12" cy="12" r="3"/>':''}</svg>`;
+  const logo = () => '<svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M5 41 20 6h8l15 35H32L24 18 15 41z"/></svg>';
+  const portraits = {admin:'admin',engineer:'engineer',legal:'lawyer',lawyer:'lawyer',finance:'finance',researcher:'researcher'};
+  const portrait = id => `./assets/agent-${portraits[id] || 'researcher'}.jpg`;
+  let floralId=0;
+  const floral = (cls='',fit='slice') => {
+    const id=`botanical-fade-${++floralId}`;
+    return `<svg class="floral ${esc(cls)}" viewBox="975 140 420 650" preserveAspectRatio="xMidYMid ${fit}" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" x2="1"><stop offset="0" stop-color="white" stop-opacity="0"/><stop offset=".2" stop-color="white"/><stop offset=".8" stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/></linearGradient><mask id="${id}-mask" maskUnits="userSpaceOnUse" x="975" y="140" width="420" height="650"><rect x="975" y="140" width="420" height="650" fill="url(#${id})"/></mask></defs><svg x="975" y="140" width="420" height="650" viewBox="975 140 420 650" overflow="hidden"><image href="./assets/dashboard-hero.jpg" width="1672" height="941" mask="url(#${id}-mask)"/></svg></svg>`;
+  };
+  const button = (label, action, symbol='', kind='', attrs='') => `<button class="btn ${kind}" data-action="${esc(action)}" ${attrs}>${symbol?icon(symbol):''}<span>${esc(label)}</span></button>`;
+  const empty = (title, hint='') => `<div class="empty-state">${icon('info')}<div><strong>${esc(title)}</strong>${hint?`<p>${esc(hint)}</p>`:''}</div></div>`;
+  const status = (text, mode='idle') => `<span class="status ${esc(mode)}"><i></i>${esc(text)}</span>`;
+  const panel = (title, content, cls='', aside='') => `<section class="panel ${cls}"><header class="panel-heading"><h2>${esc(title)}</h2>${aside}</header><div class="panel-content">${content}</div></section>`;
+  const stamp = text => `<span class="stamp">${esc(text)}</span>`;
+  const definitions = {
+    dashboard:['Eutrya','A durable mind for a more intelligent tomorrow.','A more capable you, for a more interesting future.','ORCHESTRATE / CREATE / EVOLVE'],
+    swarm:['Swarm','Many minds. A higher purpose.','Intelligence multiplies when minds work together.','COORDINATE / SYNTHESIZE / DELIVER'],
+    library:['Agent Library','Discover. Configure. Deploy.','Better questions build a brighter tomorrow.','SPECIALIZE / COLLABORATE / EVOLVE'],
+    memory:['Memory','Capture. Connect. Reason. Evolve.','The more we remember, the more we can become.','CAPTURE / CONNECT / COMPOUND'],
+    tools:['Tools','Build higher capabilities through intelligent tools.','Better tools create braver thinkers.','PLAN / BUILD / EXTEND'],
+    settings:['Settings','Configure today for a more intelligent tomorrow.','Better systems make intelligence durable.','CONFIGURE / PROTECT / EVOLVE']
+  };
+  function hero(page, extra='') {
+    const d=definitions[page] || definitions.dashboard;
+    return `<section class="hero hero-${page}"><div class="hero-main"><div class="registration-mark"></div>${floral('', 'meet')}<span class="hero-index">EUTRYA / ${esc(page.toUpperCase())}</span><h1>${esc(d[0])}</h1><p>${esc(d[1])}</p><div class="hero-foot"><span>${esc(d[3])}</span><span>v0.2.0</span></div></div><aside class="hero-aside"><div class="hero-quote">${floral()}<span class="quote-mark">“</span><blockquote>${esc(d[2])}</blockquote><cite>— EUTRYA</cite></div>${extra}</aside></section>`;
   }
-  function shell(){
-    return `<div class="desktop-shell"><header class="titlebar" id="titlebar"><div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div><div class="titlebar-copy">// ORCHESTRATE HIGHER INTELLIGENCE</div><div id="connection-label" class="connection-label">LOCAL · CONNECTING</div><div class="window-buttons">${miniButton('Minimize','window-min','minus')}${miniButton('Maximize / restore','window-max','maximize')}${miniButton('Close Eutrya','window-close','close')}</div></header><aside class="sidebar"><div class="brand">${logo()}<div><strong>Eutrya</strong><small>v0.2.0</small></div></div><nav aria-label="Main navigation">${PAGES.map(p=>`<button class="nav-link" data-page="${p}" title="${title(p)}" aria-label="${title(p)}">${icon(p)}<span>${title(p)}</span></button>`).join('')}</nav><div class="sidebar-art">${art('','sidebar')}</div><div class="sidebar-philosophy">HUMAN<br>AI<br>HIGHER<br>INTELLIGENCE<span>// eutrya<br>BUILT FOR<br>THE LONG RUN</span></div><div class="sidebar-bottom">${icon('lock')}<span>LOCAL WORKSPACE</span></div></aside><main id="main-scroll" class="main-scroll"><div id="page-content"></div><footer class="page-footer"><span>EUTRYA / <b id="footer-page">DASHBOARD</b></span><span>HUMAN × SWARM × POSSIBILITY</span><span>UI / 03</span></footer></main><div id="notice" class="notice" role="status" hidden></div><dialog id="ui-dialog" class="modal"></dialog><dialog id="approval-dialog" class="modal"></dialog></div>`;
+  function agentCard(a, selected=false, layout='library') {
+    return `<button class="agent-card ${layout} ${selected?'selected':''}" data-action="select-agent" data-id="${esc(a.id)}" aria-pressed="${selected}"><div class="agent-visual"><img src="${portrait(a.id)}" alt="" loading="lazy"><span class="agent-symbol">${icon(portraits[a.id] || 'researcher')}</span><span class="agent-index">${esc(a.index)}</span></div><div class="agent-copy"><h3>${esc(a.name)}</h3>${status(a.statusLabel,a.tone)}<p>${esc(a.description)}</p><div class="tags">${(a.verbs || []).slice(0,3).map(v=>`<span>${esc(v.toLowerCase())}</span>`).join('')}</div><footer><span>${a.taskCount} ${a.taskCount===1?'task':'tasks'}</span>${icon('arrow')}</footer></div></button>`;
   }
-  function agentCard(a,selected=false,variant='profile'){
-    return `<button class="agent-card ${variant} ${selected?'selected':''}" data-agent="${esc(a.id)}" aria-pressed="${selected}"><div class="agent-visual"><img src="${portrait(a.id)}" alt="" loading="lazy"><span class="agent-index">${esc(a.index)}</span><span class="agent-glyph">${icon(roleIcon(a.id))}</span></div><div class="agent-content"><h3>${esc(a.name)}</h3>${status(a.status)}<p>${esc(a.role)}</p><div class="tags">${(a.verbs||[]).slice(0,3).map(t=>pill(t)).join('')}</div><footer><span>JEV / ${num(a.tasks)} TASKS</span>${icon('arrow')}</footer></div></button>`;
+  function network(agents, selected, view='graph') {
+    if(view==='list' || agents.length>9) return `<div class="network-list">${agents.map(a=>`<button data-action="select-agent" data-id="${esc(a.id)}" class="network-list-row ${a.id===selected?'selected':''}"><img src="${portrait(a.id)}" alt=""><span><strong>${esc(a.name)}</strong><small>${esc(a.role)}</small></span>${status(a.statusLabel,a.tone)}${icon('chevron')}</button>`).join('')}</div>`;
+    const center = agents.find(a=>a.id==='admin') || agents[0];
+    if(!center) return empty('No agents configured');
+    const peers=agents.filter(a=>a!==center);
+    const coords=peers.map((a,i)=>{const angle=-Math.PI/2 + 2*Math.PI*i/peers.length;return {a,x:340+220*Math.cos(angle),y:215+146*Math.sin(angle)};});
+    const node = (a,x,y,hub=false) => `<button class="network-node ${hub?'hub':''} ${a.id===selected?'selected':''}" style="left:${x/680*100}%;top:${y/450*100}%" data-action="select-agent" data-id="${esc(a.id)}" aria-pressed="${a.id===selected}"><span class="node-image"><img src="${portrait(a.id)}" alt=""></span><span class="node-label"><strong>${esc(a.name)}</strong>${status(a.statusLabel,a.tone)}</span></button>`;
+    return `<div class="network-scene">${floral('network-flower')}<svg class="network-lines" viewBox="0 0 680 450" preserveAspectRatio="none" aria-hidden="true"><ellipse cx="340" cy="215" rx="220" ry="146" class="orbit"/><ellipse cx="340" cy="215" rx="130" ry="95" class="orbit"/>${coords.map(({x,y})=>`<path d="M340 215L${x} ${y}"/><circle cx="${340+(x-340)*.57}" cy="${215+(y-215)*.57}" r="3"/>`).join('')}<path d="M25 40h26m-13-13v26M617 397h26m-13-13v26" class="crosshair"/></svg>${node(center,340,215,true)}${coords.map(({a,x,y})=>node(a,x,y)).join('')}<span class="network-caption">SHARED CONTEXT<br>ROUTED INTELLIGENCE</span></div>`;
   }
-  function agentNetwork(agents,selected,view='graph',zoom=1){
-    if(view==='list')return `<div class="network-list">${agents.map(a=>agentCard(a,a.id===selected,'compact')).join('')}</div>`;
-    if(!agents.length)return empty('No active swarm','Connect the runtime to load your persistent profiles.');
-    const sorted=[...agents].sort((a,b)=>(a.id==='admin'?-1:b.id==='admin'?1:0));
-    const nodes=sorted.map((a,i)=>{if(!i)return {a,x:460,y:253};const angle=-Math.PI/2+(i-1)*2*Math.PI/(sorted.length-1);return {a,x:460+285*Math.cos(angle),y:253+178*Math.sin(angle)}});
-    return `<div class="network-stage">${art('network-botanical')}<svg class="agent-network" viewBox="0 0 920 520" aria-label="Swarm coordination map"><defs>${nodes.map(({a},i)=>`<clipPath id="avatar-${i}"><circle cx="0" cy="0" r="${i?34:44}"/></clipPath>`).join('')}</defs><g transform="translate(${460*(1-zoom)} ${260*(1-zoom)}) scale(${zoom})"><g class="network-orbits"><ellipse cx="460" cy="253" rx="285" ry="178"/><ellipse cx="460" cy="253" rx="190" ry="119"/><path d="M100 253h720M460 22v462"/></g>${nodes.slice(1).map(({x,y})=>`<path class="network-edge" d="M460 253L${x} ${y}"/><circle class="edge-dot" cx="${460+(x-460)*.53}" cy="${253+(y-253)*.53}" r="3"/>`).join('')}${nodes.map(({a,x,y},i)=>`<g data-agent="${esc(a.id)}" role="button" tabindex="0" aria-label="Focus ${esc(a.name)}" class="network-node ${a.id===selected?'selected':''}" transform="translate(${x} ${y})"><circle class="node-halo" r="${i?42:52}"/><circle class="node-ring" r="${i?38:48}"/><image href="${portrait(a.id)}" x="-${i?34:44}" y="-${i?34:44}" width="${i?68:88}" height="${i?68:88}" preserveAspectRatio="xMidYMid slice" clip-path="url(#avatar-${i})"/><text class="node-name" y="${i?60:72}" text-anchor="middle">${esc(a.name)}</text><text class="node-status" y="${i?79:91}" text-anchor="middle">${esc(String(a.status).toUpperCase())}</text></g>`).join('')}</g><text class="graph-folio" x="22" y="473">DISTRIBUTED INTELLIGENCE</text><text class="graph-folio" x="22" y="490">SHARED CONTEXT / JEV</text><path class="graph-cross" d="M35 60h26M48 47v26M863 435h26M876 422v26"/></svg></div>`;
+  function sourceGraph(groups, selected='all', mini=false) {
+    const nodes=groups.filter(g=>g.count>0);
+    return `<div class="source-graph ${mini?'mini':''}">${floral('graph-flower')}<svg viewBox="0 0 600 470" preserveAspectRatio="none" aria-hidden="true"><circle cx="300" cy="230" r="160" class="orbit"/><circle cx="300" cy="230" r="95" class="orbit"/>${nodes.map((g,i)=>{const t=-Math.PI/2+Math.PI*2*i/nodes.length;return `<path d="M300 230L${300+190*Math.cos(t)} ${230+145*Math.sin(t)}"/>`;}).join('')}</svg><div class="source-core">${logo()}<span>CONTEXT</span></div>${nodes.map((g,i)=>{const t=-Math.PI/2+Math.PI*2*i/nodes.length;return `<button class="source-node ${selected===g.id?'selected':''}" data-action="memory-source" data-id="${esc(g.id)}" style="left:${(300+190*Math.cos(t))/6}%;top:${(230+145*Math.sin(t))/4.7}%"><i></i><strong>${esc(g.name)}</strong><small>${g.count} ${g.count===1?'record':'records'}</small></button>`;}).join('')}${!nodes.length?'<div class="graph-empty">No records yet</div>':''}<span class="graph-caption">GROUPED BY SOURCE<br>NOT SEMANTIC SIMILARITY</span></div>`;
   }
-  const sources=[['memories','Memories','memory'],['messages','Conversations','mail'],['tasks','Tasks','check'],['findings','Findings','search'],['decisions','Decisions','swarm'],['artifacts','Artifacts','file']];
-  function memoryNetwork(counts,selected='',dark=false){
-    const pts=sources.map((s,i)=>{const a=-Math.PI/2+i*2*Math.PI/6;return {s,x:300+192*Math.cos(a),y:253+178*Math.sin(a)}});
-    return `<div class="memory-network ${dark?'dark':''}">${!dark?art('network-botanical'):''}<svg viewBox="0 0 600 530" aria-label="Workspace source map; lines represent categories, not inferred relationships"><g class="network-orbits"><circle cx="300" cy="253" r="178"/><circle cx="300" cy="253" r="116"/><path d="M54 253h492M300 22v478"/></g>${pts.map(({x,y})=>`<path class="network-edge" d="M300 253L${x} ${y}"/>`).join('')}<circle class="memory-center" cx="300" cy="253" r="49"/><g transform="translate(278 229) scale(1.1)"><path fill="currentColor" d="M4 39 16 5h9L13 39H4Zm18-25 14 25h-9l-9-17 4-8Z" class="memory-logo"/></g>${pts.map(({s,x,y})=>`<g data-source="${s[0]}" class="memory-source ${selected===s[0]?'selected':''}" role="button" tabindex="0" aria-label="View ${s[1]}"><circle class="source-halo" cx="${x}" cy="${y}" r="13"/><circle class="source-dot" cx="${x}" cy="${y}" r="8"/><text class="source-label" x="${x}" y="${y+30}" text-anchor="middle">${s[1]}</text><text class="source-count" x="${x}" y="${y+47}" text-anchor="middle">${num(counts[s[0]])} ITEMS</text></g>`).join('')}</svg><div class="graph-caption">${dark?'PERSISTENT CONTEXT':'WORKSPACE SOURCE MAP'}<span>${dark?'//':'Actual counts · category links'}</span></div></div>`;
-  }
-  Object.assign(U,{esc,PAGES,title,portrait,roleIcon,num,time,date,pill,status,button,miniButton,frame,empty,field,select,toggle,art,hero,shell,agentCard,agentNetwork,memoryNetwork,sources});
+  window.EutryaUI = {esc, icon, logo, portrait, floral, button, empty, status, panel, stamp, hero, agentCard, network, sourceGraph};
 })();

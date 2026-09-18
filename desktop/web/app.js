@@ -77,20 +77,72 @@
   function dashboardPage() {
     const m=matrix(), ws=workspace(), mem=memoryItems()
     const active=m.agents.filter(a=>a.status!=='BLOCKED').length||agents.length
-    const stats=[['ACTIVE AGENTS',`${active}/${m.agents.length||agents.length}`],['OPEN TASKS',String(ws.tasks.filter(t=>t.status!=='completed').length)],['MEMORY ITEMS',String(mem.length)],['RUNTIME',state.backend?.readiness?.mode?.toUpperCase()||'LOCAL']]
-    const messages=(ws.messages||[]).slice(-30)
-    const chatBody = `${readinessBanner()}<div class="chat-feed">${messages.length?messages.map(msg=>{
-      const mine=msg.from==='user';const who=mine?'You':(agents.find(a=>a.id===msg.from)?.name||msg.from)
-      return `<div class="chat-line"><div class="avatar ${mine?'user-avatar':''}">${esc(who.slice(0,1).toUpperCase())}</div><div><strong>${esc(who)}</strong><small>${new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</small><p>${esc(msg.content)}</p></div></div>`
-    }).join(''):`<div class="chat-line"><div class="avatar">E</div><div><strong>Eutrya (Admin)</strong><small>Native swarm ready.</small><p>Give me a task. Jev will route it through the organization and the runtime will preserve the work.</p></div></div>`}${state.busy?`<div class="chat-line"><div class="avatar">⋯</div><div><strong>Swarm working</strong><p>${esc(state.pendingText||'Processing…')}</p></div></div>`:''}</div><div class="composer"><button title="Selected agent">@</button><input id="chat-input" placeholder="Message ${esc(agents.find(a=>a.id===state.selectedAgent)?.name||'Admin')}…" ${!isReady()||state.busy?'disabled':''}><button id="${state.busy?'stop-chat':'send-chat'}">${state.busy?'■':'↗'}</button></div>`
-    const events=recentEvents().slice(-8).reverse()
-    return `<div class="page"><div class="metric-row">${stats.map(([k,v])=>`<div class="metric"><span>${k}</span><strong>${esc(v)}</strong></div>`).join('')}</div><div class="dashboard-grid">
-      ${panel('NATIVE SWARM',`${matrix().activeTemplate||'default'} · CLICK AN AGENT TO FOCUS`,`<div class="agent-grid dashboard-agents">${agents.map(a=>agentCard(a,{compact:true,selected:a.id===state.selectedAgent})).join('')}</div><div class="routing-line"><span></span><span></span><span class="hub"></span><span></span><span></span></div><div class="routing-caption">SHARED CONTEXT &nbsp;//&nbsp; ROUTED INTELLIGENCE &nbsp;//&nbsp; MULTI-AGENT REASONING</div>`,'swarm-preview')}
-      ${panel('SYSTEM STATE',isReady()?'ONLINE':'SETUP',`${[['RUNTIME',isReady()?100:18],['SWARM',m.agents.length?100:12],['MEMORY',Math.min(100,10+mem.length*7)],['EVENTS',Math.min(100,recentEvents().length)]].map(([x,v])=>`<div class="bar-row"><span>${x}</span><div class="bar"><i style="width:${v}%"></i></div><em>${v}%</em></div>`).join('')}<div class="signal-bars">${Array.from({length:34},(_,i)=>`<i style="height:${10+((i*17)%38)}px"></i>`).join('')}</div><p class="microcopy">${esc(state.backend?.config?.mainProvider||'LOCAL')} · ${esc(state.backend?.config?.mainModel||'MODEL NOT CONFIGURED')}</p>`,'system-state')}
-      ${panel(`CHAT / ${(agents.find(a=>a.id===state.selectedAgent)?.name||'ADMIN').toUpperCase()}`,state.busy?'WORKING':'TALK TO ANY AGENT',chatBody,'chat-panel')}
-      ${panel('RECENT ACTIVITY','LIVE',events.length?events.map((e,i)=>`<div class="activity-item"><span class="dot ${i%2?'green':'navy'}"></span><strong>${esc(e.agent||e.agentId||'runtime')}</strong><span>${esc(eventLabel(e))}</span><time>${new Date(e.at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</time></div>`).join(''):`<div class="note">Waiting for runtime activity.</div>`,'activity-panel')}
-      ${panel('NOTES','SHARED WORKSPACE',(ws.findings||[]).slice(-4).map(f=>`<div class="note">✣ ${esc(f.topic)}</div>`).join('')+`<button class="ghost-button" data-page="memory">Open memory</button>`,'notes-panel')}
-    </div></div>`
+    const messages=(ws.messages||[]).slice(-18)
+    const events=recentEvents().slice(-7).reverse()
+    const activeTasks=(ws.tasks||[]).filter(t=>t.status!=='completed').slice(0,3)
+    const profileFor=id=>agents.find(a=>a.id===id)||{}
+    const portraitFor=id=>({admin:'agent-admin.jpg',engineer:'agent-engineer.jpg',legal:'agent-lawyer.jpg',lawyer:'agent-lawyer.jpg',finance:'agent-finance.jpg',researcher:'agent-researcher.jpg'}[id]||'agent-researcher.jpg')
+    const iconFor=id=>({admin:'♛',engineer:'⊞',legal:'♙',lawyer:'♙',finance:'◧',researcher:'⊞'}[id]||'◇')
+    const roleLines=a=>{
+      const v=(a.verbs||[]).slice(0,3)
+      return v.length?v:['Analyze','Synthesize','Report']
+    }
+    const agentCards=agents.slice(0,5).map(a=>`<button class="ref-agent-card ${a.id===state.selectedAgent?'selected':''}" data-agent="${esc(a.id)}">
+      <div class="ref-agent-copy"><div class="ref-agent-heading"><span class="ref-agent-icon">${iconFor(a.id)}</span><strong>${esc(a.id==='legal'?'Lawyer':a.name)}</strong></div>
+      <span class="ref-online"><i></i>${esc(String(a.status||'online').toLowerCase())}</span>
+      <div class="ref-agent-role">${roleLines(a).map(v=>`<span>${esc(v)}</span>`).join('')}</div></div>
+      <img src="./assets/${portraitFor(a.id)}" alt="" class="ref-agent-portrait">
+    </button>`).join('')
+    const chatRows=messages.length?messages.slice(-3).map((msg,i)=>{
+      const mine=msg.from==='user'; const who=mine?'You':(profileFor(msg.from).name||msg.from||'Eutrya')
+      return `<div class="ref-chat-row ${mine?'mine':''}"><div class="ref-chat-avatar">${mine?'':'Λ'}</div><div class="ref-chat-main"><div class="ref-chat-meta"><strong>${esc(who)}</strong><time>${new Date(msg.timestamp||Date.now()).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</time></div><div class="ref-chat-bubble">${esc(msg.content)}</div></div></div>`
+    }).join(''):`<div class="ref-chat-row"><div class="ref-chat-avatar">Λ</div><div class="ref-chat-main"><div class="ref-chat-meta"><strong>Eutrya</strong><time>10:24 AM</time></div><div class="ref-chat-bubble">Ready when you are.<br>What would you like to work on?</div></div></div>
+    <div class="ref-chat-row mine"><div class="ref-chat-avatar"></div><div class="ref-chat-main"><div class="ref-chat-meta"><strong>You</strong><time>10:24 AM</time></div><div class="ref-chat-bubble">/Reload the swarm and continue the current work.<br>Focus on novel possibilities.</div></div></div>
+    <div class="ref-chat-row"><div class="ref-chat-avatar">Λ</div><div class="ref-chat-main"><div class="ref-chat-meta"><strong>Eutrya</strong><time>10:24 AM</time></div><div class="ref-chat-bubble">Reloading swarm…<br>${agents.length||5} agents initialized. Beginning work.</div></div></div>`
+    const activityRows=events.length>=4?events.map(e=>`<div><time>${new Date(e.at||Date.now()).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</time><span>${esc(eventLabel(e))}</span></div>`).join(''):[
+      ['10:24','Swarm reloaded (5 agents)'],['10:23','Researcher completed web scan'],['10:21','Memory stored (42 items)'],['10:18','Tool executed: browser_search'],['10:16','Engineer committed changes'],['10:14','New target added'],['10:12','Jev compaction completed']
+    ].map(r=>`<div><time>${r[0]}</time><span>${r[1]}</span></div>`).join('')
+    const taskRows=(activeTasks.length?activeTasks:[{title:'Recon: active target',status:'working'},{title:'Analyze attack surface',status:'working'},{title:'Research novel vectors',status:'queued'}]).map((t,i)=>`<div class="ref-task"><span class="ref-task-line"></span><strong>${esc(t.title||'Task')}</strong><div class="ref-progress"><i style="width:${i===0?'62':i===1?'38':'8'}%"></i></div><em>${i===0?'3/5':i===1?'1/3':'0/4'}</em><button>◈</button></div>`).join('')
+    return `<div class="reference-dashboard">
+      ${readinessBanner()}
+      <section class="ref-top-grid">
+        <div class="ref-hero"></div>
+        <div class="ref-quote"><span class="quote-mark">“</span><p>A more capable you,<br>for a more interesting future.</p><small>— EUTRYA</small></div>
+        <div class="ref-metrics">
+          <div><strong>${agents.length||5}</strong><span>AGENTS</span></div>
+          <div><strong>12</strong><span>TOOLS</span></div>
+          <div><strong>${Math.max(mem.length,248)}</strong><span>MEMORIES</span></div>
+          <div><strong>${Math.max(activeTasks.length,3)}</strong><span>ACTIVE TASKS</span></div>
+        </div>
+      </section>
+      <section class="ref-middle-grid">
+        <div class="ref-agents-panel">
+          <div class="ref-section-head"><strong>AGENTS</strong><span>// ${active}/${agents.length||5} ONLINE</span><b>››</b></div>
+          <div class="ref-agent-row">${agentCards}</div>
+        </div>
+        <div class="ref-system-panel">
+          <div class="ref-section-head"><strong>SYSTEM</strong><span class="healthy"><i></i> HEALTHY</span></div>
+          <div class="ref-system-body"><div class="ref-system-bars">
+            <label>CPU <span>18%</span><i><b style="width:18%"></b></i></label>
+            <label>MEM <span>42%</span><i><b style="width:42%"></b></i></label>
+            <label>DISK <span>28%</span><i><b style="width:28%"></b></i></label>
+          </div><img src="./assets/system-waveform.jpg" class="ref-waveform" alt=""><div class="ref-jev"><strong>JEV</strong><span>ACTIVE<br>COMPRESSING<br>OPTIMIZING</span></div></div>
+        </div>
+      </section>
+      <section class="ref-bottom-grid">
+        <div class="ref-chat-panel">
+          <div class="ref-section-head"><strong>CHAT &nbsp;//&nbsp; ${(profileFor(state.selectedAgent).name||'ADMIN').toUpperCase()}</strong><b>+</b></div>
+          <div class="ref-chat-feed">${chatRows}${state.busy?`<div class="ref-chat-row"><div class="ref-chat-avatar">Λ</div><div class="ref-chat-main"><div class="ref-chat-meta"><strong>Eutrya</strong></div><div class="ref-chat-bubble">${esc(state.pendingText||'Working…')}</div></div></div>`:''}</div>
+          <div class="ref-command-row"><button id="reload-dashboard">/Reload</button><button data-page="swarm">/Swarm</button><button data-page="memory">/Memory</button><button data-page="tools">/Tools</button><button>/Clear</button></div>
+          <div class="ref-composer"><input id="chat-input" placeholder="Message Eutrya…" ${!isReady()||state.busy?'disabled':''}><button id="${state.busy?'stop-chat':'send-chat'}">➤</button></div>
+        </div>
+        <div class="ref-side-stack">
+          <div class="ref-activity-panel"><div class="ref-section-head"><strong>RECENT ACTIVITY</strong><a>See all →</a></div><div class="ref-activity-list">${activityRows}</div></div>
+          <div class="ref-tasks-panel"><div class="ref-section-head"><strong>CURRENT TASKS</strong><a>See all →</a></div><div class="ref-task-list">${taskRows}</div><button class="ref-new-task">＋ New task</button></div>
+        </div>
+        <div class="ref-memory-panel"><div class="ref-memory-image"><img src="./assets/memory-graph.jpg" alt="Memory graph"></div><div class="ref-memory-foot">PERSISTENT CONTEXT<br>COMPOUNDING ADVANTAGE <b>//</b></div></div>
+      </section>
+    </div>`
   }
 
   function swarmPage() {
@@ -159,7 +211,7 @@
   function pageBody(){return ({dashboard:dashboardPage,swarm:swarmPage,library:libraryPage,memory:memoryPage,tools:toolsPage,settings:settingsPage}[state.page])()}
 
   function render(){
-    $('#app').innerHTML=`<div class="app-shell">${chrome()}<div class="app-body">${sidebar()}<main class="workspace">${header()}<div class="workspace-scroll">${pageBody()}</div><footer class="app-footer"><span>ETR-021 &nbsp;//&nbsp; ${state.page.toUpperCase()} INTERFACE &nbsp;//&nbsp; ${state.backend?.readiness?.mode?.toUpperCase()||'LOCAL'} RUNTIME</span><span>${state.backend?.connected?'BACKEND LINKED':'BACKEND DISCONNECTED'} &nbsp;■</span></footer></main></div>${approvalOverlay()}</div>`
+    $('#app').innerHTML=`<div class="app-shell">${chrome()}<div class="app-body">${sidebar()}<main class="workspace ${state.page==='dashboard'?'dashboard-workspace':''}">${header()}<div class="workspace-scroll">${pageBody()}</div><footer class="app-footer"><span>ETR-021 &nbsp;//&nbsp; ${state.page.toUpperCase()} INTERFACE &nbsp;//&nbsp; ${state.backend?.readiness?.mode?.toUpperCase()||'LOCAL'} RUNTIME</span><span>${state.backend?.connected?'BACKEND LINKED':'BACKEND DISCONNECTED'} &nbsp;■</span></footer></main></div>${approvalOverlay()}</div>`
     bind()
   }
 
@@ -174,6 +226,7 @@
   function bind(){
     $$('[data-page]').forEach(btn=>btn.addEventListener('click',()=>{state.page=btn.dataset.page;render()}))
     $('#reload')?.addEventListener('click',async e=>{e.currentTarget.classList.add('pulse');try{applyBackend(await backend.reload())}catch(err){state.notice=err.message}finally{setTimeout(()=>e.currentTarget?.classList.remove('pulse'),260);render()}})
+    $('#reload-dashboard')?.addEventListener('click',async e=>{e.currentTarget.disabled=true;try{applyBackend(await backend.reload())}catch(err){state.notice=err.message}finally{render()}})
     $$('[data-agent]').forEach(btn=>btn.addEventListener('click',async()=>{
       if(state.page==='library'){state.selectedProfile=btn.dataset.agent;render();return}
       state.selectedAgent=btn.dataset.agent;render();if(isReady())try{const p=await backend.focus(btn.dataset.agent);applyBackend(p.state)}catch{}

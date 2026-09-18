@@ -69,20 +69,21 @@
 
   function chrome() {
     return `<div class="chrome" data-tauri-drag-region>
-      <div class="chrome-mark" data-tauri-drag-region><span class="mark-grid"><i></i><i></i><i></i><i></i></span><span>EUTRYA v0.2.0</span><span class="muted">NATIVE SWARM HARNESS</span></div>
-      <div class="chrome-center" data-tauri-drag-region>HUMAN × SWARM × POSSIBILITY</div>
+      <div class="traffic-lights"><i></i><i></i><i></i></div>
+      <div class="chrome-mark" data-tauri-drag-region><span>// ORCHESTRATE HIGHER INTELLIGENCE</span></div>
+      <div class="chrome-center" data-tauri-drag-region>LOCAL &nbsp; <span class="sync-dot"></span> SYNCED &nbsp; <span class="online-dot"></span> JEV: ONLINE</div>
       <div class="window-controls"><button data-window="min">−</button><button data-window="max">□</button><button data-window="close">×</button></div>
     </div>`
   }
 
   function sidebar() {
     return `<aside class="sidebar">
-      <div><div class="brand">Eutrya<span>™</span></div><div class="brand-sub">NATIVE SWARM HARNESS</div></div>
+      <div class="brand-lockup"><div class="brand-mark">Λ</div><div><div class="brand">Eutrya</div><div class="brand-sub">v0.2.0</div></div></div>
       <div class="slash">//</div>
       <nav class="nav-list">${nav.map(([key,icon,label]) => `<button class="nav-item ${state.page===key?'active':''}" data-page="${key}"><b>${icon}</b><span>${label}</span></button>`).join('')}</nav>
-      <div class="sidebar-copy">FIVE MINDS.<br>ONE FLOW.<br>GREATER TOGETHER.</div>
+      <div class="sidebar-copy">HUMAN<br>AI<br>HIGHER<br>INTELLIGENCE</div>
       <div class="botanical-orbit"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="stem"></div></div>
-      <div class="sidebar-foot">EUTRYA<br>INTELLIGENCE<br>INFRASTRUCTURE<br>v0.2.0<span class="slash">//</span>NATURAL<br>INTELLIGENCE<br>SCALES<br>DIFFERENTLY.</div>
+      <div class="sidebar-foot">// eutrya<br><span>BUILT FOR<br>THE LONG RUN</span></div>
       <div class="sidebar-index">${String(PAGES.indexOf(state.page)+1).padStart(2,'0')}</div>
     </aside>`
   }

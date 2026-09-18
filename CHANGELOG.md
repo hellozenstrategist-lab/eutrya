@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.6 — CLI protected-context overflow fix
+
+Fixed long-lived CLI sessions that could fail with `Protected or Jev-retained context is still too large` because `previousTasks` accumulated indefinitely when Jev compaction was enabled.
+
+Active packets now use a deterministic, budget-scaled recent-task handoff window. Runtime state keeps a bounded recent history, while full session evidence remains available in durable trace/chat history. A regression test covers a fresh task after 100 oversized legacy prior-task entries under a 12k prompt budget.
+
 ## 0.4.5 — Agent message boundary hardening
 
 Hardened the shared chat persistence boundary so no agent/backend path can write a bare `Completed`, `Done`, `Finished`, or equivalent success label as an agent-to-user chat response. If an internal path still produces one, the stored message is replaced with an explicit diagnostic saying no substantive response was produced.

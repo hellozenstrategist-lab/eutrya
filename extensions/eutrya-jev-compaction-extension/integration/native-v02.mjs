@@ -2,9 +2,38 @@ import path from 'node:path';
 import {createCompactor,FileArchive,nativeJevAsker} from '../src/index.mjs';
 import {assert,hash,clone,aborted,canonical} from '../src/util.mjs';
 
+function clipString(value,max) {
+  const text=String(value ?? '');
+  return text.length<=max?text:text.slice(0,Math.max(0,max-16))+'…[bounded]';
+}
+
+export function projectPreviousTasks(previousTasks,{maxItems=4,maxChars=6400}={}) {
+  const rows=Array.isArray(previousTasks)?previousTasks:[];
+  const selected=[];
+  let used=2;
+  for(let i=rows.length-1;i>=0 && selected.length<maxItems;i--) {
+    const row=rows[i]??{};
+    const projected={
+      task:clipString(row.task,700),
+      status:String(row.status??'UNKNOWN'),
+      answer:clipString(row.answer,900)
+    };
+    const chars=JSON.stringify(projected).length+(selected.length?1:0);
+    if(selected.length && used+chars>maxChars) break;
+    selected.unshift(projected);used+=chars;
+  }
+  return {
+    recent:selected,
+    total:rows.length,
+    omitted:Math.max(0,rows.length-selected.length),
+    note:'Deterministic recent-task handoff window. Older task turns remain in durable session/chat history and are not injected into every active prompt.'
+  };
+}
+
 /** Packet builder replaces BOTH the old last-12 slice and blind result clipping. */
 export function nativePacket(state,observations=state.observations) {
-  return {taskContext:state.taskContext??null,task:state.task,directives:state.directives,previousTasks:state.previousTasks,
+  const history=projectPreviousTasks(state.previousTasks);
+  return {taskContext:state.taskContext??null,task:state.task,directives:state.directives,previousTasks:history.recent,previousTaskArchive:{total:history.total,omitted:history.omitted,note:history.note},
     modelSummary:{text:state.summary,hypotheses:state.hypotheses,unknowns:state.unknowns,trust:'model-generated; not observed facts'},
     observations:observations.map(o=>({id:o.id,action:o.action.type,arguments:o.action.type==='write'?{path:o.action.path}:o.action,result:o.result})),
     notebook:state.notebook,availableObservationIds:observations.map(o=>o.id),

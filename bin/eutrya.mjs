@@ -7,6 +7,7 @@ import { spawn } from 'node:child_process';
 import { loadConfig, writeConfig, CONFIG_PATH, DEFAULTS } from '../src/config.mjs';
 import { Store, listSessions, workspaceBucket } from '../src/store.mjs';
 import { Eutrya } from '../src/runtime.mjs';
+import { ResearchRunner } from '../src/research-runtime.mjs';
 import { Toolbox } from '../src/tools.mjs';
 import { GatewayCortex, availableModels, textModelReady, providerSettings } from '../src/providers/gateway.mjs';
 import { GatewayJev } from '../src/providers/jev.mjs';
@@ -25,7 +26,7 @@ import { readJson } from '../src/local-state.mjs';
 import { McpTools } from '../src/mcp.mjs';
 import { handleAdaptiveCommand, capturePlainCorrection } from '../extensions/eutrya-adaptive-extension/src/commands.mjs';
 
-const HELP=`EUTRYA 0.2.0 — standalone Jev-native terminal agent & native swarm
+const HELP=`EUTRYA 0.3.0 — standalone Jev-native terminal agent & native swarm
 
 Usage:
   eutrya                                  Interactive swarm session (Admin orchestrator)
@@ -41,6 +42,7 @@ Usage:
   eutrya usage                            This workspace's reported usage
   eutrya export latest --output FILE.json  Export an idle session and decision trace
   eutrya run "your task"                   One task, then exit
+  eutrya research "objective"              Strategist + Jev local code-research lane
   eutrya swarm [status|agents|tasks]       Inspect the native swarm
   eutrya agents                           List swarm agent profiles
   eutrya tasks                            List shared workspace tasks
@@ -202,6 +204,23 @@ async function benchmark() {
   if(rows.some(x=>x.status!=='VERIFIED'))process.exitCode=1;
 }
 
+async function runResearch() {
+  requireLive();
+  const taskText=positionals.slice(1).join(' ').trim();insist(taskText,'Enter a research objective');
+  const store=new Store(config.sessionRoot,cwd,{redact});
+  try {
+    store.state.engine={mode:'research',mainModel:config.mainModel,mainProvider:config.mainProvider,jevModel:config.jevModel};store.save();
+    const cortex=new GatewayCortex(config),jev=new GatewayJev(config);
+    const toolbox=new Toolbox({workspace:store.workspace,store,config,approve:async()=>false,redact,readOnly:true,allowedTools:['code_surface','code_symbol','code_references','code_inspect','code_state','code_compare']});
+    const runner=new ResearchRunner({store,cortex,jev,toolbox,config,onEvent:emit,redact});
+    if(!values.json)print(`\nE U T R Y A  ·  Jev Research Lane 0.3.0\nStrategist: ${config.mainProvider}/${config.mainModel}\nExecutor: ${config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nRead-only semantic code tools only.\n`);
+    runner.start(taskText);await runner.run();
+    if(values.json)console.log(JSON.stringify({type:'research.result',status:runner.state.status,answer:runner.state.answer,reason:runner.state.reason,meter:runner.state.meter,session:runner.state.id,trace:store.trace}));
+    else {print(`\n${statusText(runner.state)}\n`);if(runner.state.answer)print(runner.state.answer);}
+    if(['ERROR','NEEDS_REVIEW'].includes(runner.state.status))process.exitCode=1;
+  } finally {store.close();}
+}
+
 async function runAgent() {
   const explicitDemo=Boolean(values.demo || command==='demo');
   let id=values.resume;
@@ -226,7 +245,7 @@ async function runAgent() {
       store.save();
       if(values.mcp&&!demo){mcp=new McpTools(readJson(userPaths(configFile).mcp,{servers:{}}).servers);await mcp.connect();}
       runtime=engine(store,{demo,mcp,approve:terminal?(a,s)=>terminal.approve(a,s):async()=>false});
-      if(!values.json)print(`\nE U T R Y A  ·  Jev-native CLI 0.2.0\n${demo?'OFFLINE FIXTURES — no real models and no paid calls':'LIVE · '+config.mainProvider+' text model '+config.mainModel+' + '+config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nTrace: ${store.trace}\n`);
+      if(!values.json)print(`\nE U T R Y A  ·  Jev-native CLI 0.3.0\n${demo?'OFFLINE FIXTURES — no real models and no paid calls':'LIVE · '+config.mainProvider+' text model '+config.mainModel+' + '+config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nTrace: ${store.trace}\n`);
       const finish=()=>{if(terminal)terminal.prompt();};
       const launch=async()=>{
         if(runtime.busy){print('Already running. Use /steer or /stop.');return;}
@@ -578,6 +597,7 @@ async function main() {
       else for(const t of tasks) print(`[${t.id}] ${t.title} (${t.status}, assigned: @${t.assignedTo})`);
       sw.close();return;
     }
+    case 'research':await runResearch();return;
     case 'chat':case 'run':case 'demo':case 'puzzle':await runAgent();return;
     default:throw new Error(`Unknown command ${command}. Use --help.`);
   }

@@ -4,7 +4,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { parseArgs } from 'node:util';
 import { spawn } from 'node:child_process';
-import { loadConfig, writeConfig, CONFIG_PATH, DEFAULTS } from '../src/config.mjs';
+import { loadConfig, writeConfig, updateConfig, CONFIG_PATH, DEFAULTS } from '../src/config.mjs';
 import { Store, listSessions, workspaceBucket } from '../src/store.mjs';
 import { Eutrya } from '../src/runtime.mjs';
 import { ResearchRunner } from '../src/research-runtime.mjs';
@@ -25,6 +25,7 @@ import { MANAGEMENT,management,userPaths,setup } from '../src/commands.mjs';
 import { readJson } from '../src/local-state.mjs';
 import { McpTools } from '../src/mcp.mjs';
 import { handleAdaptiveCommand, capturePlainCorrection } from '../extensions/eutrya-adaptive-extension/src/commands.mjs';
+import { parseContextBudget, parseAutoCompact } from '../src/interactive-settings.mjs';
 
 const HELP=`EUTRYA 0.4.1 — standalone Jev-native terminal agent & native swarm
 
@@ -90,7 +91,7 @@ OpenRouter text models additionally need OPENROUTER_API_KEY. No Nous login is us
 Chat commands: /help /status /trace /compact /continue /stop /steer TEXT
                /resolve NOTE /model ID /new /memory /skills /usage /swarm /agents
                /agent NAME /tasks /findings /hunt [ID|run ID|pause ID|resume ID] /template [NAME]
-               /thinking [on|off] /reload /quit
+               /context [N|64k] /autocompact [on|off] /thinking [on|off] /reload /quit
 `;
 
 const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to a specialist.
@@ -110,6 +111,8 @@ const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to 
 /status                 Show attention, session, request and usage counters
 /trace                  Show recent mode and candidate-selection records
 /compact                Run Jev relevance pruning; originals remain recallable
+/context [N|64k]        Show or set maxPromptChars (4k..200k serialized characters)
+/autocompact [on|off]   Show or toggle automatic Jev compaction
 /continue               Continue a paused task with a fresh Jev decision cycle
 /stop                   Cancel an in-flight model call or local process
 /steer TEXT             Queue guidance; discard obsolete plans before execution
@@ -482,6 +485,36 @@ Type / for available commands.
             const s=result.stats;
             print(`Jev compaction: ${result.status}; ${s.before??'n/a'} → ${s.after} ${s.unit}; ${s.requests} evaluator request(s). Originals remain recallable.`);
           } catch(e) {print(`Compaction failed; original context retained: ${e.message}`);}
+          finish();return;
+        }
+        if(line==='/context'||line.startsWith('/context ')){
+          try {
+            const raw=line.slice(8).trim();
+            if(!raw) {
+              print(`Context budget: ${config.maxPromptChars.toLocaleString()} serialized characters (valid range 4k..200k).`);
+            } else {
+              const maxPromptChars=parseContextBudget(raw);
+              const persisted=updateConfig(configFile,{maxPromptChars});
+              config.maxPromptChars=persisted.maxPromptChars;
+              const live=await swarm.applyRuntimeSettings({maxPromptChars:persisted.maxPromptChars});
+              print(`Context budget set to ${live.maxPromptChars.toLocaleString()} serialized characters. Applied to the next agent turn and saved to ${configFile}.`);
+            }
+          } catch(e) {print(`Context setting failed: ${e.message}`);}
+          finish();return;
+        }
+        if(line==='/autocompact'||line.startsWith('/autocompact ')){
+          try {
+            const raw=line.slice(12).trim();
+            if(!raw) {
+              print(`Auto-compaction: ${config.jevCompaction?'on':'off'}.`);
+            } else {
+              const jevCompaction=parseAutoCompact(raw);
+              const persisted=updateConfig(configFile,{jevCompaction});
+              config.jevCompaction=persisted.jevCompaction;
+              const live=await swarm.applyRuntimeSettings({jevCompaction:persisted.jevCompaction});
+              print(`Auto-compaction: ${live.jevCompaction?'on':'off'}. Applied to the next agent turn and saved to ${configFile}.`);
+            }
+          } catch(e) {print(`Auto-compaction setting failed: ${e.message}`);}
           finish();return;
         }
         if(line==='/status'||line==='/usage'){

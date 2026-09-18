@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.7 — Interactive context controls
+
+Added persistent interactive CLI controls for runtime context budgeting and Jev compaction.
+
+- `/context` shows the current `maxPromptChars` budget.
+- `/context 64k` or `/context 64000` updates the serialized prompt-character budget within the validated 4k..200k range.
+- `/autocompact` shows whether Jev auto-compaction is enabled.
+- `/autocompact on|off` toggles Jev auto-compaction.
+- Changes are atomically persisted to the active Eutrya profile config and applied on the next agent turn by safely recycling idle resident runtimes while preserving their saved sessions.
+- CLI version banners now derive from the package version instead of a stale hard-coded 0.4.1 string.
+
 ## 0.4.6 — CLI protected-context overflow fix
 
 Fixed long-lived CLI sessions that could fail with `Protected or Jev-retained context is still too large` because `previousTasks` accumulated indefinitely when Jev compaction was enabled.

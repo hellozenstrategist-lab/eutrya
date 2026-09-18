@@ -54,8 +54,8 @@ function solidityFunctions(text){
     const raw=m[1],name=m[2]??m[3]??raw;const declarationStart=m.index;const open=m[6]==='{'?re.lastIndex-1:-1;const end=open>=0?balancedBlock(text,open):-1;
     const declaration=text.slice(declarationStart,open>=0?open+1:re.lastIndex).replace(/\s+/g,' ').trim();
     const tail=(m[5]??'').replace(/\s+/g,' ').trim();
-    const visibility=['external','public','internal','private'].find(v=>new RegExp(`\b${v}\b`).test(tail))??'unspecified';
-    const mutability=['view','pure','payable'].find(v=>new RegExp(`\b${v}\b`).test(tail))??'nonpayable';
+    const visibility=['external','public','internal','private'].find(v=>new RegExp(`\\b${v}\\b`).test(tail))??'unspecified';
+    const mutability=['view','pure','payable'].find(v=>new RegExp(`\\b${v}\\b`).test(tail))??'nonpayable';
     const modifierTokens=tail.split(/\s+/).map(x=>x.replace(/\(.*/,''))
       .filter(Boolean).filter(x=>!['external','public','internal','private','view','pure','payable','virtual','override','returns','memory','calldata','storage'].includes(x)&&!/^[({]/.test(x));
     out.push({name,kind:raw.startsWith('modifier')?'modifier':'function',line:lineAt(text,declarationStart),endLine:end>=0?lineAt(text,end):lineAt(text,re.lastIndex),visibility,mutability,modifiers:[...new Set(modifierTokens)].slice(0,12),declaration,start:declarationStart,open,end:end>=0?end:re.lastIndex});
@@ -91,7 +91,7 @@ export function codeSurface(root,relativePath='.'){
   return {root:relativePath,filesScanned:files.length,contracts,externallyReachable,functions:functions.slice(0,240),truncated:files.length>=500||functions.length>=400};
 }
 export function codeSymbol(root,relativePath,query){
-  const start=safeResearchPath(root,relativePath);const files=walk(root,start);const definitions=[],mentions=[];const word=new RegExp(`\b${query.replace(/[.*+?^${}()|[\]\\]/g,'\$&')}\b`);
+  const start=safeResearchPath(root,relativePath);const files=walk(root,start);const definitions=[],mentions=[];const word=new RegExp(`\\b${query.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')}\\b`);
   for(const file of files){let text;try{text=readCode(file);}catch{continue;}const rel=relative(root,file),funcs=functionsFor(file,text);for(const f of funcs)if(f.name===query&&definitions.length<60)definitions.push({path:rel,kind:f.kind,name:f.name,line:f.line,endLine:f.endLine,visibility:f.visibility,modifiers:f.modifiers});for(const c of contractsFor(text))if(c.name===query&&definitions.length<60)definitions.push({path:rel,...c});if(mentions.length<80){const lines=text.split('\n');for(let i=0;i<lines.length&&mentions.length<80;i++)if(word.test(lines[i]))mentions.push({path:rel,line:i+1,enclosing:enclosing(funcs,i+1),text:clip(lines[i].trim(),360)});}}
   return {query,definitions,mentions,filesScanned:files.length,truncated:definitions.length>=60||mentions.length>=80};
 }
@@ -102,8 +102,8 @@ export function codeInspect(root,relativePath,symbol){
   const file=safeResearchPath(root,relativePath);const text=readCode(file);const result=inspectFunction(file,text,symbol);insist(result,`Function or modifier ${symbol} not found in ${relativePath}`);result.path=relativePath;return result;
 }
 export function codeState(root,relativePath,symbol){
-  const start=safeResearchPath(root,relativePath);const files=walk(root,start);const reads=[],writes=[];const word=new RegExp(`\b${symbol.replace(/[.*+?^${}()|[\]\\]/g,'\$&')}\b`);
-  for(const file of files){let text;try{text=readCode(file);}catch{continue;}const rel=relative(root,file),funcs=functionsFor(file,text),lines=text.split('\n');for(let i=0;i<lines.length;i++){const line=lines[i];if(!word.test(line))continue;const row={path:rel,line:i+1,enclosing:enclosing(funcs,i+1),text:clip(line.trim(),360)};if(new RegExp(`\b${symbol.replace(/[.*+?^${}()|[\]\\]/g,'\$&')}(?:\s*\[[^\]]+\])?\s*(?:\+\+|--|\+=|-=|\*=|/=|%=|=(?!=))`).test(line))writes.push(row);else reads.push(row);if(reads.length+writes.length>=120)return {symbol,writes,reads,truncated:true};}}
+  const start=safeResearchPath(root,relativePath);const files=walk(root,start);const reads=[],writes=[];const word=new RegExp(`\\b${symbol.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')}\\b`);
+  for(const file of files){let text;try{text=readCode(file);}catch{continue;}const rel=relative(root,file),funcs=functionsFor(file,text),lines=text.split('\n');for(let i=0;i<lines.length;i++){const line=lines[i];if(!word.test(line))continue;const row={path:rel,line:i+1,enclosing:enclosing(funcs,i+1),text:clip(line.trim(),360)};if(new RegExp(`\\b${symbol.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')}(?:\\s*\\[[^\\]]+\\])?\\s*(?:\\+\\+|--|\\+=|-=|\\*=|/=|%=|=(?!=))`).test(line))writes.push(row);else reads.push(row);if(reads.length+writes.length>=120)return {symbol,writes,reads,truncated:true};}}
   return {symbol,writes,reads,truncated:false};
 }
 export function codeCompare(root,relativePath,symbols){

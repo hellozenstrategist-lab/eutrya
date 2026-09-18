@@ -499,6 +499,24 @@ export class NativeSwarm {
     };
   }
 
+  busyRuntimes() {
+    return Array.from(this.runtimes.entries())
+      .filter(([,runtime])=>runtime.busy)
+      .map(([agentId,runtime])=>({agentId,runtime,profile:this.profiles.get(agentId)}));
+  }
+
+  stopActiveRuns() {
+    const busy=this.busyRuntimes();
+    for(const {runtime} of busy) runtime.stop();
+    return busy.map(({agentId,profile})=>({agentId,name:profile?.name??agentId}));
+  }
+
+  steerActiveRuns(message) {
+    const busy=this.busyRuntimes();
+    for(const {runtime} of busy) runtime.steer(message);
+    return busy.map(({agentId,profile})=>({agentId,name:profile?.name??agentId}));
+  }
+
   notifyDelegation({ from, to, task, taskId }) {
     this.eventBus.emit({
       type: SWARM_EVENTS.TASK_ASSIGNED,

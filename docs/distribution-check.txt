@@ -1,9 +1,12 @@
-Eutrya Native v0.4.0 distribution verification
+Eutrya Native v0.4.0 unified distribution verification
 
-Clean GitHub Actions verification:
-- npm test: 226 passed, 0 failed, 0 skipped
-- npm run check: 53 JavaScript modules syntax checked
-- node bin/eutrya.mjs --help reports EUTRYA 0.4.0
-- persistent Jev hunt Kanban and routing tests passed
-- existing research-lane and security-swarm tests remained green
+- npm test: 227 passed, 0 failed, 0 skipped
+- npm run check: 65 JavaScript modules syntax checked
+- bash -n scripts/*.sh: passed
+- cargo metadata for desktop/src-tauri/Cargo.toml: passed
+- desktop/src-tauri/tauri.conf.json parse: passed
+- CLI remains eutrya
+- native desktop installs as eutrya-desktop
+- desktop bridge uses the current root NativeSwarm runtime
+- no stale duplicated backend tree is merged
 - no live paid inference performed during CI

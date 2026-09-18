@@ -6,7 +6,7 @@ Date: September 18, 2026. Scope: the actual Studio frontend and human-operated H
 
 The integrated source passed **249 tests**, with **0 failures, 0 skipped**, and **70 JavaScript modules** passed syntax checking in the preparation run. The raw TAP output is preserved in the `desktop-review-source` GitHub Actions artifact for run `35379201168`. That run's final commit step failed while deleting its temporary preparation script; the script-cleanup failure was subsequently corrected. The passing test result is separate from that workflow failure. Pull request #5 must pass the ordinary protected-branch CI before merge.
 
-The new regression coverage includes active entry-point loading, security-role defaults, the semantic-code tool catalog, empty/offline board behavior, filters, escaping, unknown statuses, missing dependencies, manual move restrictions, metadata validation, optimistic edit conflicts, pause semantics, and incomplete worker outcomes.
+The new regression coverage includes active entry-point loading, security-role defaults, the semantic-code tool catalog, empty/offline board behavior, filters, escaping, unknown statuses, missing dependencies, manual move restrictions, metadata validation, optimistic edit conflicts, pause semantics, and incomplete worker outcomes. The final 22 focused desktop and pause tests also passed locally after the viewport/column-navigation changes.
 
 ## Browser fixture checks
 
@@ -19,11 +19,12 @@ Checks passed:
 - Human notes survive a subsequent read and polling.
 - Blocked-state changes and board pause/resume require confirmation.
 - Search filtering, card dialogs, and JSON export work.
+- New and edited cards are revealed in their column. Column jump buttons provide keyboard navigation, and the view records horizontal scroll position across refreshes.
 - The 820-pixel-wide layout does not overflow the document; the Kanban intentionally scrolls horizontally.
 - No JavaScript page errors were observed.
 - No model calls, target requests, or execution attempts were made.
 
-Screenshots of the empty board, populated fixture board, card dialog, and narrow layout were visually inspected during development. They are test fixtures, not evidence of a real hunt.
+The browser fixture was rerun successfully after the final viewport changes. Screenshots of the fixture board, card dialog, and narrow layout were visually inspected. They are test fixtures, not evidence of a real hunt. The tested Hunt JavaScript matched repository blob `a08021dcbb48a46dfe3201288f51b0e00078159f`.
 
 ## Actual local HTTP bridge checks
 

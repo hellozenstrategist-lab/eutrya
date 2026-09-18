@@ -248,7 +248,29 @@
     $('#save-provider-key')?.addEventListener('click',async()=>{const value=$('#setting-provider-key')?.value.trim();const name=state.backend?.config?.mainKeyEnv;if(!value||!name)return;try{applyBackend(await backend.credential(name,value));render()}catch(err){if(err.payload?.state)applyBackend(err.payload.state);state.notice=err.message;render()}})
     $('#switch-workspace')?.addEventListener('click',async()=>{const value=$('#setting-workspace')?.value.trim();if(!value)return;try{await backend.setWorkspace(value);await refresh()}catch(err){state.notice=err.message;render()}})
     $('#restart-runtime')?.addEventListener('click',async()=>{try{await backend.restart();await refresh()}catch(err){state.notice=err.message;render()}})
-    $$('[data-window]').forEach(btn=>btn.addEventListener('click',()=>windowAction(btn.dataset.window)))
+    $('[data-window]').forEach(btn=>btn.addEventListener('click',()=>windowAction(btn.dataset.window)))
+    installWindowDrag()
+  }
+
+  function installWindowDrag(){
+    const bar=$('.chrome')
+    if(!bar || bar.dataset.dragBound==='1') return
+    bar.dataset.dragBound='1'
+    bar.addEventListener('pointerdown',async e=>{
+      if(e.button!==0) return
+      if(e.target.closest('button,input,select,textarea,a,[data-no-drag]')) return
+      try{
+        const w=window.__TAURI__?.window?.getCurrentWindow?.()
+        if(w?.startDragging) await w.startDragging()
+      }catch{}
+    })
+    bar.addEventListener('dblclick',async e=>{
+      if(e.target.closest('button,input,select,textarea,a,[data-no-drag]')) return
+      try{
+        const w=window.__TAURI__?.window?.getCurrentWindow?.()
+        if(w?.toggleMaximize) await w.toggleMaximize()
+      }catch{}
+    })
   }
 
   async function windowAction(action){try{const w=window.__TAURI__?.window?.getCurrentWindow?.();if(!w)return;if(action==='min')await w.minimize();if(action==='max')await w.toggleMaximize();if(action==='close')await w.close()}catch{}}

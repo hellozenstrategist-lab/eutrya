@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 — Security-native default swarm
+
+Replaced the generic default Engineer, Legal, Finance, and Researcher profiles with Auditor, Operator, Sentinel, and Analyst while retaining Admin as the primary orchestrator. Updated Jev profile routing, security event destinations, mock routing, tool examples, tests, and documentation. The new roles separate vulnerability discovery, controlled execution, independent verification, and architecture/research synthesis.
+
+
 ## 0.3.0 — Jev research lane
 
 Added a separate strategist/executor research mode for local codebase review. The text model now plans at investigation boundaries while Jev drives several read-only semantic code lookups between replans. Added first-class invariant and hypothesis state, compact evidence packets, Jev escalation/stagnation decisions, and state-bound action tickets for research micro-steps.

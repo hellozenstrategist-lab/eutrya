@@ -49,6 +49,18 @@ test('hunt boards and cards serialize and restore with kanban state',()=>{
   assert.equal(restored.huntBoard(hunt.id).cards.length,1);
 });
 
+test('dependent hunt cards remain in intake until prerequisites are done',()=>{
+  const ws=new SharedWorkspace();
+  const hunt=addHunt(ws);
+  const first=ws.createHuntCard({huntId:hunt.id,title:'Map surface',objective:'Map the authorized surface.',priority:'high'});
+  const second=ws.createHuntCard({huntId:hunt.id,title:'Validate follow-up',objective:'Use the mapped evidence.',priority:'medium',dependsOn:[first.id]});
+  assert.equal(second.status,'intake');
+  assert.deepEqual(ws.refreshHuntReadiness(hunt.id),[]);
+  ws.updateHuntCard(first.id,{status:'done'});
+  assert.deepEqual(ws.refreshHuntReadiness(hunt.id),[second.id]);
+  assert.equal(ws.getHuntCard(second.id).status,'ready');
+});
+
 test('hunt action schema accepts normalized program intake and cards',()=>{
   assert.doesNotThrow(()=>validateAction({
     type:'hunt_create',

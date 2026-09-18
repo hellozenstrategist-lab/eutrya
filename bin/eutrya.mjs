@@ -26,7 +26,7 @@ import { readJson } from '../src/local-state.mjs';
 import { McpTools } from '../src/mcp.mjs';
 import { handleAdaptiveCommand, capturePlainCorrection } from '../extensions/eutrya-adaptive-extension/src/commands.mjs';
 
-const HELP=`EUTRYA 0.4.0 — standalone Jev-native terminal agent & native swarm
+const HELP=`EUTRYA 0.4.1 — standalone Jev-native terminal agent & native swarm
 
 Usage:
   eutrya                                  Interactive swarm session (Admin orchestrator)
@@ -219,7 +219,7 @@ async function runResearch() {
     const cortex=new GatewayCortex(config),jev=new GatewayJev(config);
     const toolbox=new Toolbox({workspace:store.workspace,store,config,approve:async()=>false,redact,readOnly:true,allowedTools:['code_surface','code_symbol','code_references','code_inspect','code_state','code_compare']});
     const runner=new ResearchRunner({store,cortex,jev,toolbox,config,onEvent:emit,redact});
-    if(!values.json)print(`\nE U T R Y A  ·  Jev Research Lane 0.4.0\nStrategist: ${config.mainProvider}/${config.mainModel}\nExecutor: ${config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nRead-only semantic code tools only.\n`);
+    if(!values.json)print(`\nE U T R Y A  ·  Jev Research Lane 0.4.1\nStrategist: ${config.mainProvider}/${config.mainModel}\nExecutor: ${config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nRead-only semantic code tools only.\n`);
     runner.start(taskText);await runner.run();
     if(values.json)console.log(JSON.stringify({type:'research.result',status:runner.state.status,answer:runner.state.answer,reason:runner.state.reason,meter:runner.state.meter,session:runner.state.id,trace:store.trace}));
     else {print(`\n${statusText(runner.state)}\n`);if(runner.state.answer)print(runner.state.answer);}
@@ -251,7 +251,7 @@ async function runAgent() {
       store.save();
       if(values.mcp&&!demo){mcp=new McpTools(readJson(userPaths(configFile).mcp,{servers:{}}).servers);await mcp.connect();}
       runtime=engine(store,{demo,mcp,approve:terminal?(a,s)=>terminal.approve(a,s):async()=>false});
-      if(!values.json)print(`\nE U T R Y A  ·  Jev-native CLI 0.4.0\n${demo?'OFFLINE FIXTURES — no real models and no paid calls':'LIVE · '+config.mainProvider+' text model '+config.mainModel+' + '+config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nTrace: ${store.trace}\n`);
+      if(!values.json)print(`\nE U T R Y A  ·  Jev-native CLI 0.4.1\n${demo?'OFFLINE FIXTURES — no real models and no paid calls':'LIVE · '+config.mainProvider+' text model '+config.mainModel+' + '+config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nTrace: ${store.trace}\n`);
       const finish=()=>{if(terminal)terminal.prompt();};
       const launch=async()=>{
         if(runtime.busy){print('Already running. Use /steer or /stop.');return;}

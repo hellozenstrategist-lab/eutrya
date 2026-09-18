@@ -4,6 +4,7 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const paths = {
     dashboard:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',
+    hunts:'M3 3h18v18H3zM9 3v18M15 3v18M5 7h2m4 3h2m4-3h2',
     swarm:'M12 9V5M9 12H5m10 0h4m-7 3v4M9 9l-3-3m9 9 3 3M9 15l-3 3m9-9 3-3',
     library:'M4 3h4v18H4zM11 3h4v18h-4zM18 4l3 16M5 7h2m5 0h2',
     memory:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10z',
@@ -34,7 +35,7 @@
   };
   const icon = (name, cls='') => `<svg class="icon ${esc(cls)}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.file}"/>${name==='swarm'?'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="3" r="1.5"/><circle cx="3" cy="12" r="1.5"/><circle cx="21" cy="12" r="1.5"/><circle cx="12" cy="21" r="1.5"/>':''}${name==='settings'?'<circle cx="12" cy="12" r="3"/>':''}</svg>`;
   const logo = () => '<svg class="logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M5 41 20 6h8l15 35H32L24 18 15 41z"/></svg>';
-  const portraits = {admin:'admin',engineer:'engineer',legal:'lawyer',lawyer:'lawyer',finance:'finance',researcher:'researcher'};
+  const portraits = {admin:'admin',auditor:'engineer',operator:'researcher',sentinel:'lawyer',analyst:'finance',engineer:'engineer',legal:'lawyer',lawyer:'lawyer',finance:'finance',researcher:'researcher'};
   const portrait = id => `./assets/agent-${portraits[id] || 'researcher'}.jpg`;
   let floralId=0;
   const floral = (cls='',fit='slice') => {
@@ -56,7 +57,7 @@
   };
   function hero(page, extra='') {
     const d=definitions[page] || definitions.dashboard;
-    return `<section class="hero hero-${page}"><div class="hero-main"><div class="registration-mark"></div>${floral('', 'meet')}<span class="hero-index">EUTRYA / ${esc(page.toUpperCase())}</span><h1>${esc(d[0])}</h1><p>${esc(d[1])}</p><div class="hero-foot"><span>${esc(d[3])}</span><span>v0.2.0</span></div></div><aside class="hero-aside"><div class="hero-quote">${floral()}<span class="quote-mark">“</span><blockquote>${esc(d[2])}</blockquote><cite>— EUTRYA</cite></div>${extra}</aside></section>`;
+    return `<section class="hero hero-${page}"><div class="hero-main"><div class="registration-mark"></div>${floral('', 'meet')}<span class="hero-index">EUTRYA / ${esc(page.toUpperCase())}</span><h1>${esc(d[0])}</h1><p>${esc(d[1])}</p><div class="hero-foot"><span>${esc(d[3])}</span><span>${esc(window.EutryaStudio?.state.data?.readiness?.bridgeVersion ? "v"+window.EutryaStudio.state.data.readiness.bridgeVersion : "Bridge not linked")}</span></div></div><aside class="hero-aside"><div class="hero-quote">${floral()}<span class="quote-mark">“</span><blockquote>${esc(d[2])}</blockquote><cite>— EUTRYA</cite></div>${extra}</aside></section>`;
   }
   function agentCard(a, selected=false, layout='library') {
     return `<button class="agent-card ${layout} ${selected?'selected':''}" data-action="select-agent" data-id="${esc(a.id)}" aria-pressed="${selected}"><div class="agent-visual"><img src="${portrait(a.id)}" alt="" loading="lazy"><span class="agent-symbol">${icon(portraits[a.id] || 'researcher')}</span><span class="agent-index">${esc(a.index)}</span></div><div class="agent-copy"><h3>${esc(a.name)}</h3>${status(a.statusLabel,a.tone)}<p>${esc(a.description)}</p><div class="tags">${(a.verbs || []).slice(0,3).map(v=>`<span>${esc(v.toLowerCase())}</span>`).join('')}</div><footer><span>${a.taskCount} ${a.taskCount===1?'task':'tasks'}</span>${icon('arrow')}</footer></div></button>`;

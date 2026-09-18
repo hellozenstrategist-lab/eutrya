@@ -30,12 +30,13 @@
     return Number.isFinite(value) && value >= 0 && value <= 1 ? `${(value * 100).toFixed(1)}% choice weight` : 'Weight not recorded'
   }
   function editable() {
-    const b = window.EutryaCore.state.backend
+    const state = window.EutryaStudio.state
+    const b = {...state.data, connected:state.connected}
     return Boolean(b?.connected && b?.readiness?.ready && b?.capabilities?.desktopReviewBoard)
   }
   function current() {
-    const s = window.EutryaCore.state
-    const m = model(s.backend, s.selectedHunt, s.huntSearch, s.huntAssignee)
+    const s = window.EutryaStudio.state
+    const m = model(s.data, s.selectedHunt, s.huntSearch, s.huntAssignee)
     if (m.hunt) s.selectedHunt = m.hunt.id
     return m
   }
@@ -57,8 +58,8 @@
     }).join('') || empty('Resident status has not been reported.')
   }
   function render() {
-    const s = window.EutryaCore.state, m = current(), writable = editable()
-    const connected = Boolean(s.backend?.connected)
+    const s = window.EutryaStudio.state, m = current(), writable = editable()
+    const connected = Boolean(s.connected)
     const tool = (label, action, disabled = false) => `<button type="button" class="ghost-button" data-hunt-action="${action}" ${disabled ? 'disabled' : ''}>${label}</button>`
     const list = [...columns, ...(m.groups.unknown.length ? ['unknown'] : [])]
     const history = m.cards.flatMap(c => array(c.routeHistory).map(r => ({...r, card:c}))).sort((a,b) => String(b.at || '').localeCompare(String(a.at || ''))).slice(0, 30)
@@ -90,7 +91,7 @@
     const dialog = modal
     document.body.append(dialog)
     dialog.querySelector('[data-close]').onclick = () => dialog.close()
-    dialog.addEventListener('close', () => { dialog.remove(); if (modal === dialog) modal = null; openingFocus?.focus?.() }, {once:true})
+    dialog.addEventListener('close', () => { dialog.remove(); if (modal === dialog) modal = null; openingFocus?.focus?.(); hooks.render?.() }, {once:true})
     dialog.querySelector('form').onsubmit = async event => {
       event.preventDefault()
       if (!onSubmit) return
@@ -105,7 +106,9 @@
   }
   async function request(method, path, data) {
     if (!editable()) throw new Error('A compatible, connected bridge is required.')
-    const result = await window.EutryaBackend.request(path, {method,body:data})
+    hooks.invalidate?.()
+    let result
+    try { result = await window.EutryaBackend.request(path, {method,body:data}) } finally { hooks.invalidate?.() }
     if (result.state) hooks.applyBackend?.(result.state)
     else await hooks.refresh?.({rerender:false})
     return result
@@ -116,7 +119,7 @@
       ${field('title','Board title','',false,true,300)}${field('pageUrl','Program page URL','',false,true,2048)}${field('rules','Program rules','',true,true,12000)}
       ${field('scope','In-scope assets — one per line','',true)}${field('exclusions','Exclusions — one per line','',true)}${field('testingRules','Testing restrictions — one per line','',true)}<footer><button class="primary-button" type="submit">Create paused board</button></footer>`, async values => {
         const r = await request('POST','/api/review/hunts',{...values,scope:lines(values.scope),exclusions:lines(values.exclusions),testingRules:lines(values.testingRules)})
-        window.EutryaCore.state.selectedHunt = r.hunt.id
+        window.EutryaStudio.state.selectedHunt = r.hunt.id
       })
   }
   function newCard() {
@@ -171,7 +174,7 @@
   }
   function bind(callbacks) {
     hooks = callbacks
-    const s=window.EutryaCore.state
+    const s=window.EutryaStudio.state
     document.querySelectorAll('[data-hunt-card]').forEach(el=>{
       el.addEventListener('click',()=>cardDetail(el.dataset.huntCard))
       el.addEventListener('dragstart',e=>{if(el.draggable){e.dataTransfer.setData('application/x-eutrya-card',el.dataset.huntCard);e.dataTransfer.effectAllowed='move'}})

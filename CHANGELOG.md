@@ -8,6 +8,7 @@ Added `/yolo [on|off]` to interactive CLI sessions.
 - `/yolo off` restores normal approval behavior and restores the prior `allowExec` state when YOLO mode enabled it.
 - YOLO mode is intentionally session-only and is not persisted across Eutrya restarts.
 - File writes, memory writes, MCP actions, credential changes, and unrelated approvals are not auto-approved by YOLO mode.
+- The interactive terminal remains writable while work is in progress. Plain text entered during a run is queued as follow-up work; `/queue` shows pending follow-ups; `/queue clear` clears them; `/stop` interrupts active resident runtimes; and `/steer TEXT` injects guidance at the next decision boundary.
 
 ## 0.4.7 — Interactive context controls
 

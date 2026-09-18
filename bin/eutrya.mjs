@@ -93,7 +93,8 @@ OpenRouter text models additionally need OPENROUTER_API_KEY. No Nous login is us
 Chat commands: /help /status /trace /compact /continue /stop /steer TEXT
                /resolve NOTE /model ID /new /memory /skills /usage /swarm /agents
                /agent NAME /tasks /findings /hunt [ID|run ID|pause ID|resume ID] /template [NAME]
-               /context [N|64k] /autocompact [on|off] /yolo [on|off] /thinking [on|off] /reload /quit
+               /context [N|64k] /autocompact [on|off] /yolo [on|off] /queue [clear]
+               /thinking [on|off] /reload /quit
 `;
 
 const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to a specialist.

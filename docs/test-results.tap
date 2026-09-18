@@ -1,18 +1,15 @@
 TAP version 13
-# Eutrya Native v0.3.1 security-swarm verification summary
-# Command: npm test
-# Environment: Linux, Node.js v22.16.0
-# Date: 2026-09-18
-ok 1 - complete local release test suite
+# Eutrya Native v0.4.0 hunt-board verification summary
+# GitHub Actions run: 35373873266
+# Node: 22
+ok 1 - complete CI test suite
 1..1
-# tests 220
+# tests 226
 # suites 0
-# pass 220
+# pass 226
 # fail 0
 # cancelled 0
 # skipped 0
 # todo 0
-# NOTE: Compact repository summary of the local v0.3.1 verification run.
-# Security role routing, adaptive runtime identity, resident compaction identity,
-# and the existing Jev research lane were included in the passing suite.
-# Default swarm: Admin, Auditor, Operator, Sentinel, Analyst
+# Includes persistent hunt board, busy-agent exclusion, independent review,
+# multi-card Jev distribution, dependencies, security swarm, and research lane.

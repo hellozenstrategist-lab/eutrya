@@ -255,3 +255,21 @@ input:focus,textarea:focus,select:focus{
   .page-subtitle{font-size:9px}
   .sidebar-copy{font-size:9px}
 }
+
+
+/* Half-screen / tiled-window responsive mode */
+@media (max-width:960px){
+  .app-shell{min-width:0!important;min-height:560px}
+  .app-body{grid-template-columns:76px minmax(0,1fr)}
+  .sidebar{padding:10px 6px 12px}
+  .brand-lockup{padding:6px 10px!important;justify-content:center!important}
+  .brand-lockup .brand,.brand-lockup .brand-sub{display:none!important}
+  .brand-lockup .brand-mark{width:auto!important;font-size:42px!important}
+  .nav-item{padding:0!important;justify-content:center!important;gap:0!important}
+  .nav-item b{width:auto!important}
+  .nav-item span,.sidebar-copy,.sidebar-foot{display:none!important}
+  .sidebar:after{top:300px!important;background-size:130px auto!important;opacity:.45!important}
+  .workspace{grid-template-rows:minmax(0,1fr)!important}
+  .workspace>.page-header,.workspace>.app-footer{display:none}
+  .page{padding:10px}
+}

@@ -29,40 +29,40 @@ test('Native Swarm initializes with the five default persistent agent profiles',
   assert.equal(agents.length, 5);
 
   const ids = agents.map(a => a.id).sort();
-  assert.deepEqual(ids, ['admin', 'engineer', 'finance', 'legal', 'researcher']);
+  assert.deepEqual(ids, ['admin', 'analyst', 'auditor', 'operator', 'sentinel']);
 
   const admin = swarm.getAgent('admin');
   assert.equal(admin.name, 'Admin');
-  assert.equal(admin.role, 'Chief of Staff & Swarm Orchestrator');
+  assert.equal(admin.role, 'Security Swarm Administrator & Chief of Staff');
 
-  const engineer = swarm.getAgent('engineer');
-  assert.equal(engineer.name, 'Engineer');
-  assert.match(engineer.profession, /Software Engineering/);
+  const auditor = swarm.getAgent('auditor');
+  assert.equal(auditor.name, 'Auditor');
+  assert.match(auditor.profession, /Application Security/);
 
-  const legal = swarm.getAgent('legal');
-  assert.equal(legal.name, 'Legal');
-  assert.match(legal.profession, /Legal Research/);
+  const operator = swarm.getAgent('operator');
+  assert.equal(operator.name, 'Operator');
+  assert.match(operator.profession, /Controlled Reproduction/);
 
-  const finance = swarm.getAgent('finance');
-  assert.equal(finance.name, 'Finance');
-  assert.match(finance.profession, /Financial Modeling/);
+  const sentinel = swarm.getAgent('sentinel');
+  assert.equal(sentinel.name, 'Sentinel');
+  assert.match(sentinel.profession, /Evidence Verification/);
 
-  const researcher = swarm.getAgent('researcher');
-  assert.equal(researcher.name, 'Researcher');
-  assert.match(researcher.profession, /Deep Research/);
+  const analyst = swarm.getAgent('analyst');
+  assert.equal(analyst.name, 'Analyst');
+  assert.match(analyst.profession, /Threat Modeling/);
 });
 
 test('Swarm profiles support renaming, updating, adding, and removing agents', t => {
   const { swarm } = setupSwarmTest(t);
 
   // Rename
-  const renamed = swarm.renameAgent('engineer', 'LeadBuilder');
-  assert.equal(renamed.name, 'LeadBuilder');
-  assert.equal(swarm.getAgent('engineer').name, 'LeadBuilder');
+  const renamed = swarm.renameAgent('auditor', 'LeadAuditor');
+  assert.equal(renamed.name, 'LeadAuditor');
+  assert.equal(swarm.getAgent('auditor').name, 'LeadAuditor');
 
   // Update
-  const updated = swarm.updateAgent('finance', { role: 'CFO & Capital Allocator' });
-  assert.equal(updated.role, 'CFO & Capital Allocator');
+  const updated = swarm.updateAgent('sentinel', { role: 'Principal Security Verifier' });
+  assert.equal(updated.role, 'Principal Security Verifier');
 
   // Add agent
   const added = swarm.addAgent({
@@ -91,13 +91,13 @@ test('Swarm supports switching to organization templates', t => {
   const startupAgents = swarm.applyTemplate('startup');
   assert.equal(swarm.activeTemplate, 'startup');
   const names = startupAgents.map(a => a.id).sort();
-  assert.deepEqual(names, ['ceo', 'engineer', 'finance', 'growth', 'product']);
+  assert.deepEqual(names, ['analyst', 'ceo', 'growth', 'operator', 'product']);
 
   // Switch to engineering template
   const engAgents = swarm.applyTemplate('engineering');
   assert.equal(swarm.activeTemplate, 'engineering');
   const engNames = engAgents.map(a => a.id).sort();
-  assert.deepEqual(engNames, ['architect', 'backend', 'frontend', 'qa', 'researcher']);
+  assert.deepEqual(engNames, ['analyst', 'architect', 'backend', 'frontend', 'qa']);
 
   // Switch back to default
   swarm.applyTemplate('default');
@@ -165,40 +165,40 @@ test('SwarmEventBus dispatches targeted events without broadcasting to all agent
     received.push(ev);
   });
 
-  bus.on(SWARM_EVENTS.LEGAL_REVIEW_REQUIRED, ev => {
+  bus.on(SWARM_EVENTS.SENTINEL_REVIEW_REQUIRED, ev => {
     received.push(ev);
   });
 
   await bus.emit({
     type: SWARM_EVENTS.TASK_ASSIGNED,
     from: 'admin',
-    to: 'engineer',
-    payload: { task: 'Verify code' }
+    to: 'auditor',
+    payload: { task: 'Review code' }
   });
 
   await bus.emit({
-    type: SWARM_EVENTS.LEGAL_REVIEW_REQUIRED,
+    type: SWARM_EVENTS.SENTINEL_REVIEW_REQUIRED,
     from: 'admin',
-    to: 'legal',
-    payload: { message: 'Check terms' }
+    to: 'sentinel',
+    payload: { message: 'Independently verify evidence' }
   });
 
   assert.equal(received.length, 2);
-  assert.equal(received[0].to, 'engineer');
-  assert.equal(received[1].to, 'legal');
+  assert.equal(received[0].to, 'auditor');
+  assert.equal(received[1].to, 'sentinel');
 });
 
 test('Swarm actions pass strict schema validation', () => {
   assert.doesNotThrow(() => validateAction({
     type: 'delegate',
-    to: 'engineer',
-    task: 'Investigate technical feasibility'
+    to: 'auditor',
+    task: 'Review authorization boundaries'
   }));
 
   assert.doesNotThrow(() => validateAction({
     type: 'send_message',
-    to: 'finance',
-    message: 'Estimate the token cost of this run'
+    to: 'sentinel',
+    message: 'Independently verify the candidate evidence'
   }));
 
   assert.doesNotThrow(() => validateAction({
@@ -225,45 +225,49 @@ test('Swarm actions pass strict schema validation', () => {
   }));
 
   // Rejects invalid types or missing required fields
-  assert.throws(() => validateAction({ type: 'delegate', to: 'engineer' }));
+  assert.throws(() => validateAction({ type: 'delegate', to: 'auditor' }));
   assert.throws(() => validateAction({ type: 'update_task', taskId: 't1', status: 'invalid_status' }));
 });
 
 test('Direct conversation with @Agent routes to that specialist', async t => {
   const { swarm } = setupSwarmTest(t);
 
-  // Focus directly on Engineer
-  const focused = swarm.focusAgent('engineer');
-  assert.equal(focused.id, 'engineer');
-  assert.equal(swarm.activeAgentId, 'engineer');
+  // Focus directly on Auditor
+  const focused = swarm.focusAgent('auditor');
+  assert.equal(focused.id, 'auditor');
+  assert.equal(swarm.activeAgentId, 'auditor');
 
   // Direct dispatch with @mention
-  const result = await swarm.dispatch('@Legal Review this regulatory constraint');
-  assert.equal(result.agent, 'Legal');
-  assert.equal(result.agentId, 'legal');
+  const result = await swarm.dispatch('@Sentinel Verify this candidate independently');
+  assert.equal(result.agent, 'Sentinel');
+  assert.equal(result.agentId, 'sentinel');
 });
 
 test('Jev cognitive layer evaluates and selects which profile to use for unmentioned tasks', async t => {
   const { swarm } = setupSwarmTest(t);
 
-  // Technical task evaluated by Jev -> routes to Engineer
-  const techAgent = await swarm.selectProfileWithJev('Fix the bug in the TypeScript build pipeline');
-  assert.equal(techAgent, 'engineer');
+  // Security review -> Auditor
+  const auditAgent = await swarm.selectProfileWithJev('Audit the smart contract for authorization and invariant violations');
+  assert.equal(auditAgent, 'auditor');
 
-  // Legal/contract task evaluated by Jev -> routes to Legal
-  const legalAgent = await swarm.selectProfileWithJev('Audit contract clause for liability and regulatory compliance');
-  assert.equal(legalAgent, 'legal');
+  // Controlled execution/reproduction -> Operator
+  const operatorAgent = await swarm.selectProfileWithJev('Run the local harness and reproduce the candidate with a bounded test');
+  assert.equal(operatorAgent, 'operator');
 
-  // Financial task evaluated by Jev -> routes to Finance
-  const financeAgent = await swarm.selectProfileWithJev('Model the unit economics and profit margin under $10M revenue');
-  assert.equal(financeAgent, 'finance');
+  // Independent verification/triage -> Sentinel
+  const sentinelAgent = await swarm.selectProfileWithJev('Independently verify the evidence, scope, duplicate risk, and severity');
+  assert.equal(sentinelAgent, 'sentinel');
+
+  // Architecture/research/synthesis -> Analyst
+  const analystAgent = await swarm.selectProfileWithJev('Build a threat model and research the protocol architecture');
+  assert.equal(analystAgent, 'analyst');
 
   // Cross-functional orchestration task evaluated by Jev -> routes to Admin
   const adminAgent = await swarm.selectProfileWithJev('Coordinate team across multiple workstreams to launch a new product');
   assert.equal(adminAgent, 'admin');
 
   // Dispatch without @mention routes through Jev cognitive profile evaluation
-  const dispatched = await swarm.dispatch('Audit contract for regulatory compliance');
-  assert.equal(dispatched.agentId, 'legal');
-  assert.equal(dispatched.agent, 'Legal');
+  const dispatched = await swarm.dispatch('Audit authorization controls in this codebase');
+  assert.equal(dispatched.agentId, 'auditor');
+  assert.equal(dispatched.agent, 'Auditor');
 });

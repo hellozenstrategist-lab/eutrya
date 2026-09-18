@@ -1,4 +1,4 @@
-# Eutrya Native architecture · 0.3.0
+# Eutrya Native architecture · 0.3.1
 
 ```text
 CLI / messaging ingress / explicit job / explicit task batch

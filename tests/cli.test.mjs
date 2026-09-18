@@ -13,7 +13,7 @@ function setup(t) {
 }
 test('CLI help documents the standalone loop and controls',t=>{
   const {run}=setup(t);const r=run('--help');assert.equal(r.status,0);assert.match(r.stdout,/standalone Jev-native/);assert.match(r.stdout,/steer/);
-  assert.match(r.stdout,/thinking/);assert.match(r.stdout,/reload/);assert.match(r.stdout,/\/context/);assert.match(r.stdout,/\/autocompact/);assert.match(r.stdout,/\/yolo/);
+  assert.match(r.stdout,/thinking/);assert.match(r.stdout,/reload/);assert.match(r.stdout,/\/context/);assert.match(r.stdout,/\/autocompact/);assert.match(r.stdout,/\/yolo/);assert.match(r.stdout,/\/queue/);
 });
 test('offline CLI demo works with no installed SDK and no key',t=>{
   const {run}=setup(t);const r=run('demo','--json');assert.equal(r.status,0,r.stdout+r.stderr);

@@ -435,12 +435,13 @@ export class NativeSwarm {
 
   async applyRuntimeSettings(patch = {}) {
     insist(patch && typeof patch === 'object' && !Array.isArray(patch), 'Runtime settings patch must be an object');
-    const allowed=new Set(['maxPromptChars','jevCompaction']);
+    const allowed=new Set(['maxPromptChars','jevCompaction','allowExec']);
     insist(Object.keys(patch).every(k=>allowed.has(k)), 'Unsupported live runtime setting');
     if(Object.hasOwn(patch,'maxPromptChars')) {
       insist(Number.isInteger(patch.maxPromptChars) && patch.maxPromptChars>=4000 && patch.maxPromptChars<=200000, 'maxPromptChars must be 4000..200000');
     }
     if(Object.hasOwn(patch,'jevCompaction')) insist(typeof patch.jevCompaction==='boolean','jevCompaction must be boolean');
+    if(Object.hasOwn(patch,'allowExec')) insist(typeof patch.allowExec==='boolean','allowExec must be boolean');
     insist(Array.from(this.runtimes.values()).every(r=>!r.busy), 'Wait for running agents to become idle before changing runtime context settings');
 
     Object.assign(this.config,patch);
@@ -450,10 +451,7 @@ export class NativeSwarm {
     }
     this.runtimes.clear();
 
-    return {
-      maxPromptChars:this.config.maxPromptChars,
-      jevCompaction:this.config.jevCompaction
-    };
+    return Object.fromEntries(Object.keys(patch).map(k=>[k,this.config[k]]));
   }
 
   async setProviderAndModel(provider, model) {
@@ -499,6 +497,24 @@ export class NativeSwarm {
         override: Boolean(profile.model)
       }))
     };
+  }
+
+  busyRuntimes() {
+    return Array.from(this.runtimes.entries())
+      .filter(([,runtime])=>runtime.busy)
+      .map(([agentId,runtime])=>({agentId,runtime,profile:this.profiles.get(agentId)}));
+  }
+
+  stopActiveRuns() {
+    const busy=this.busyRuntimes();
+    for(const {runtime} of busy) runtime.stop();
+    return busy.map(({agentId,profile})=>({agentId,name:profile?.name??agentId}));
+  }
+
+  steerActiveRuns(message) {
+    const busy=this.busyRuntimes();
+    for(const {runtime} of busy) runtime.steer(message);
+    return busy.map(({agentId,profile})=>({agentId,name:profile?.name??agentId}));
   }
 
   notifyDelegation({ from, to, task, taskId }) {

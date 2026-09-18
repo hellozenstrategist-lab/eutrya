@@ -112,7 +112,7 @@ export function statusText(s) {
 }
 export class Terminal {
   constructor() {
-    const commands=['/help','/status','/trace','/compact','/continue','/stop','/steer','/resolve','/model','/new','/memory','/remember','/skills','/usage','/swarm','/agents','/agent','/tasks','/findings','/template','/thinking','/reload','/quit'];
+    const commands=['/help','/status','/trace','/compact','/context','/autocompact','/yolo','/queue','/continue','/stop','/steer','/resolve','/model','/new','/memory','/remember','/skills','/usage','/swarm','/agents','/agent','/tasks','/findings','/template','/thinking','/reload','/quit'];
     this.rl=readline.createInterface({input:process.stdin,output:process.stdout,terminal:Boolean(process.stdin.isTTY),historySize:500,completer:line=>{const hits=commands.filter(c=>c.startsWith(line));return [hits.length?hits:commands,line];}});
     this.approval=null;this.onLine=()=>{};this.onInterrupt=()=>{};
     this.rl.on('line',line=>{

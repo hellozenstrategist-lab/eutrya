@@ -17,3 +17,8 @@ export function parseAutoCompact(input) {
   if(['off','false','no','0','disable','disabled'].includes(raw)) return false;
   throw new Error('Use /autocompact on or /autocompact off');
 }
+
+
+export function shouldAutoApproveExec(enabled, action) {
+  return Boolean(enabled && ['run','shell'].includes(action?.type));
+}

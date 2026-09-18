@@ -25,7 +25,7 @@ import { MANAGEMENT,management,userPaths,setup } from '../src/commands.mjs';
 import { readJson } from '../src/local-state.mjs';
 import { McpTools } from '../src/mcp.mjs';
 import { handleAdaptiveCommand, capturePlainCorrection } from '../extensions/eutrya-adaptive-extension/src/commands.mjs';
-import { parseContextBudget, parseAutoCompact } from '../src/interactive-settings.mjs';
+import { parseContextBudget, parseAutoCompact, shouldAutoApproveExec } from '../src/interactive-settings.mjs';
 
 const BUILD_VERSION=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8')).version;
 
@@ -93,7 +93,8 @@ OpenRouter text models additionally need OPENROUTER_API_KEY. No Nous login is us
 Chat commands: /help /status /trace /compact /continue /stop /steer TEXT
                /resolve NOTE /model ID /new /memory /skills /usage /swarm /agents
                /agent NAME /tasks /findings /hunt [ID|run ID|pause ID|resume ID] /template [NAME]
-               /context [N|64k] /autocompact [on|off] /thinking [on|off] /reload /quit
+               /context [N|64k] /autocompact [on|off] /yolo [on|off] /queue [clear]
+               /thinking [on|off] /reload /quit
 `;
 
 const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to a specialist.
@@ -115,6 +116,11 @@ const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to 
 /compact                Run Jev relevance pruning; originals remain recallable
 /context [N|64k]        Show or set maxPromptChars (4k..200k serialized characters)
 /autocompact [on|off]   Show or toggle automatic Jev compaction
+/yolo [on|off]          Session-only auto-approval for local run/shell commands
+/queue                  Show follow-up messages waiting behind the active turn
+/queue clear            Clear queued follow-up messages
+/stop                   Interrupt active resident run(s)
+/steer TEXT             Inject guidance at the next decision boundary
 /continue               Continue a paused task with a fresh Jev decision cycle
 /stop                   Cancel an in-flight model call or local process
 /steer TEXT             Queue guidance; discard obsolete plans before execution
@@ -279,11 +285,16 @@ async function runAgent() {
 
   // Native Swarm Mode (Default for chat and tasks)
   if(!explicitDemo) requireLive();
+  let yoloExec=false;
+  let yoloRestoreAllowExec=null;
+  const approveAction = terminal
+    ? (action,signal) => (shouldAutoApproveExec(yoloExec,action) ? true : terminal.approve(action,signal))
+    : async()=>false;
   const swarm = new NativeSwarm({
     config,
     workspace: cwd,
     demo: explicitDemo,
-    approve: terminal ? (a,s)=>terminal.approve(a,s) : async()=>false,
+    approve: approveAction,
     onEvent: emit,
     redact
   });
@@ -300,12 +311,14 @@ Type / for available commands.
 `);
     }
 
+    let workActive=false;
+    const followups=[];
     const finish=()=>{
       if(quitting)return;
       if(terminal && !terminal.rl.closed) {
         const activeName = swarm.getAgent(swarm.activeAgentId)?.name ?? swarm.activeAgentId;
-        terminal.rl.setPrompt(`eutrya [@${activeName}] › `);
-        terminal.prompt();
+        terminal.rl.setPrompt(workActive?`working [@${activeName}] › `:`eutrya [@${activeName}] › `);
+        terminal.rl.prompt();
       }
     };
 
@@ -370,10 +383,55 @@ Type / for available commands.
       terminal.rl.prompt();
     };
 
+    const queueSummary=()=>followups.length
+      ? followups.map((text,i)=>`${i+1}. ${clip(text,120)}`).join('\n')
+      : 'Queue is empty.';
+    const drainFollowups=async()=>{
+      if(workActive||quitting)return;
+      workActive=true;
+      finish();
+      try {
+        while(followups.length&&!quitting) {
+          const task=followups.shift();
+          try { await swarm.dispatch(task); }
+          catch(e) { print(`Error: ${e.message}`); }
+        }
+      } finally {
+        workActive=false;
+        if(!quitting)finish();
+      }
+    };
+    const enqueueFollowup=text=>{
+      followups.push(text);
+      if(workActive) print(`Queued follow-up #${followups.length}: ${clip(text,100)}`);
+      void drainFollowups();
+    };
+
     await new Promise(resolve=>{
       terminal.rl.on('close',()=>{quitting=true;resolve();});
       terminal.onLine=async line=>{
         if(line==='/quit') {quitting=true;terminal.finishApproval(false);terminal.close();resolve();return;}
+        if(workActive) {
+          if(line==='/stop') {
+            const stopped=swarm.stopActiveRuns();
+            print(stopped.length?`Stop requested for: ${stopped.map(x=>'@'+x.name).join(', ')}`:'No resident runtime is currently executing; the active orchestration step will finish at its next boundary.');
+            finish();return;
+          }
+          if(line.startsWith('/steer ')) {
+            const text=line.slice(7).trim();
+            if(!text){print('Usage: /steer TEXT');finish();return;}
+            const steered=swarm.steerActiveRuns(text);
+            print(steered.length?`Steering queued for: ${steered.map(x=>'@'+x.name).join(', ')}`:'No resident runtime is currently at a steerable execution boundary.');
+            finish();return;
+          }
+          if(line==='/queue') {print(queueSummary());finish();return;}
+          if(line==='/queue clear') {followups.splice(0);print('Queued follow-ups cleared.');finish();return;}
+          if(line && !line.startsWith('/')) {
+            followups.push(line);
+            print(`Queued follow-up #${followups.length}: ${clip(line,100)}`);
+            finish();return;
+          }
+        }
         if(modelMenu) {
           const choice=line.trim().toLowerCase();
           if(choice==='q'||choice==='quit'||choice==='/cancel') {
@@ -519,6 +577,51 @@ Type / for available commands.
           } catch(e) {print(`Auto-compaction setting failed: ${e.message}`);}
           finish();return;
         }
+        if(line==='/yolo'||line.startsWith('/yolo ')){
+          try {
+            const raw=line.slice(5).trim().toLowerCase();
+            if(!raw) {
+              print(`YOLO mode: ${yoloExec?'on':'off'}. When on, local run/shell approvals are skipped for this CLI session only.`);
+            } else if(['on','true','yes','1'].includes(raw)) {
+              if(!yoloExec) {
+                yoloRestoreAllowExec=config.allowExec;
+                if(!config.allowExec) {
+                  config.allowExec=true;
+                  await swarm.applyRuntimeSettings({allowExec:true});
+                }
+                yoloExec=true;
+              }
+              print('YOLO mode: on. Local run/shell commands will execute without approval prompts for this CLI session.');
+            } else if(['off','false','no','0'].includes(raw)) {
+              if(yoloExec) {
+                yoloExec=false;
+                if(yoloRestoreAllowExec===false && config.allowExec) {
+                  config.allowExec=false;
+                  await swarm.applyRuntimeSettings({allowExec:false});
+                }
+                yoloRestoreAllowExec=null;
+              }
+              print('YOLO mode: off. Local run/shell commands require normal approval again.');
+            } else {
+              throw new Error('Use /yolo on or /yolo off');
+            }
+          } catch(e) {print(`YOLO setting failed: ${e.message}`);}
+          finish();return;
+        }
+        if(line==='/queue'){print(queueSummary());finish();return;}
+        if(line==='/queue clear'){followups.splice(0);print('Queued follow-ups cleared.');finish();return;}
+        if(line==='/stop'){
+          const stopped=swarm.stopActiveRuns();
+          print(stopped.length?`Stop requested for: ${stopped.map(x=>'@'+x.name).join(', ')}`:'No active resident run.');
+          finish();return;
+        }
+        if(line==='/steer'||line.startsWith('/steer ')){
+          const text=line.slice(6).trim();
+          if(!text){print('Usage: /steer TEXT');finish();return;}
+          const steered=swarm.steerActiveRuns(text);
+          print(steered.length?`Steering queued for: ${steered.map(x=>'@'+x.name).join(', ')}`:'No active resident run to steer.');
+          finish();return;
+        }
         if(line==='/status'||line==='/usage'){
           const r=swarm.getRuntime(swarm.activeAgentId);
           print(statusText(r.state));
@@ -589,12 +692,8 @@ Type / for available commands.
 
         if(line.startsWith('/')){print('Unknown command. Use /help.');finish();return;}
 
-        try {
-          await swarm.dispatch(line);
-        } catch(e) {
-          print(`Error: ${e.message}`);
-        }
-        if(quitting)resolve();else finish();
+        enqueueFollowup(line);
+        finish();
       };
       finish();
     });

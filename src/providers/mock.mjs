@@ -80,6 +80,10 @@ export class MockJev {
     }
     return wrap(answers);
   }
+  async research(packet,candidates) {
+    const ids=candidates.map(c=>c.id),pick=ids[0];
+    return wrap({next:oneHotChoice(pick,ids),escalate:bool(0.05),stagnation:bool(0.05)});
+  }
   async rank(packet,attention,proposal) {
     const v=visiblePuzzle(packet);const answers={};
     proposal.candidates.forEach((c,i)=>{

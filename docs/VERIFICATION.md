@@ -1,4 +1,4 @@
-# Eutrya Native 0.4.0 — verification record
+# Eutrya Native 0.4.0 — unified verification record
 
 Build date: **September 18, 2026**. Clean CI environment: **GitHub Actions, Ubuntu, Node.js 22**.
 
@@ -6,26 +6,25 @@ Build date: **September 18, 2026**. Clean CI environment: **GitHub Actions, Ubun
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Full test suite | **226 passed, 0 failed, 0 skipped** | GitHub Actions run 35373873266 |
-| JavaScript syntax | **53 modules passed** | `npm run check` in the same CI run |
-| Hunt-board persistence | **Passed** | `tests/hunt-board.test.mjs` |
-| Busy-agent exclusion | **Passed** | Jev hunt routing regression test |
-| Independent review routing | **Passed** | Original worker excluded when another specialist is idle |
-| Multi-card distribution | **Passed** | One routing wave spreads cards across distinct idle residents |
-| Hunt dependencies | **Passed** | Dependent cards remain Intake until prerequisites are Done |
-| Existing research lane | **Passed** | Existing strategist/Jev and semantic-code tests remain green |
-| Live paid inference | **Not part of CI** | No claim of live-provider quality certification |
+| Full test suite | **227 passed, 0 failed, 0 skipped** | GitHub Actions integration run |
+| JavaScript syntax | **65 modules passed** | `npm run check` |
+| Shell installer syntax | **Passed** | `bash -n scripts/*.sh` |
+| Tauri manifest | **Passed** | `cargo metadata --no-deps` |
+| Tauri config JSON | **Passed** | JSON parse in CI |
+| Hunt-board persistence/routing | **Passed** | `tests/hunt-board.test.mjs` |
+| Desktop bridge | **Passed** | `tests/desktop-bridge.test.mjs` |
+| Security swarm | **Passed** | existing swarm regression suite |
+| Jev research lane | **Passed** | existing research regression suite |
+| Live paid inference | **Not part of CI** | no claim of live-provider quality certification |
 
-## 0.4 hunt-board acceptance checks
+## Unified runtime acceptance checks
 
-The hunt board stores the authorized program page, normalized rules, scope, exclusions, testing constraints, cards, card dependencies, assignment history, results, blockers, and review results in the shared swarm workspace.
+The CLI and desktop now share one authoritative backend source tree. The desktop bridge imports the current root `NativeSwarm`, security-agent profiles, shared workspace, Jev-routed hunt board, memory, settings, and approval gates. No stale duplicated `runtime/` backend is merged into source control.
 
-The router passes only currently idle, enabled non-Admin specialists to Jev. Busy residents are therefore unavailable by construction rather than merely discouraged by prompt text. Review-stage routing excludes the original worker whenever another idle specialist is available.
+Development uses the repository root directly. Packaged desktop resources mirror the current root runtime into the application resource namespace, while the Omarchy installer installs a local runtime snapshot under `~/.local/share/eutrya/runtime`.
 
-A routing wave assigns cards sequentially while launching the chosen resident jobs concurrently. Because a resident is marked Working before the next card is routed, subsequent Jev choices see the updated availability set and cannot pile work onto that resident.
-
-Cards move through `intake → ready → active → review → done`, with explicit `blocked` and `parked` states. Dependencies keep a card in Intake until all prerequisite cards are Done.
+The CLI command remains `eutrya`. The desktop command is `eutrya-desktop`, with `eutrya-cli` available as an installed CLI snapshot.
 
 ## What these results do not establish
 
-The suite validates controller wiring, persistence, availability filtering, deterministic mock routing, action validation, and prior runtime behavior. It does not establish live-model judgment quality, vulnerability-finding rates, bounty eligibility, production reliability, or formal security correctness. Real hunt activity must still remain within the supplied program rules and authorization.
+The suite validates controller wiring, persistence, availability filtering, desktop bridge integration, action validation, shell/manifests, and prior runtime behavior. It does not establish live-model judgment quality, vulnerability-finding rates, bounty eligibility, production reliability, Tauri packaging on every Linux distribution, or formal security correctness.

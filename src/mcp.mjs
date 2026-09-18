@@ -15,7 +15,7 @@ export class McpTools {
       if(!s.enabled)continue;insist(s.trusted===true,`MCP server ${name} requires trusted:true in local config`);
       insist(/^[a-zA-Z0-9_-]{1,60}$/.test(name),'Invalid MCP server name');
       insist(Array.isArray(s.allowedTools)&&s.allowedTools.length>0&&!s.allowedTools.includes('*'),'MCP requires explicit allowedTools');
-      const client=new modules.Client({name:'eutrya-native',version:'0.3.0'},{capabilities:{}});let transport;
+      const client=new modules.Client({name:'eutrya-native',version:'0.3.1'},{capabilities:{}});let transport;
       if(s.transport==='stdio'){
         insist(typeof s.command==='string'&&Array.isArray(s.args)&&s.args.every(x=>typeof x==='string'),'Invalid stdio command');
         const env=Object.fromEntries(['PATH','HOME','LANG'].filter(k=>this.env[k]).map(k=>[k,this.env[k]]));

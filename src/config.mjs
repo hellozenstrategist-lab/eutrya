@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { integer, insist, object, finite } from './util.mjs';
+import { atomicJson } from './local-state.mjs';
 
 export const CONFIG_PATH = path.join(os.homedir(), '.config', 'eutrya', 'config.json');
 export const DEFAULTS = Object.freeze({
@@ -40,4 +41,13 @@ export function writeConfig(file = CONFIG_PATH, model = '') {
   fs.mkdirSync(path.dirname(file),{recursive:true,mode:0o700});
   fs.writeFileSync(file, JSON.stringify({...DEFAULTS,mainModel:model},null,2)+'\n',{mode:0o600,flag:'wx'});
   return file;
+}
+
+export function updateConfig(file = CONFIG_PATH, patch = {}) {
+  object(patch,'config patch');
+  insist(Object.keys(patch).every(k=>Object.hasOwn(DEFAULTS,k)),'Unsupported configuration key');
+  const current=loadConfig(file);
+  const next=validateConfig({...current,...patch});
+  atomicJson(file,next);
+  return next;
 }

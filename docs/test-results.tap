@@ -1,15 +1,10 @@
 TAP version 13
-# Eutrya Native v0.4.0 hunt-board verification summary
-# GitHub Actions run: 35373873266
-# Node: 22
+# Eutrya Native v0.4.0 unified CLI + desktop verification summary
 ok 1 - complete CI test suite
 1..1
-# tests 226
-# suites 0
-# pass 226
+# tests 227
+# pass 227
 # fail 0
-# cancelled 0
 # skipped 0
-# todo 0
-# Includes persistent hunt board, busy-agent exclusion, independent review,
-# multi-card Jev distribution, dependencies, security swarm, and research lane.
+# Includes desktop bridge, hunt board, security swarm, Jev research lane,
+# providers, compaction, tools, gateway, scheduling, and persistence.

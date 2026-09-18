@@ -19,6 +19,11 @@
     { id:'researcher', index:'05', name:'Researcher', role:'Research', verbs:['Explore','Synthesize','Validate','Report'], status:'online', tasks:2 },
   ]
 
+  const agentPortraits = {
+    admin:'agent-admin.jpg', engineer:'agent-engineer.jpg', lawyer:'agent-lawyer.jpg',
+    legal:'agent-lawyer.jpg', finance:'agent-finance.jpg', researcher:'agent-researcher.jpg'
+  }
+
   const concepts = {
     dashboard:'./assets/dashboard.jpg', swarm:'./assets/swarm.jpg', library:'./assets/library.jpg',
     memory:'./assets/memory.jpg', tools:'./assets/tools.jpg', settings:'./assets/settings.jpg'
@@ -112,7 +117,9 @@
   function agentCard(a, opts={}) {
     const selected=opts.selected?'selected':''
     const compact=opts.compact?'compact':''
+    const portrait=agentPortraits[a.id]||agentPortraits.researcher
     return `<button class="agent-card ${selected} ${compact}" data-agent="${a.id}">
+      <img class="agent-card-portrait" src="./assets/${portrait}" alt="" aria-hidden="true">
       <div class="agent-top"><span>${a.index}</span><span class="status ${String(a.status).toLowerCase()}">${String(a.status).toLowerCase()}</span></div>
       <div class="agent-name">${a.name}</div><div class="agent-verbs">${a.verbs.map(v=>`<span>${v}</span>`).join('')}</div>
       <div class="agent-art"><span></span><span></span><span></span></div><div class="jev"><strong>Jev</strong><small>NATIVE THINKING LAYER</small></div>

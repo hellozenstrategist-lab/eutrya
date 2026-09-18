@@ -1,6 +1,6 @@
 {
   "name": "eutrya-native",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Jev-native cybersecurity swarm with CLI and desktop interfaces, persistent hunt Kanban boards, availability-aware routing, research, memory and scheduling",
   "type": "module",
   "bin": {

@@ -5,7 +5,7 @@
   const initial=location.hash.slice(1);
   let preferences={density:'precise',motion:'system'};
   try { preferences={...preferences,...JSON.parse(localStorage.getItem('eutrya.studio.preferences')||'{}')}; } catch { /* Local storage can be unavailable in a restricted webview. */ }
-  const state={page:names.includes(initial)?initial:'dashboard',data:null,connected:false,error:'',selectedAgent:'admin',selectedProfile:'admin',selectedTool:'Web Browser',selectedRecord:null,source:'all',agentQuery:'',memoryQuery:'',toolQuery:'',toolCategory:'all',libraryView:'grid',networkView:'graph',settingsTab:'all',profileTab:'configuration',configDraft:null,configDirty:false,profileDrafts:{},chatDraft:'',chatBusy:false,outbox:null,pending:new Set(),preferences,scroll:{},modal:null,seenApprovals:new Set(),toastTimer:null};
+  const state={page:names.includes(initial)?initial:'dashboard',data:null,connected:false,error:'',selectedAgent:'admin',selectedProfile:'admin',selectedTool:'Web Browser',selectedRecord:null,source:'all',agentQuery:'',memoryQuery:'',toolQuery:'',toolCategory:'all',libraryView:'grid',networkView:'graph',settingsTab:'all',profileTab:'configuration',configDraft:null,configDirty:false,profileDrafts:{},chatDraft:'',chatBusy:false,outbox:null,outboxAt:0,pending:new Set(),preferences,scroll:{},modal:null,seenApprovals:new Set(),toastTimer:null};
   const defaults=[
   {
     "id": "admin",
@@ -111,13 +111,29 @@
   function selectedAgent(){return agents().find(a=>a.id===state.selectedAgent)||agents()[0];}
   function selectedProfile(){return agents().find(a=>a.id===state.selectedProfile)||agents()[0];}
   function profileDraft(){const p=selectedProfile();return state.profileDrafts[p.id]||{name:p.name,role:p.role,profession:p.profession||p.role,instructions:p.instructions||'',model:p.model||''};}
+  function persistedOutbox(messages=[]){
+    if(!state.outbox) return false;
+    const text=String(state.outbox).trim();
+    const sentAt=Number(state.outboxAt)||0;
+    return messages.some(m=>{
+      if(m?.from!=='user') return false;
+      if(String(m.content??m.text??'').trim()!==text) return false;
+      if(!sentAt) return true;
+      const at=Date.parse(m.timestamp??m.at??'');
+      return Number.isFinite(at) && at >= sentAt-2000;
+    });
+  }
   function accept(payload){
     const data=payload?.state || payload;
     if(!data?.readiness) return;
     state.data=data;state.connected=true;state.error='';
+    if(persistedOutbox(data?.swarm?.workspace?.messages||[])){
+      state.outbox=null;
+      state.outboxAt=0;
+    }
     if(!state.configDirty) state.configDraft={...config()};
   }
   const time = (value,full=false) => {const d=new Date(value);return !value||!Number.isFinite(d.getTime())?'—':(full?d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}):d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}));};
   function eventLabel(e){const d=e?.data||{};if(e.type==='hunt.card_started')return `${d.cardId} → @${d.agent||d.agentId} (${d.stage})`;if(e.type==='hunt.card_stage_complete')return `${d.cardId} → ${d.nextStatus}`;if(e.type==='hunt.card_blocked')return `${d.cardId} blocked: ${d.error||'Review needed'}`;if(e.type==='hunt.waiting')return `${d.cardId}: ${d.reason||'Waiting'}`;if(e.type==='swarm.agent_status')return `${d.agent||e.agent||'Agent'} · ${d.status||'updated'}`;if(e.type==='observation')return `${e.agent||'Agent'} · ${d.action?.type||'tool observation'}`;if(e.type==='answer')return `${e.agent||'Agent'} answered`;if(e.type==='desktop.user_message')return 'Message sent to the swarm';if(e.type==='desktop.runtime_ready')return 'Runtime connected';if(e.type==='desktop.approval_required')return 'Operator approval requested';return String(e.type||'Runtime event').replaceAll(/[._]/g,' ');}
-  window.EutryaStudio={names,state,defaults,toolGroups,ready,ws,config,events,memory,mode,isPreview,activeTasks,agents,availableTools,records,groups,selectedAgent,selectedProfile,profileDraft,accept,time,eventLabel};
+  window.EutryaStudio={names,state,defaults,toolGroups,ready,ws,config,events,memory,mode,isPreview,activeTasks,agents,availableTools,records,groups,selectedAgent,selectedProfile,profileDraft,persistedOutbox,accept,time,eventLabel};
 })();

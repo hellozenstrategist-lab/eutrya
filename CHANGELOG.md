@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.3 — Desktop chat outbox deduplication
+
+Fixed a Studio chat rendering race where a just-sent user message could briefly appear twice while the backend had already persisted the message but the long-running chat request was still in flight. The optimistic outbox now carries a send timestamp and is reconciled as soon as the matching newly persisted workspace message arrives. Re-sending identical text later still renders correctly because old matching messages do not suppress the new optimistic bubble.
+
 ## 0.4.2 — Persisted web-tool migration
 
 Fixed upgrades from older Eutrya workspaces where saved resident-profile tool allowlists could permanently hide the live `browser` capability even after the runtime gained it. Eutrya-managed legacy profiles that already have local search now inherit the read-only browser tool on load while preserving custom names, instructions, models, and other tool choices. Intentionally custom/local-only profiles are left unchanged.

@@ -25,7 +25,7 @@ import { MANAGEMENT,management,userPaths,setup } from '../src/commands.mjs';
 import { readJson } from '../src/local-state.mjs';
 import { McpTools } from '../src/mcp.mjs';
 import { handleAdaptiveCommand, capturePlainCorrection } from '../extensions/eutrya-adaptive-extension/src/commands.mjs';
-import { parseContextBudget, parseAutoCompact } from '../src/interactive-settings.mjs';
+import { parseContextBudget, parseAutoCompact, shouldAutoApproveExec } from '../src/interactive-settings.mjs';
 
 const BUILD_VERSION=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8')).version;
 
@@ -283,7 +283,7 @@ async function runAgent() {
   let yoloExec=false;
   let yoloRestoreAllowExec=null;
   const approveAction = terminal
-    ? (action,signal) => (yoloExec && ['run','shell'].includes(action?.type) ? true : terminal.approve(action,signal))
+    ? (action,signal) => (shouldAutoApproveExec(yoloExec,action) ? true : terminal.approve(action,signal))
     : async()=>false;
   const swarm = new NativeSwarm({
     config,

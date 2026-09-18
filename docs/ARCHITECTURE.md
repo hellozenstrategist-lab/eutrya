@@ -1,4 +1,4 @@
-# Eutrya Native architecture · 0.3.1
+# Eutrya Native architecture · 0.4.0
 
 ```text
 CLI / messaging ingress / explicit job / explicit task batch
@@ -50,6 +50,8 @@ These controls guarantee consultation and action-path enforcement, not that Jev 
 | `src/bootstrap.mjs` | Reuse the same core for messaging, scheduler, and read-only team workers |
 | `src/tools.mjs`, `src/schema.mjs` | Strict action vocabulary, argument validation, permission and effect execution |
 | `src/store.mjs`, `src/memory.mjs` | Checkpoint/journal state, locking, archived observations, deterministic compaction |
+| `src/swarm/workspace.mjs` | Persistent shared tasks, hunt boards/cards, findings, blockers and resident status |
+| `src/swarm/swarm.mjs` | Security resident orchestration and availability-aware Jev hunt routing |
 | `src/knowledge.mjs` | Approved persistent memory, local skill/draft namespaces, project/persona references |
 | `src/mcp.mjs` | Explicit trusted stdio/HTTP clients, catalog allowlists, input validation |
 | `src/gateway/*` | Transport normalization, authentication, queues, isolated routes, approvals, delivery |
@@ -86,6 +88,40 @@ Strategist text model
 The research lane is intentionally separate from the normal proposal/rank loop. It uses only read-only local semantic code tools. The strategist does not micromanage file operations; it defines the investigation state. A deterministic frontier generator turns that state plus observed code relationships into bounded candidate actions, and Jev selects the next action. After a configured micro-step boundary, meaningful escalation, or stagnation, the strategist receives compact evidence and updates stable invariant/hypothesis objects.
 
 Research decisions use the same single-use state-bound ticket machinery as ordinary actions. Research state is included in the semantic state hash, so a ticket becomes stale when the ledger changes.
+
+## Jev hunt-board routing
+
+```text
+User supplies authorized hunt page + rules
+                  │
+                  ▼
+               Admin
+ normalize scope / exclusions / testing rules
+                  │
+                  ▼
+       Persistent Kanban cards
+  Intake → Ready → Active → Review → Done
+                  │
+                  ▼
+        Current resident statuses
+                  │
+        remove non-idle agents
+                  ▼
+                 Jev
+     choose best AVAILABLE specialist
+                  │
+          ┌───────┴────────┐
+          ▼                ▼
+       execute          next card
+    mark resident       sees updated
+      WORKING            availability
+```
+
+Availability is enforced before Jev is called: Admin is not a hunt worker, disabled residents are excluded, and any resident whose shared status is not `IDLE` or whose runtime is already busy is omitted from the choice criteria. The chosen resident is marked Working/Reviewing before routing proceeds to the next card, so a single routing wave naturally spreads work across idle residents.
+
+Worker completion moves a card to Review. Review routing avoids the original worker when another idle specialist is available. A successful independent review moves the card to Done. Errors move the card to Blocked and mark the resident blocked for subsequent routing. Cards with prerequisites remain Intake until all dependencies are Done.
+
+The hunt page and normalized rules are included in each worker/reviewer task prompt. This preserves program constraints across delegated work, but it is not a substitute for operator authorization or the program's own terms.
 
 ## Messaging flow
 

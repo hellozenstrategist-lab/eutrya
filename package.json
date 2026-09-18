@@ -1,7 +1,7 @@
 {
   "name": "eutrya-native",
   "version": "0.4.0",
-  "description": "Jev-native cybersecurity swarm with persistent hunt Kanban boards, availability-aware routing, strategist/Jev research, providers, memory and scheduling",
+  "description": "Jev-native cybersecurity swarm with CLI and desktop interfaces, persistent hunt Kanban boards, availability-aware routing, research, memory and scheduling",
   "type": "module",
   "bin": {
     "eutrya": "bin/eutrya.mjs"
@@ -16,7 +16,11 @@
     "demo": "node bin/eutrya.mjs demo",
     "doctor": "node bin/eutrya.mjs doctor",
     "gateway": "node bin/eutrya.mjs gateway start",
-    "setup": "node bin/eutrya.mjs setup"
+    "setup": "node bin/eutrya.mjs setup",
+    "test:desktop-bridge": "node --test tests/desktop-bridge.test.mjs",
+    "desktop:dev": "bash scripts/dev-desktop.sh",
+    "desktop:build": "npm install && cd desktop && cargo tauri build",
+    "install:omarchy": "bash scripts/install-omarchy.sh"
   },
   "dependencies": {
     "ai": "^7.0.105"
@@ -34,7 +38,9 @@
     "AGENTS.md",
     "CHANGELOG.md",
     "LICENSE",
-    ".env.example"
+    ".env.example",
+    "desktop",
+    "scripts"
   ],
   "optionalDependencies": {
     "discord.js": "14.22.1",

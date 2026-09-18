@@ -17,4 +17,7 @@ jobs:
         with:
           node-version: 22
       - run: npm run check
+      - run: bash -n scripts/*.sh
+      - run: cargo metadata --no-deps --format-version 1 --manifest-path desktop/src-tauri/Cargo.toml > /dev/null
+      - run: node -e "JSON.parse(require('fs').readFileSync('desktop/src-tauri/tauri.conf.json','utf8'))"
       - run: npm test

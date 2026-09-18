@@ -73,6 +73,38 @@ Useful commands:
 Admin has native `hunt_create`, `hunt_card`, `hunt_board`, and `hunt_route` tools. Hunt state is stored with the shared swarm workspace and survives restarts. Program rules, scope, exclusions, testing constraints, card dependencies, routing history, worker results, and independent review results are preserved.
 
 
+## Desktop control surface
+
+The former `desktop-frontend` branch is now integrated into the same repository and uses the **same root v0.4 runtime** as the CLI. There is no second stale backend copy.
+
+The native Tauri interface includes Dashboard, Swarm, Profile Library, Memory, Tools, Settings, approvals, and the localhost runtime bridge. The bridge exposes current security profiles and shared hunt-board state from `NativeSwarm`.
+
+Development:
+
+```bash
+npm run desktop:dev
+```
+
+Build:
+
+```bash
+npm run desktop:build
+```
+
+Omarchy / Arch installation:
+
+```bash
+npm run install:omarchy
+```
+
+The installer preserves **`eutrya` as the CLI command** and installs the graphical app as:
+
+```bash
+eutrya-desktop
+```
+
+It also creates `eutrya-cli` as a CLI snapshot backed by the installed desktop runtime copy.
+
 ## Start without credentials
 
 From the extracted `eutrya` directory:
@@ -306,7 +338,11 @@ src/puzzle.mjs           Local switchboard and independent checker
 src/swarm/workspace.mjs Shared workspace, persistent tasks and hunt Kanban state
 src/swarm/swarm.mjs     Native security swarm and availability-aware Jev hunt router
 src/ui.mjs               Terminal events, hunt board rendering, and one-action approvals
-tests/                   Offline regression and contract tests
+desktop/server.mjs        Localhost bridge into the same NativeSwarm runtime
+desktop/web/              Native desktop frontend
+desktop/src-tauri/        Tauri shell and launcher
+scripts/                  Desktop development and Omarchy install helpers
+tests/                    Offline regression and contract tests
 ```
 
-This is a standalone implementation with native multi-agent orchestration, browser/content retrieval, explicit MCP clients, persistent hunt boards, and Jev evaluation. It still does not provide full Pi feature parity, token-by-token interleaving inside a hosted model, or a full-screen terminal UI.
+This is a standalone implementation with native multi-agent orchestration, browser/content retrieval, explicit MCP clients, persistent hunt boards, Jev evaluation, a CLI, and a native desktop control surface. It still does not provide full Pi feature parity or token-by-token interleaving inside a hosted model.

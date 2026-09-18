@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 420" role="img" aria-label="Eutrya botanical technical field">
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#9ca1a5" stroke-opacity=".16" stroke-width="1"/>
+    </pattern>
+    <filter id="soft"><feGaussianBlur stdDeviation=".25"/></filter>
+  </defs>
+  <rect width="1600" height="420" fill="#f4f1ea"/>
+  <rect width="1600" height="420" fill="url(#grid)"/>
+  <g fill="none" stroke="#687078" stroke-opacity=".42">
+    <circle cx="1190" cy="205" r="104"/><circle cx="1190" cy="205" r="154"/><circle cx="1190" cy="205" r="202"/>
+    <path d="M910 205H1500M1190 6V414"/>
+    <path d="M1030 75h190M1345 316h160M1010 344h130"/>
+  </g>
+  <g stroke="#252a2f" stroke-opacity=".75" fill="none" stroke-linecap="round" filter="url(#soft)">
+    <path d="M1082 420C1110 339 1123 284 1162 237c31-37 67-74 87-127"/>
+    <path d="M1136 295c-60-31-94-64-120-118M1177 220c69-40 105-78 132-138M1203 177c41 10 83 2 118-24M1119 336c-27-8-62-7-93 6"/>
+    <path d="M1247 109c34-38 74-65 112-76"/>
+  </g>
+  <g fill="#252a2f" fill-opacity=".70">
+    <ellipse cx="1041" cy="182" rx="27" ry="11" transform="rotate(32 1041 182)"/>
+    <ellipse cx="1091" cy="239" rx="34" ry="12" transform="rotate(21 1091 239)"/>
+    <ellipse cx="1130" cy="294" rx="30" ry="11" transform="rotate(-18 1130 294)"/>
+    <ellipse cx="1206" cy="190" rx="34" ry="12" transform="rotate(-30 1206 190)"/>
+    <ellipse cx="1267" cy="127" rx="28" ry="10" transform="rotate(-35 1267 127)"/>
+    <ellipse cx="1309" cy="83" rx="23" ry="9" transform="rotate(-26 1309 83)"/>
+    <ellipse cx="1321" cy="155" rx="22" ry="9" transform="rotate(-6 1321 155)"/>
+    <ellipse cx="1029" cy="341" rx="28" ry="10" transform="rotate(-7 1029 341)"/>
+  </g>
+  <g fill="#252a2f" fill-opacity=".56">
+    <circle cx="1017" cy="176" r="18"/><circle cx="1029" cy="166" r="12"/><circle cx="1007" cy="160" r="11"/>
+    <circle cx="1289" cy="94" r="17"/><circle cx="1304" cy="105" r="13"/><circle cx="1274" cy="109" r="12"/>
+    <circle cx="1214" cy="201" r="15"/><circle cx="1230" cy="194" r="10"/>
+  </g>
+  <g stroke="#20252a" stroke-width="1">
+    <path d="M1450 72h44M1472 50v44M938 318h34M955 301v34M1370 240h30M1385 225v30"/>
+    <path d="M1520 120v112M1510 120h20M1510 232h20"/>
+  </g>
+  <g fill="#40464d">
+    <circle cx="1190" cy="205" r="3"/><circle cx="1040" cy="205" r="3"/><circle cx="1340" cy="205" r="3"/>
+  </g>
+</svg>

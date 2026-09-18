@@ -52,6 +52,8 @@ These controls guarantee consultation and action-path enforcement, not that Jev 
 | `src/store.mjs`, `src/memory.mjs` | Checkpoint/journal state, locking, archived observations, deterministic compaction |
 | `src/swarm/workspace.mjs` | Persistent shared tasks, hunt boards/cards, findings, blockers and resident status |
 | `src/swarm/swarm.mjs` | Security resident orchestration and availability-aware Jev hunt routing |
+| `desktop/server.mjs` | Localhost-only bridge into the same root NativeSwarm runtime |
+| `desktop/web/*`, `desktop/src-tauri/*` | Native desktop control surface and Tauri launcher |
 | `src/knowledge.mjs` | Approved persistent memory, local skill/draft namespaces, project/persona references |
 | `src/mcp.mjs` | Explicit trusted stdio/HTTP clients, catalog allowlists, input validation |
 | `src/gateway/*` | Transport normalization, authentication, queues, isolated routes, approvals, delivery |
@@ -122,6 +124,12 @@ Availability is enforced before Jev is called: Admin is not a hunt worker, disab
 Worker completion moves a card to Review. Review routing avoids the original worker when another idle specialist is available. A successful independent review moves the card to Done. Errors move the card to Blocked and mark the resident blocked for subsequent routing. Cards with prerequisites remain Intake until all dependencies are Done.
 
 The hunt page and normalized rules are included in each worker/reviewer task prompt. This preserves program constraints across delegated work, but it is not a substitute for operator authorization or the program's own terms.
+
+## Desktop boundary
+
+The desktop is a presentation/control layer over the same backend. `desktop/server.mjs` imports the root `src/` modules directly in development and is packaged under `runtime/desktop/server.mjs` alongside the same root runtime sources for installed builds. The Tauri shell launches that bridge on `127.0.0.1` and never creates a second agent/tool executor.
+
+The bridge exposes swarm state, security profiles, tasks, findings, memory, approvals, hunt boards/cards, settings, chat dispatch, focus/template controls, and hunt execution. Effectful actions still travel through the existing NativeSwarm/runtime/Toolbox/DecisionGate path.
 
 ## Messaging flow
 

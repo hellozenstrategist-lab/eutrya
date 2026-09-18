@@ -45,7 +45,7 @@ This release extends the attached Eutrya Native v0.1.0 implementation. It does n
 | Provider token/cost accounting | Implemented/partial | Actual reported values; missing costs remain unknown |
 | Model/provider failover and intelligent auto-routing | Not included | Text provider selected explicitly; Jev never silently replaced |
 | Extension ecosystem and lifecycle hooks | Not included | Local skill references are not executable plugins |
-| Desktop/web/mobile UI and full-screen TUI | Not included | CLI plus native messaging text |
+| Native desktop UI | Implemented/partial | Tauri desktop control surface over localhost bridge; no mobile UI or full-screen terminal TUI |
 | ChatGPT/Codex/Claude/Gemini subscription login | Not included | Does not scrape or reuse browser session credentials |
 | Nous Portal, Nous subscription login, Nous Tool Gateway | Deliberately excluded | No Nous-specific provider/service dependencies |
 

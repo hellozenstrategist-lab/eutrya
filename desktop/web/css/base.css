@@ -1,0 +1,275 @@
+:root{
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:#171b21;
+  background:#dedbd3;
+  font-synthesis:none;
+  text-rendering:optimizeLegibility;
+  --canvas:#f0eee8;
+  --canvas-subtle:#f7f5ef;
+  --panel:#f7f5ef;
+  --panel-secondary:#e7e4dc;
+  --sidebar:#111419;
+  --sidebar-raised:#171b21;
+  --ink:#171b21;
+  --ink-soft:#4e5662;
+  --muted:#7a828d;
+  --border:#cfd2d5;
+  --border-strong:#b8bdc4;
+  --navy:#0b3d86;
+  --navy-deep:#0a2f66;
+  --navy-soft:#2b63a7;
+  --green:#23795f;
+  --warning:#9a6b20;
+  --danger:#9c3740;
+  --white:#fff;
+  --shadow-1:0 2px 8px rgba(15,19,25,.08);
+  --shadow-2:0 14px 42px rgba(15,19,25,.12);
+  --r1:4px;
+  --r2:8px;
+  --r3:12px;
+  --r4:16px;
+}
+*{box-sizing:border-box}
+html,body,#root,#app{margin:0;width:100%;height:100%;overflow:hidden}
+body{
+  background:
+    radial-gradient(circle at 26% 16%,rgba(255,255,255,.72),transparent 34%),
+    linear-gradient(135deg,#dedbd3,#cbc7bf);
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid rgba(43,99,167,.6);
+  outline-offset:2px;
+}
+.app-shell{
+  width:100vw;height:100vh;min-width:1180px;min-height:740px;
+  background:var(--canvas);
+  position:relative;overflow:hidden;
+  box-shadow:0 24px 90px rgba(18,22,28,.18);
+}
+.app-shell:before{
+  content:"";position:absolute;inset:38px 0 0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(17,20,25,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(17,20,25,.035) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.65) 12%,rgba(0,0,0,.65) 88%,transparent 100%);
+}
+.app-shell:after{
+  content:"";position:absolute;inset:38px 0 0;pointer-events:none;z-index:0;
+  opacity:.035;
+  background-image:radial-gradient(#111 0.5px,transparent .6px);
+  background-size:7px 7px;
+}
+.chrome{
+  height:38px;background:#e9e7e1;border-bottom:1px solid rgba(98,104,112,.28);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 8px 0 18px;position:relative;z-index:10;user-select:none;
+}
+.chrome-mark,.chrome-center{
+  font:600 9px/1 "Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.12em;display:flex;align-items:center;gap:10px
+}
+.chrome-mark .muted{color:#737a83}
+.chrome-center{position:absolute;left:50%;transform:translateX(-50%);color:#59616a}
+.mark-grid{width:15px;height:15px;display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.mark-grid i{background:#171b21;border-radius:1px}
+.window-controls{display:flex;gap:2px}
+.window-controls button{
+  width:34px;height:26px;border:0;background:transparent;border-radius:6px;display:grid;place-items:center;color:#656d77
+}
+.window-controls button:hover{background:#d9d6cf;color:#171b21}
+.window-controls button:last-child:hover{background:#9c3740;color:white}
+.app-body{
+  height:calc(100% - 38px);
+  display:grid;grid-template-columns:214px 1fr;
+  position:relative;z-index:1;min-width:0;
+}
+.sidebar{
+  position:relative;background:var(--sidebar);color:#e7e9ec;
+  border-right:1px solid #272c34;padding:24px 14px 18px;overflow:hidden
+}
+.sidebar:after{
+  content:"";position:absolute;left:18px;right:18px;bottom:116px;height:290px;
+  background:url("../assets/eutrya-bloom.svg") center bottom/180px auto no-repeat;
+  color:#8e99a7;opacity:.18;filter:grayscale(1);
+  pointer-events:none
+}
+.brand{font-size:34px;font-weight:800;letter-spacing:-.055em;line-height:1}
+.brand span{font-size:8px;vertical-align:top;margin-left:2px;color:#8f98a5}
+.brand-sub{
+  font:600 8px "Geist Mono",ui-monospace,monospace;letter-spacing:.16em;
+  color:#9ca5b0;margin-top:7px
+}
+.slash{
+  font:700 13px "Geist Mono",ui-monospace,monospace;letter-spacing:.14em;
+  color:#77818d;margin:24px 10px 10px
+}
+.nav-list{display:flex;flex-direction:column;gap:4px}
+.nav-item{
+  min-height:42px;border:0;background:transparent;color:#adb4bd;padding:0 12px;
+  display:flex;align-items:center;gap:11px;border-radius:9px;
+  text-transform:uppercase;font:600 10px "Geist Mono",ui-monospace,monospace;
+  letter-spacing:.055em;text-align:left;border-left:2px solid transparent;transition:.15s ease
+}
+.nav-item b{width:18px;font-size:15px;font-weight:600;color:#7f8995}
+.nav-item:hover{background:#191e25;color:#fff}
+.nav-item.active{
+  color:#fff;background:linear-gradient(90deg,rgba(11,61,134,.82),rgba(23,27,33,.96));
+  border-left-color:#6f9dd3;box-shadow:inset 0 0 0 1px rgba(129,158,191,.1)
+}
+.nav-item.active b{color:#d8e7fb}
+.sidebar-copy{
+  border-top:1px solid #2e343d;margin-top:18px;padding:20px 12px;
+  color:#d8dde2;font:600 10px/1.65 "Geist Mono",ui-monospace,monospace;letter-spacing:.065em
+}
+.botanical-orbit{display:none}
+.sidebar-foot{
+  position:absolute;left:26px;bottom:28px;
+  font:500 8px/1.45 "Geist Mono",ui-monospace,monospace;
+  letter-spacing:.065em;color:#7f8995;z-index:1
+}
+.sidebar-foot .slash{display:block;margin:12px 0 8px;color:#66717e}
+.sidebar-index{
+  position:absolute;bottom:-21px;right:8px;font-size:78px;font-weight:800;
+  color:rgba(255,255,255,.035);letter-spacing:-.08em
+}
+.workspace{
+  min-width:0;height:100%;
+  display:grid;grid-template-rows:138px minmax(0,1fr) 28px;
+  background:rgba(240,238,232,.92)
+}
+.page-header{
+  display:grid;grid-template-columns:minmax(470px,1.16fr) minmax(260px,.64fr) 132px 118px;
+  position:relative;border-bottom:1px solid rgba(114,119,126,.24);
+  overflow:hidden;background:rgba(247,245,239,.82);min-width:0
+}
+.header-copy{padding:20px 26px 16px}
+.eyebrow{
+  font:600 9px "Geist Mono",ui-monospace,monospace;letter-spacing:.085em;
+  color:#757d86;margin-bottom:10px;text-transform:uppercase
+}
+.page-title{
+  font-size:44px;font-weight:800;letter-spacing:-.05em;line-height:.9;
+  text-transform:none;white-space:nowrap;color:var(--ink)
+}
+.page-subtitle{
+  font:500 11px "Geist Mono",ui-monospace,monospace;letter-spacing:.05em;
+  margin-top:12px;color:#5c6470;white-space:nowrap;text-transform:uppercase
+}
+.concept-strip{
+  background-size:cover;background-position:center;
+  border-left:1px solid rgba(114,119,126,.2);position:relative;
+  filter:grayscale(100%);opacity:.64;overflow:hidden
+}
+.concept-strip:before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(247,245,239,.02),rgba(247,245,239,.84))
+}
+.concept-strip:after{
+  content:"";position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(17,20,25,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(17,20,25,.06) 1px,transparent 1px);
+  background-size:36px 36px
+}
+.concept-annotation{
+  position:absolute;left:14px;bottom:14px;z-index:2;
+  font:600 8px/1.35 "Geist Mono",ui-monospace,monospace;
+  letter-spacing:.08em;color:#3f464f
+}
+.reload-btn{
+  align-self:center;justify-self:center;width:112px;height:40px;border-radius:10px;
+  background:linear-gradient(180deg,#0c438f,#0a2f66);border:1px solid #082858;color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font:700 10px "Geist Mono",ui-monospace,monospace;
+  box-shadow:0 6px 16px rgba(10,47,102,.16);transition:.15s ease
+}
+.reload-btn:hover{transform:translateY(-1px);filter:brightness(1.05);box-shadow:0 9px 22px rgba(10,47,102,.18)}
+.reload-btn:active{transform:translateY(0)}
+.reload-btn:disabled{opacity:.5;cursor:wait;transform:none}
+.sys-mini{
+  padding:22px 12px;border-left:1px solid rgba(114,119,126,.22);
+  font:600 8px/1.55 "Geist Mono",ui-monospace,monospace;
+  letter-spacing:.055em;color:#4b535d;overflow:hidden
+}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex:none}
+.dot.navy{background:var(--navy)}
+.dot.green{background:var(--green)}
+.workspace-scroll{overflow:auto;min-height:0;scrollbar-width:thin;scrollbar-color:#b7b8b5 transparent}
+.page{padding:18px 20px 28px;min-height:100%;position:relative}
+.app-footer{
+  height:28px;border-top:1px solid rgba(114,119,126,.22);padding:0 18px;
+  display:flex;align-items:center;justify-content:space-between;
+  font:600 8px "Geist Mono",ui-monospace,monospace;
+  letter-spacing:.055em;color:#777f88;background:#e9e7e1
+}
+.panel{
+  border:1px solid var(--border);
+  background:rgba(247,245,239,.94);
+  border-radius:14px;box-shadow:var(--shadow-1);min-width:0;overflow:hidden
+}
+.panel-head{
+  min-height:46px;border-bottom:1px solid rgba(168,173,179,.45);
+  display:flex;align-items:center;justify-content:space-between;padding:0 16px;
+  font:700 11px "Geist Mono",ui-monospace,monospace;letter-spacing:.04em
+}
+.panel-head strong{color:#252a31}
+.panel-head span{font-size:8px;color:#7a828d;font-weight:600;letter-spacing:.07em}
+.divider{height:1px;background:rgba(168,173,179,.45);margin:14px 0}
+.microcopy{
+  font:500 9px/1.55 "Geist Mono",ui-monospace,monospace;color:#6f7781
+}
+.section-label{
+  font:700 9px "Geist Mono",ui-monospace,monospace;letter-spacing:.07em
+}
+.ghost-button,.primary-button{
+  min-height:38px;border-radius:9px;padding:0 14px;
+  border:1px solid var(--border-strong);background:#f3f1eb;
+  font:700 9px "Geist Mono",ui-monospace,monospace;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.15s ease
+}
+.ghost-button:hover{background:#ece9e1;border-color:#a8adb4}
+.primary-button{
+  background:linear-gradient(180deg,#0c438f,#0a2f66);border-color:#082858;color:#fff;
+  box-shadow:0 5px 14px rgba(10,47,102,.14)
+}
+.primary-button:hover{filter:brightness(1.05);transform:translateY(-1px)}
+button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+input,textarea,select{
+  border:1px solid var(--border);border-radius:8px;background:#f3f1eb;
+  min-height:36px;padding:8px 10px;outline:0;font-size:12px;transition:.14s ease
+}
+input:hover,textarea:hover,select:hover{border-color:#b4b9c0}
+input:focus,textarea:focus,select:focus{
+  border-color:#7f9ec3;box-shadow:0 0 0 3px rgba(43,99,167,.08);background:#f7f5ef
+}
+@media (max-width:1280px){
+  .app-shell{min-width:1040px}
+  .app-body{grid-template-columns:188px 1fr}
+  .sidebar{padding-left:10px;padding-right:10px}
+  .workspace{grid-template-rows:128px minmax(0,1fr) 28px}
+  .page-header{grid-template-columns:minmax(390px,1fr) minmax(220px,.52fr) 116px 100px}
+  .page-title{font-size:38px}
+  .page-subtitle{font-size:9px}
+  .sidebar-copy{font-size:9px}
+}
+
+
+/* Half-screen / tiled-window responsive mode */
+@media (max-width:960px){
+  .app-shell{min-width:0!important;min-height:560px}
+  .app-body{grid-template-columns:76px minmax(0,1fr)}
+  .sidebar{padding:10px 6px 12px}
+  .brand-lockup{padding:6px 10px!important;justify-content:center!important}
+  .brand-lockup .brand,.brand-lockup .brand-sub{display:none!important}
+  .brand-lockup .brand-mark{width:auto!important;font-size:42px!important}
+  .nav-item{padding:0!important;justify-content:center!important;gap:0!important}
+  .nav-item b{width:auto!important}
+  .nav-item span,.sidebar-copy,.sidebar-foot{display:none!important}
+  .sidebar:after{top:300px!important;background-size:130px auto!important;opacity:.45!important}
+  .workspace{grid-template-rows:minmax(0,1fr)!important}
+  .workspace>.page-header,.workspace>.app-footer{display:none}
+  .page{padding:10px}
+}

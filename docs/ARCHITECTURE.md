@@ -56,6 +56,7 @@ These controls guarantee consultation and action-path enforcement, not that Jev 
 | `src/scheduler.mjs` | Claim-before-run cron/one-shot jobs and bounded explicit read-only batches |
 | `src/environment.mjs`, `src/local-state.mjs`, `src/http.mjs` | Credential parsing, atomic control state, bounded HTTP primitives |
 
+
 ## Jev research lane
 
 ```text

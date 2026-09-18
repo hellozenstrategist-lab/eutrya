@@ -116,7 +116,7 @@ test('session model command backend updates existing and future swarm runtimes',
   assert.equal(swarm.modelStatus().defaultModel, 'fixture/alternate-text');
   assert.equal(admin.config.mainModel, 'fixture/alternate-text');
   assert.equal(admin.cortex.config?.mainModel ?? admin.config.mainModel, 'fixture/alternate-text');
-  assert.equal(swarm.getRuntime('researcher').config.mainModel, 'fixture/alternate-text');
+  assert.equal(swarm.getRuntime('analyst').config.mainModel, 'fixture/alternate-text');
   assert.ok(swarm.adaptive);
 
   await swarm.setProviderAndModel('openrouter', 'fixture/openrouter-text');

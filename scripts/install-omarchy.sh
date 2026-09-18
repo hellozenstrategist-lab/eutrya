@@ -2,6 +2,7 @@
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SHARE="${XDG_DATA_HOME:-$HOME/.local/share}/eutrya"
+RUNTIME="$SHARE/runtime"
 BIN_DIR="$HOME/.local/bin"
 APP_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
 NODE_BIN="$(command -v node || true)"
@@ -12,7 +13,6 @@ fail() { printf '\nEutrya install: %s\n' "$*" >&2; exit 1; }
 NODE_MAJOR="$(node -p 'Number(process.versions.node.split(".")[0])')"
 (( NODE_MAJOR >= 22 )) || fail "Node.js 22+ is required; found $(node -v)."
 command -v cargo >/dev/null 2>&1 || fail "Rust/Cargo is required. Install rustup, then run this script again."
-command -v pacman >/dev/null 2>&1 || printf 'Note: this installer is optimized for Omarchy/Arch.\n'
 
 if command -v pacman >/dev/null 2>&1; then
   missing=()
@@ -25,8 +25,8 @@ if command -v pacman >/dev/null 2>&1; then
   fi
 fi
 
-printf 'Installing Eutrya runtime dependencies...\n'
-npm --prefix "$ROOT/runtime" install
+printf 'Installing Eutrya dependencies...\n'
+npm --prefix "$ROOT" install
 
 if ! command -v cargo-tauri >/dev/null 2>&1; then
   printf 'Installing Tauri CLI...\n'
@@ -39,9 +39,12 @@ printf 'Building Eutrya desktop...\n'
   cargo tauri build
 )
 
-mkdir -p "$SHARE" "$BIN_DIR" "$APP_DIR"
-rm -rf "$SHARE/runtime"
-cp -a "$ROOT/runtime" "$SHARE/runtime"
+mkdir -p "$RUNTIME/desktop" "$BIN_DIR" "$APP_DIR"
+rm -rf "$RUNTIME/bin" "$RUNTIME/src" "$RUNTIME/extensions" "$RUNTIME/node_modules"
+cp -a "$ROOT/bin" "$ROOT/src" "$ROOT/extensions" "$RUNTIME/"
+cp "$ROOT/package.json" "$ROOT/scripts-check.mjs" "$ROOT/.env.example" "$RUNTIME/"
+cp "$ROOT/desktop/server.mjs" "$RUNTIME/desktop/server.mjs"
+cp -a "$ROOT/node_modules" "$RUNTIME/node_modules"
 cp "$ROOT/desktop/src-tauri/icons/icon.png" "$SHARE/icon.png"
 
 APPIMAGE="$(find "$ROOT/desktop/src-tauri/target/release/bundle/appimage" -maxdepth 1 -type f -name '*.AppImage' -print -quit 2>/dev/null || true)"
@@ -51,37 +54,37 @@ if [[ -n "$APPIMAGE" ]]; then
   chmod +x "$SHARE/Eutrya.AppImage"
   GUI="$SHARE/Eutrya.AppImage"
 elif [[ -x "$RAW_BIN" ]]; then
-  cp "$RAW_BIN" "$SHARE/eutrya-desktop"
-  chmod +x "$SHARE/eutrya-desktop"
-  GUI="$SHARE/eutrya-desktop"
+  cp "$RAW_BIN" "$SHARE/eutrya-desktop-bin"
+  chmod +x "$SHARE/eutrya-desktop-bin"
+  GUI="$SHARE/eutrya-desktop-bin"
 else
-  fail "Build completed but no Eutrya executable was found."
+  fail "Build completed but no Eutrya desktop executable was found."
 fi
 
-cat > "$BIN_DIR/eutrya" <<WRAPPER
+cat > "$BIN_DIR/eutrya-desktop" <<WRAPPER
 #!/usr/bin/env bash
-export EUTRYA_NODE="\${EUTRYA_NODE:-$NODE_BIN}"
-export EUTRYA_RUNTIME_DIR="\${EUTRYA_RUNTIME_DIR:-$SHARE/runtime}"
-exec "$GUI" "\$@"
+export EUTRYA_NODE="${EUTRYA_NODE:-${NODE_BIN}}"
+export EUTRYA_RUNTIME_DIR="${EUTRYA_RUNTIME_DIR:-${RUNTIME}}"
+exec "${GUI}" "$@"
 WRAPPER
-chmod +x "$BIN_DIR/eutrya"
+chmod +x "$BIN_DIR/eutrya-desktop"
 
 cat > "$BIN_DIR/eutrya-cli" <<WRAPPER
 #!/usr/bin/env bash
-exec "$NODE_BIN" "$SHARE/runtime/bin/eutrya.mjs" "\$@"
+exec "${NODE_BIN}" "${RUNTIME}/bin/eutrya.mjs" "$@"
 WRAPPER
 chmod +x "$BIN_DIR/eutrya-cli"
 
 cat > "$APP_DIR/eutrya.desktop" <<DESKTOP
 [Desktop Entry]
 Name=Eutrya
-Comment=Native Jev swarm harness
-Exec=$BIN_DIR/eutrya
-Icon=$SHARE/icon.png
+Comment=Jev-native security swarm harness
+Exec=${BIN_DIR}/eutrya-desktop
+Icon=${SHARE}/icon.png
 Terminal=false
 Type=Application
 Categories=Development;Utility;
 StartupNotify=true
 DESKTOP
 
-printf '\nInstalled.\n\n  Desktop:  eutrya\n  CLI:      eutrya-cli\n\nIf ~/.local/bin is not on PATH, restart your shell or add it.\n'
+printf '\nInstalled.\n\n  Existing CLI: eutrya\n  Installed CLI snapshot: eutrya-cli\n  Desktop: eutrya-desktop\n\n'

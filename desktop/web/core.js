@@ -12,16 +12,16 @@
   ]
 
   const agents = [
-    { id:'admin', index:'01', name:'Admin', role:'Primary agent', verbs:['Coordinate','Delegate','Plan','Synthesize'], status:'online', tasks:3 },
-    { id:'engineer', index:'02', name:'Engineer', role:'Engineering', verbs:['Build','Analyze','Debug','Implement'], status:'working', tasks:2 },
-    { id:'lawyer', index:'03', name:'Lawyer', role:'Law', verbs:['Review','Analyze','Ensure','Mitigate'], status:'online', tasks:1 },
-    { id:'finance', index:'04', name:'Finance Analyst', role:'Finance', verbs:['Model','Analyze','Forecast','Optimize'], status:'working', tasks:1 },
-    { id:'researcher', index:'05', name:'Researcher', role:'Research', verbs:['Explore','Synthesize','Validate','Report'], status:'online', tasks:2 },
+    { id:'admin', index:'01', name:'Admin', role:'Security Orchestrator', verbs:['Coordinate','Scope','Delegate','Synthesize'], status:'online', tasks:0 },
+    { id:'auditor', index:'02', name:'Auditor', role:'Security Audit', verbs:['Audit','Trace','Hypothesize','Evidence'], status:'online', tasks:0 },
+    { id:'operator', index:'03', name:'Operator', role:'Validation', verbs:['Reproduce','Fuzz','Execute','Validate'], status:'online', tasks:0 },
+    { id:'sentinel', index:'04', name:'Sentinel', role:'Independent Review', verbs:['Verify','Triage','Challenge','Guard'], status:'online', tasks:0 },
+    { id:'analyst', index:'05', name:'Analyst', role:'Security Research', verbs:['Model','Research','Synthesize','Report'], status:'online', tasks:0 },
   ]
 
   const agentPortraits = {
-    admin:'agent-admin.jpg', engineer:'agent-engineer.jpg', lawyer:'agent-lawyer.jpg',
-    legal:'agent-lawyer.jpg', finance:'agent-finance.jpg', researcher:'agent-researcher.jpg'
+    admin:'agent-admin.jpg', auditor:'agent-engineer.jpg', operator:'agent-researcher.jpg',
+    sentinel:'agent-lawyer.jpg', analyst:'agent-finance.jpg', researcher:'agent-researcher.jpg'
   }
 
   const concepts = {
@@ -39,7 +39,7 @@
   }
 
   const state = {
-    page:'dashboard', reloads:0, chat:[], selectedAgent:'admin', selectedProfile:'engineer', selectedTool:'Web Browser',
+    page:'dashboard', reloads:0, chat:[], selectedAgent:'admin', selectedProfile:'auditor', selectedTool:'Web Browser',
     memoryQuery:'', settingsCategory:'General', busy:false, pendingText:'', notice:'',
     backend:{connected:false,readiness:{ready:false,mode:'starting',error:null},config:null,swarm:null,memory:{items:[],skills:[]},approvals:[],events:[]},
     toolEnabled:{'Web Browser':true,'Code Interpreter':true,'File System':true,'Memory':true,'Search':true,'API Connector':true,'Database':true,'Email':true,'External Apps':true,'Custom Tool':true},
@@ -83,7 +83,7 @@
 
   function sidebar() {
     return `<aside class="sidebar">
-      <div class="brand-lockup"><div class="brand-mark">Λ</div><div><div class="brand">Eutrya</div><div class="brand-sub">v0.2.0</div></div></div>
+      <div class="brand-lockup"><div class="brand-mark">Λ</div><div><div class="brand">Eutrya</div><div class="brand-sub">v0.4.0</div></div></div>
       <div class="slash">//</div>
       <nav class="nav-list">${nav.map(([key,icon,label]) => `<button class="nav-item ${state.page===key?'active':''}" data-page="${key}"><b>${icon}</b><span>${label}</span></button>`).join('')}</nav>
       <div class="sidebar-copy">HUMAN<br>AI<br>HIGHER<br>INTELLIGENCE</div>

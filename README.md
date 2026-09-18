@@ -28,7 +28,7 @@ State-bound, single-use decision ticket + tool permission
 Execute → record observation → repeat
 ```
 
-Version: **0.3.1**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
+Version: **0.4.0**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
 
 
 ## Jev research lane
@@ -44,6 +44,34 @@ Research mode is deliberately read-only. The strategist produces a compact objec
 Built-in semantic operations cover code-surface mapping, symbol lookup, reference/caller tracing, function/modifier inspection, state read/write tracing, and structural function comparison. Smart-contract Solidity is parsed with a bounded local structural scanner; TypeScript/JavaScript/Rust/Move receive lighter function discovery. These are research aids, not a compiler or proof engine.
 
 The research ledger stores invariants and hypotheses as first-class state with stable IDs and statuses (`open`, `supported`, `weakened`, `closed`). Structural asymmetry is intentionally treated as a lead requiring context, not as automatic proof of a vulnerability.
+
+
+## Jev-routed hunt Kanban
+
+For authorized security hunts, give Admin the program page plus the rules/scope. Admin can browse or read the supplied material, normalize the constraints, create a persistent hunt board, decompose it into bounded cards, and hand routing to Jev.
+
+The board uses these stages:
+
+```text
+INTAKE → READY → ACTIVE → REVIEW → DONE
+                    │
+                    └────→ BLOCKED
+```
+
+Routing is availability-aware. Jev only receives currently idle specialist agents as assignment candidates. If Auditor is already working, the next card is evaluated among the remaining Operator, Sentinel, and Analyst rather than being queued behind Auditor. Review-stage cards avoid the original worker when another specialist is available.
+
+Useful commands:
+
+```text
+/hunt                    Show the current hunt board
+/hunt HUNT_ID            Show a specific hunt board
+/hunt run [HUNT_ID]      Route and run ready/review cards
+/hunt pause HUNT_ID      Pause routing for a hunt
+/hunt resume HUNT_ID     Resume routing
+```
+
+Admin has native `hunt_create`, `hunt_card`, `hunt_board`, and `hunt_route` tools. Hunt state is stored with the shared swarm workspace and survives restarts. Program rules, scope, exclusions, testing constraints, card dependencies, routing history, worker results, and independent review results are preserved.
+
 
 ## Start without credentials
 
@@ -140,6 +168,8 @@ Process execution uses an executable and argument array, not an implicit shell. 
 | `/agent remove ID` | Remove a swarm agent. |
 | `/tasks` | List shared workspace tasks and backlog. |
 | `/findings` | List shared organizational findings. |
+| `/hunt [ID]` | Show the current or selected hunt Kanban board. |
+| `/hunt run [ID]` | Let Jev route ready/review cards across idle specialists. |
 | `/template [NAME]` | View or apply an organization template (default, engineering, startup, legal, research). |
 | `/thinking [on\|off]` | Toggle display of candidate thinking/summary (hidden by default). |
 | `/reload` | Save the current session and restart the harness with updated code while preserving conversation history. |
@@ -164,7 +194,7 @@ Eutrya is designed as a persistent organization of specialized AI agents, not a 
    Targeted events (`TASK_ASSIGNED`, `SECURITY_AUDIT_REQUIRED`, `OPERATION_REQUIRED`, `SENTINEL_REVIEW_REQUIRED`, `ANALYSIS_REQUIRED`, `CANDIDATE_RESULT`, `BLOCKED`, `TASK_COMPLETE`) wake only the relevant security specialist, keeping token consumption bounded. Legacy event names remain accepted for compatibility and route into the closest security role.
 
 4. **Shared Workspace**:
-   Agents collaborate through structured organizational memory (`tasks`, `findings`, `decisions`, `artifacts`, `messages`, `evidence`, `openQuestions`, `blockers`, `agentStatus`) rather than unbounded group chat histories.
+   Agents collaborate through structured organizational memory (`tasks`, `hunts`, `huntCards`, `findings`, `decisions`, `artifacts`, `messages`, `evidence`, `openQuestions`, `blockers`, `agentStatus`) rather than unbounded group chat histories.
 
 5. **Direct Conversations**:
    Users can address any specialist directly using `@AgentName <task>` (e.g. `@Auditor Review the withdrawal invariant` or `@Sentinel Verify the evidence independently`) or switch focus using `/agent <name>`.
@@ -273,8 +303,10 @@ src/store.mjs            Session snapshots, locking, trace, observation archive
 src/memory.mjs           Legacy bounded context used only when Jev compaction is explicitly disabled
 extensions/eutrya-jev-compaction-extension/  Active archive-backed Jev context pruning
 src/puzzle.mjs           Local switchboard and independent checker
-src/ui.mjs               Terminal events and one-action approvals
+src/swarm/workspace.mjs Shared workspace, persistent tasks and hunt Kanban state
+src/swarm/swarm.mjs     Native security swarm and availability-aware Jev hunt router
+src/ui.mjs               Terminal events, hunt board rendering, and one-action approvals
 tests/                   Offline regression and contract tests
 ```
 
-This is a small standalone implementation, not full Pi feature parity: no extension marketplace, MCP loader, browser, multiple-agent orchestration, token-by-token interleaving inside a hosted model, or full-screen terminal UI is included.
+This is a standalone implementation with native multi-agent orchestration, browser/content retrieval, explicit MCP clients, persistent hunt boards, and Jev evaluation. It still does not provide full Pi feature parity, token-by-token interleaving inside a hosted model, or a full-screen terminal UI.

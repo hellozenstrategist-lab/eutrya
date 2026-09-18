@@ -1,19 +1,72 @@
 /* State helpers. Runtime data and presentation-only preferences stay separate. */
 (() => {
   'use strict';
-  const names=['dashboard','swarm','library','memory','tools','settings'];
+  const names=['dashboard','swarm','hunts','library','memory','tools','settings'];
   const initial=location.hash.slice(1);
   let preferences={density:'precise',motion:'system'};
   try { preferences={...preferences,...JSON.parse(localStorage.getItem('eutrya.studio.preferences')||'{}')}; } catch { /* Local storage can be unavailable in a restricted webview. */ }
   const state={page:names.includes(initial)?initial:'dashboard',data:null,connected:false,error:'',selectedAgent:'admin',selectedProfile:'admin',selectedTool:'Web Browser',selectedRecord:null,source:'all',agentQuery:'',memoryQuery:'',toolQuery:'',toolCategory:'all',libraryView:'grid',networkView:'graph',settingsTab:'all',profileTab:'configuration',configDraft:null,configDirty:false,profileDrafts:{},chatDraft:'',chatBusy:false,outbox:null,pending:new Set(),preferences,scroll:{},modal:null,seenApprovals:new Set(),toastTimer:null};
   const defaults=[
-    {id:'admin',name:'Admin',role:'Orchestration & coordination',description:'Coordinate teams, delegate work, and maintain the larger plan.',verbs:['Coordinate','Delegate','Plan']},
-    {id:'engineer',name:'Engineer',role:'Engineering',description:'Build, analyze, and debug complex systems.',verbs:['Build','Analyze','Debug']},
-    {id:'lawyer',name:'Lawyer',role:'Law & compliance',description:'Review requirements, analyze risk, and support compliance.',verbs:['Review','Analyze','Ensure']},
-    {id:'finance',name:'Finance Analyst',role:'Finance',description:'Model scenarios, analyze data, and evaluate trade-offs.',verbs:['Model','Analyze','Forecast']},
-    {id:'researcher',name:'Researcher',role:'Research',description:'Explore ideas, synthesize information, and validate knowledge.',verbs:['Explore','Synthesize','Validate']}
-  ];
+  {
+    "id": "admin",
+    "name": "Admin",
+    "role": "Security orchestration",
+    "description": "Coordinate scoped work and maintain the shared plan.",
+    "verbs": [
+      "Coordinate",
+      "Scope",
+      "Delegate"
+    ]
+  },
+  {
+    "id": "auditor",
+    "name": "Auditor",
+    "role": "Security code review",
+    "description": "Review code, trace invariants, and gather supporting evidence.",
+    "verbs": [
+      "Review",
+      "Trace",
+      "Document"
+    ]
+  },
+  {
+    "id": "operator",
+    "name": "Operator",
+    "role": "Validation engineering",
+    "description": "Support controlled local validation and record its results.",
+    "verbs": [
+      "Validate",
+      "Record",
+      "Report"
+    ]
+  },
+  {
+    "id": "sentinel",
+    "name": "Sentinel",
+    "role": "Independent review",
+    "description": "Challenge assumptions, assess evidence, and flag uncertainty.",
+    "verbs": [
+      "Verify",
+      "Challenge",
+      "Triage"
+    ]
+  },
+  {
+    "id": "analyst",
+    "name": "Analyst",
+    "role": "Architecture & research",
+    "description": "Connect documentation, architecture, and review evidence.",
+    "verbs": [
+      "Model",
+      "Research",
+      "Synthesize"
+    ]
+  }
+];
   const toolGroups=[
+    {"name":"Semantic Code","icon":"code","category":"Research","description":"Read-only structural code navigation; signals are not proofs.","keys":["code_surface","code_symbol","code_references","code_inspect","code_state","code_compare"]},
+    {"name":"Hunt Board","icon":"hunts","category":"Collaboration","description":"Shared board metadata and recorded routing. The desktop review view does not launch tests.","keys":["hunt_create","hunt_card","hunt_board","hunt_route"]},
+
     {name:'Web Browser',icon:'globe',category:'Research',description:'Read and navigate web content within runtime permissions.',keys:['browser']},
     {name:'Code Interpreter',icon:'code',category:'Execution',description:'Run local processes through the runtime approval gate.',keys:['run','shell']},
     {name:'File System',icon:'folder',category:'Data',description:'Read and manage files inside your working environment.',keys:['list','read','mkdir','write','edit']},
@@ -31,7 +84,7 @@
   const memory=()=>state.data?.memory?.items||[];
   const mode=()=>state.data?.readiness?.mode|| (state.error?'offline':'connecting');
   const isPreview=()=>['demo','preview'].includes(mode());
-  const activeTasks=()=>(ws().tasks||[]).filter(t=>!['completed','cancelled','failed'].includes(String(t.status).toLowerCase()));
+  const activeTasks=()=>[...(ws().tasks||[]),...(ws().huntCards||[])].filter(t=>!['completed','cancelled','failed','done','parked'].includes(String(t.status).toLowerCase()));
   function agents(){
     const profiles=state.data?.swarm?.profiles||[];
     const statuses=new Map((state.data?.swarm?.matrix?.agents||[]).map(a=>[a.id,a]));
@@ -46,14 +99,15 @@
   function records(){
     const result=[];
     const add=(source,rows,titleKey,textKey)=>rows.forEach((r,i)=>{
-      const text=String(r[textKey]||r.text||r.content||r.summary||r.title||r.topic||r.path||'');
+      const text=String(r[textKey]||r.text||r.content||r.summary||r.objective||r.title||r.topic||r.path||'');
       const id=r.id??`${source}-${i}`;
       result.push({key:`${source}:${id}`,id,source,title:String(r[titleKey]||text.split('\n')[0]||'Untitled').slice(0,110),text,time:r.at||r.createdAt||r.timestamp||null,author:r.author||r.from||r.assignedTo||'Workspace',deletable:source==='notes'&&Boolean(r.id)});
     });
     add('notes',memory(),'title','text');add('messages',ws().messages||[],'subject','content');add('tasks',ws().tasks||[],'title','description');add('findings',ws().findings||[],'topic','summary');add('decisions',ws().decisions||[],'topic','decision');add('artifacts',ws().artifacts||[],'name','path');
+    add('hunt-cards',ws().huntCards||[],'title','workerResult');
     return result;
   }
-  function groups(){const all=records();return [['notes','Notes'],['messages','Conversations'],['tasks','Tasks'],['findings','Findings'],['decisions','Decisions'],['artifacts','Artifacts']].map(([id,name])=>({id,name,count:all.filter(r=>r.source===id).length}));}
+  function groups(){const all=records();return [['notes','Notes'],['messages','Conversations'],['tasks','Tasks'],['findings','Findings'],['decisions','Decisions'],['artifacts','Artifacts'],['hunt-cards','Hunt cards']].map(([id,name])=>({id,name,count:all.filter(r=>r.source===id).length}));}
   function selectedAgent(){return agents().find(a=>a.id===state.selectedAgent)||agents()[0];}
   function selectedProfile(){return agents().find(a=>a.id===state.selectedProfile)||agents()[0];}
   function profileDraft(){const p=selectedProfile();return state.profileDrafts[p.id]||{name:p.name,role:p.role,profession:p.profession||p.role,instructions:p.instructions||'',model:p.model||''};}
@@ -64,6 +118,6 @@
     if(!state.configDirty) state.configDraft={...config()};
   }
   const time = (value,full=false) => {const d=new Date(value);return !value||!Number.isFinite(d.getTime())?'—':(full?d.toLocaleDateString([], {month:'short',day:'numeric',year:'numeric'}):d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',hour12:false}));};
-  function eventLabel(e){const d=e?.data||{};if(e.type==='swarm.agent_status')return `${d.agent||e.agent||'Agent'} · ${d.status||'updated'}`;if(e.type==='observation')return `${e.agent||'Agent'} · ${d.action?.type||'tool observation'}`;if(e.type==='answer')return `${e.agent||'Agent'} answered`;if(e.type==='desktop.user_message')return 'Message sent to the swarm';if(e.type==='desktop.runtime_ready')return 'Runtime connected';if(e.type==='desktop.approval_required')return 'Operator approval requested';return String(e.type||'Runtime event').replaceAll(/[._]/g,' ');}
+  function eventLabel(e){const d=e?.data||{};if(e.type==='hunt.card_started')return `${d.cardId} → @${d.agent||d.agentId} (${d.stage})`;if(e.type==='hunt.card_stage_complete')return `${d.cardId} → ${d.nextStatus}`;if(e.type==='hunt.card_blocked')return `${d.cardId} blocked: ${d.error||'Review needed'}`;if(e.type==='hunt.waiting')return `${d.cardId}: ${d.reason||'Waiting'}`;if(e.type==='swarm.agent_status')return `${d.agent||e.agent||'Agent'} · ${d.status||'updated'}`;if(e.type==='observation')return `${e.agent||'Agent'} · ${d.action?.type||'tool observation'}`;if(e.type==='answer')return `${e.agent||'Agent'} answered`;if(e.type==='desktop.user_message')return 'Message sent to the swarm';if(e.type==='desktop.runtime_ready')return 'Runtime connected';if(e.type==='desktop.approval_required')return 'Operator approval requested';return String(e.type||'Runtime event').replaceAll(/[._]/g,' ');}
   window.EutryaStudio={names,state,defaults,toolGroups,ready,ws,config,events,memory,mode,isPreview,activeTasks,agents,availableTools,records,groups,selectedAgent,selectedProfile,profileDraft,accept,time,eventLabel};
 })();

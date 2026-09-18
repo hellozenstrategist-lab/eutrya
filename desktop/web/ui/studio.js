@@ -13,12 +13,14 @@
   preferences();
   function toast(message,error=false){const el=$('#toast');clearTimeout(state.toastTimer);el.textContent=message;el.className=`toast ${error?'error':''}`;state.toastTimer=setTimeout(()=>el.classList.add('hidden'),6500);}
   function paintChrome(){
+    const build=document.querySelector("#build-version");if(build)build.textContent=state.data?.readiness?.bridgeVersion ? `v${state.data.readiness.bridgeVersion} / STUDIO` : "STUDIO / BRIDGE NOT LINKED";
     $('#connection-status').innerHTML=`<span>LOCAL</span>${status(state.connected?'LINKED':'OFFLINE',state.connected?'online':'offline')}<span>${esc(M.mode().toUpperCase())}</span>`;
     document.querySelectorAll('.primary-nav [data-page]').forEach(el=>{if(el.dataset.page===state.page)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});
     document.title=`${state.page==='dashboard'?'Eutrya':state.page[0].toUpperCase()+state.page.slice(1)+' · Eutrya'}`;
   }
   function render(force=false, pageChanged=false){
     paintChrome();
+    if(window.EutryaHunts?.hasOpenDialog()){renderPending=true;return;}
     const active=document.activeElement;
     if(!force && active?.matches('input,textarea,select')){renderPending=true;syncApproval();return;}
     const focus=active?.id, start=active?.selectionStart, end=active?.selectionEnd;
@@ -27,6 +29,7 @@
     const nested={};document.querySelectorAll('[data-scroll]').forEach(el=>nested[el.dataset.scroll]=el.scrollTop);
     try { $('#page').innerHTML=V.renderPage(); }
     catch(err){$('#page').innerHTML=`<div class="notice"><div><strong>Interface rendering error</strong><p>${esc(err.message)}</p></div></div>`;console.error('Eutrya UI render failed:',err);}
+    window.EutryaHunts?.bind({render:()=>render(true),refresh,applyBackend:accept,invalidate:()=>{refreshSerial++;}});
     area.scrollTop=top;
     document.querySelectorAll('[data-scroll]').forEach(el=>{el.scrollTop=nested[el.dataset.scroll]??(el.dataset.scroll==='chat'?el.scrollHeight:0);});
     if(focus && !pageChanged){const next=document.getElementById(focus);if(next){next.focus({preventScroll:true});if(typeof start==='number'&&next.setSelectionRange){try{next.setSelectionRange(start,end);}catch{/* Number inputs do not expose a selection. */}}}}
@@ -79,7 +82,7 @@
     dialog.innerHTML=`<form id="modal-form"><header class="dialog-header"><h2 id="modal-title">${title}</h2>${button('Close dialog','close-modal','close','square','type="button" aria-label="Close dialog"')}</header><div class="dialog-content">${body}</div><footer class="dialog-actions">${button(type==='approval'?'Deny':'Cancel',type==='approval'?'deny-approval':'close-modal','','','type="button"')}${type!=='events'?`<button class="btn ${danger?'danger':'primary'}" type="submit">${save}</button>`:''}</footer></form>`;
     dialog.showModal();
   }
-  function syncApproval(){const row=state.data?.approvals?.find(a=>a.status==='pending');if(row&&!dialog.open)modal('approval',{row});}
+  function syncApproval(){const row=state.data?.approvals?.find(a=>a.status==='pending');if(row&&!dialog.open&&!window.EutryaHunts?.hasOpenDialog())modal('approval',{row});}
   async function submitModal(form){
     const m=state.modal;if(!m)return;const data=new FormData(form);
     const key=`modal-${m.type}`;if(state.pending.has(key))return;

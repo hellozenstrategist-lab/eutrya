@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1 — Desktop hunt review workspace
+
+Updated the actual Studio entry point with Hunt Kanban, live assignments and routing history, card evidence/review dialogs, manual intake and notes, guarded status edits, pause controls, and exports. Added security-profile defaults, current tool groups, accurate work-item counts and backend-derived version labels. New desktop records start paused/parked and no automatic target-testing launcher is provided. Fixed dispatch after a board is paused and prevented incomplete workers from marking work complete.
+
 ## 0.4.0 — Jev-routed hunt Kanban
 
 Unified the former desktop-frontend branch into the main v0.4 codebase. The Tauri desktop now launches the same root NativeSwarm backend as the CLI, uses the security-specialist profiles, exposes hunt-board state through its bridge, and installs as `eutrya-desktop` without replacing the `eutrya` CLI command.

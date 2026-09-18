@@ -2,7 +2,7 @@
 
 # Eutrya Native
 
-> **Public Alpha · v0.4.0** — developer release. The CLI is the primary supported interface; the desktop app is experimental and Linux-first. Eutrya has automated regression coverage, but it has **not** undergone an independent security audit.
+> **Public Alpha · v0.4.1** — developer release. The CLI is the primary supported interface; the desktop app is experimental and Linux-first. Eutrya has automated regression coverage, but it has **not** undergone an independent security audit.
 
 **A standalone terminal agent with Jev in its decision loop.**
 
@@ -66,7 +66,7 @@ State-bound, single-use decision ticket + tool permission
 Execute → record observation → repeat
 ```
 
-Version: **0.4.0**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
+Version: **0.4.1**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
 
 
 ## Jev research lane
@@ -384,3 +384,10 @@ tests/                    Offline regression and contract tests
 ```
 
 This is a standalone implementation with native multi-agent orchestration, browser/content retrieval, explicit MCP clients, persistent hunt boards, Jev evaluation, a CLI, and a native desktop control surface. It still does not provide full Pi feature parity or token-by-token interleaving inside a hosted model.
+
+
+### Desktop review workspace (0.4.1)
+
+The active Studio entry point now includes a **Hunts** tab with seven Kanban columns, filters, current assignments, recorded Jev routing history, scope/rules, card evidence and independent-review details. It also includes manual paused-board creation, parked cards, human notes, conflict-safe edits, JSON export, and pause/resume of board state. Resume does not start execution. The UI does not launch autonomous target testing. Running, review, and completed work stages cannot be set by dragging a card.
+
+Security roles, portraits, semantic-code tools, hunt records in Memory, dashboard counts, and displayed versions reflect the current backend. Rebuild an installed desktop binary after updating source; reloading its bridge alone cannot update bundled frontend assets. See [desktop/README.md](desktop/README.md).

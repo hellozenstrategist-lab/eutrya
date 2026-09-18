@@ -44,6 +44,7 @@ rm -rf "$RUNTIME/bin" "$RUNTIME/src" "$RUNTIME/extensions" "$RUNTIME/node_module
 cp -a "$ROOT/bin" "$ROOT/src" "$ROOT/extensions" "$RUNTIME/"
 cp "$ROOT/package.json" "$ROOT/scripts-check.mjs" "$ROOT/.env.example" "$RUNTIME/"
 cp "$ROOT/desktop/server.mjs" "$RUNTIME/desktop/server.mjs"
+cp "$ROOT/desktop/review-board.mjs" "$RUNTIME/desktop/review-board.mjs"
 cp -a "$ROOT/node_modules" "$RUNTIME/node_modules"
 cp "$ROOT/desktop/src-tauri/icons/icon.png" "$SHARE/icon.png"
 

@@ -683,7 +683,7 @@ export class NativeSwarm {
       const runtime=this.getRuntime(agentId);
       runtime.startTask(this.huntTaskPrompt(hunt,card,stage));
       await runtime.run();
-      if(['ERROR','NEEDS_REVIEW'].includes(runtime.state.status)) throw new Error(runtime.state.reason || `Agent ended in ${runtime.state.status}`);
+      if(!['ANSWERED','VERIFIED'].includes(runtime.state.status)) throw new Error(runtime.state.reason || `Agent ended without completion: ${runtime.state.status}`);
       const answer=runtime.state.answer || runtime.state.summary || 'No substantive result returned';
       if(stage==='review') {
         this.sharedWorkspace.updateHuntCard(cardId,{status:'done',assignedTo:null,reviewer:agentId,reviewResult:answer,blockers:[]});
@@ -711,6 +711,7 @@ export class NativeSwarm {
     let wave=0,routed=0;
     const results=[];
     while(wave<maxWaves) {
+      if(this.sharedWorkspace.getHunt(huntId)?.status!=="active" || signal?.aborted) break;
       this.sharedWorkspace.refreshHuntReadiness(huntId);
       const cards=this.sharedWorkspace.listHuntCards({huntId}).filter(c=>
         ['ready','review'].includes(c.status) && this.sharedWorkspace.dependenciesSatisfied(c)
@@ -718,7 +719,9 @@ export class NativeSwarm {
       if(!cards.length) break;
       const jobs=[];
       for(const card of cards) {
+        if(this.sharedWorkspace.getHunt(huntId)?.status!=="active" || signal?.aborted) break;
         const route=await this.routeHuntCard(card.id,signal);
+        if(this.sharedWorkspace.getHunt(huntId)?.status!=="active" || signal?.aborted) break;
         if(!route) continue;
         routed++;
         jobs.push(this.executeHuntCard(card.id,route.agentId,card.status,route));

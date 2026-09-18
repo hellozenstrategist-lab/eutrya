@@ -59,7 +59,7 @@ test('desktop bridge exposes current security swarm and shared hunt state', asyn
   const health = await fetch(base + '/health').then(r => r.json());
   assert.equal(health.ready, true);
   assert.equal(health.mode, 'demo');
-  assert.equal(health.bridgeVersion, '0.4.0');
+  assert.equal(health.bridgeVersion, '0.4.1');
 
   const state = await call(base, '/api/state');
   assert.equal(state.swarm.profiles.length, 5);

@@ -1,6 +1,6 @@
 [package]
 name = "eutrya-desktop"
-version = "0.4.0"
+version = "0.4.1"
 description = "Eutrya native swarm desktop"
 authors = ["Eutrya contributors"]
 edition = "2021"

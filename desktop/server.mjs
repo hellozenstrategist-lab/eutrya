@@ -11,8 +11,10 @@ import { loadEnvFile, profileConfigPath, saveSecret } from '../src/environment.m
 import { atomicJson } from '../src/local-state.mjs';
 import { providerSettings, textModelReady } from '../src/providers/gateway.mjs';
 import { redactor, insist, clip, uid } from '../src/util.mjs';
+import { editReviewBoard, withEditToken } from './review-board.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const BUILD_VERSION = JSON.parse(fs.readFileSync(path.join(HERE,'..','package.json'),'utf8')).version;
 const args = parseArgs(process.argv.slice(2));
 const host = '127.0.0.1';
 const requestedPort = numberArg(args.port, 32117, 1, 65535);
@@ -127,7 +129,7 @@ function readiness() {
     mode: explicitDemo ? 'demo' : (swarm ? 'live' : 'setup'),
     error: readinessError ?? startupError,
     node: process.versions.node,
-    bridgeVersion: '0.4.0',
+    bridgeVersion: BUILD_VERSION,
   };
 }
 async function ensureRuntime({ force = false } = {}) {
@@ -183,8 +185,8 @@ function swarmView() {
       artifacts: swarm.sharedWorkspace.listArtifacts(),
       messages: swarm.sharedWorkspace.listMessages({ limit: 120 }),
       blockers: swarm.sharedWorkspace.listBlockers({ unresolvedOnly: false }),
-      hunts: swarm.sharedWorkspace.listHunts(),
-      huntCards: swarm.sharedWorkspace.listHuntCards(),
+      hunts: swarm.sharedWorkspace.listHunts().map(withEditToken),
+      huntCards: swarm.sharedWorkspace.listHuntCards().map(withEditToken),
       summary: swarm.sharedWorkspace.summary(),
     },
   };
@@ -192,6 +194,7 @@ function swarmView() {
 function stateView() {
   return {
     readiness: readiness(),
+    capabilities: { desktopReviewBoard: true, huntExecutionControls: false },
     config: configView(),
     swarm: swarmView(),
     memory: knowledge ? { items: knowledge.memories(''), skills: knowledge.listSkills() } : { items: [], skills: [] },
@@ -241,6 +244,11 @@ async function dispatchRoute(req, res) {
   if (req.method === 'GET' && url.pathname === '/health') return json(res, 200, { ok: true, ...readiness() });
   if (!authorized(req)) return json(res, 403, { error: 'Desktop bridge request rejected' });
 
+  if (url.pathname.startsWith('/api/review/')) {
+    const edited = editReviewBoard(swarm, req.method, url.pathname, await body(req));
+    const {code, ...result} = edited;
+    return json(res, code, {...result, state: stateView()});
+  }
   if (req.method === 'GET' && url.pathname === '/api/state') return json(res, 200, stateView());
   if (req.method === 'GET' && url.pathname === '/api/events') {
     const since = Number(url.searchParams.get('since') || 0);
@@ -267,7 +275,7 @@ async function dispatchRoute(req, res) {
   }
   if (req.method === 'GET' && url.pathname === '/api/hunts') {
     insist(swarm, 'Runtime not ready');
-    return json(res, 200, { hunts: swarm.sharedWorkspace.listHunts(), cards: swarm.sharedWorkspace.listHuntCards() });
+    return json(res, 200, { hunts: swarm.sharedWorkspace.listHunts().map(withEditToken), cards: swarm.sharedWorkspace.listHuntCards() });
   }
   if (req.method === 'POST' && parts[0] === 'api' && parts[1] === 'hunts' && parts[2] && parts[3] === 'run') {
     insist(swarm, 'Runtime not ready');

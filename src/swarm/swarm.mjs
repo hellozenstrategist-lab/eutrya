@@ -15,6 +15,44 @@ import { createAdaptive } from '../../extensions/eutrya-adaptive-extension/src/i
 import { createChatStreamer } from '../../extensions/eutrya-adaptive-extension/src/chat-stream.mjs';
 import { createCodexSubscriptionStreamer } from '../providers/codex-subscription.mjs';
 
+
+const GENERIC_COMPLETION_RE = /^(?:completed?|done|finished|success(?:ful(?:ly)?)?)\.?$/i;
+
+export function isGenericCompletionText(value) {
+  return typeof value === 'string' && GENERIC_COMPLETION_RE.test(value.trim());
+}
+
+export function dispatchFlags(taskText) {
+  const text=String(taskText ?? '');
+  return {
+    requiresTools: /(?:write|edit|create\s+file|delete|run|npm|test|bash|shell|exec|search\s+in|list\s+dir|browse|fetch\s+url|clone|hunt|hunting)/i.test(text),
+    highStakes: /(?:security|vulnerability|exploit|audit|authorization|access control|smart contract|web3|scope|triage|severity|production|credential|secret|bug\s*bounty|bounty|hunt|hunting|immunefi|bugcrowd|hackerone|pentest|penetration\s+test)/i.test(text),
+    requiresVerification: /(?:verify|independent|checker|triage|reproduce|false positive|duplicate|severity)/i.test(text)
+  };
+}
+
+export function finalRunResponse(state) {
+  const answer=typeof state?.answer==='string'?state.answer.trim():'';
+  if(answer && !isGenericCompletionText(answer)) return answer;
+
+  const summary=typeof state?.summary==='string'?state.summary.trim():'';
+  if(summary && !isGenericCompletionText(summary)) return summary;
+
+  const status=String(state?.status || 'UNKNOWN').toUpperCase();
+  const reason=typeof state?.reason==='string'?state.reason.trim():'';
+  if(reason) return status==='NEEDS_INPUT' ? reason : `${status}: ${reason}`;
+
+  const last=Array.isArray(state?.observations) ? state.observations.at(-1) : null;
+  if(last?.action?.type==='hunt_route') {
+    return 'Hunt routing ran, but the agent did not produce a final narrative response. Open Hunts to review the current board, card statuses, and recorded results.';
+  }
+
+  if(['ANSWERED','VERIFIED'].includes(status)) {
+    return `The run ended with status ${status}, but no substantive final response was produced. Please retry the request or inspect the latest runtime events.`;
+  }
+  return `The run ended with status ${status} without a final response. Check the latest runtime events before treating the task as complete.`;
+}
+
 export class NativeSwarm {
   constructor({
     config,
@@ -465,11 +503,14 @@ export class NativeSwarm {
       runtime.startTask(taskText);
       await runtime.run();
 
-      const answer = runtime.state.answer || runtime.state.summary || 'Task completed';
+      const answer = finalRunResponse(runtime.state);
       if (taskId) {
+        const completed = ['ANSWERED','VERIFIED'].includes(String(runtime.state.status).toUpperCase()) &&
+          Boolean(runtime.state.answer && !isGenericCompletionText(runtime.state.answer));
         this.sharedWorkspace.updateTask(taskId, {
-          status: 'completed',
-          result: answer
+          status: completed ? 'completed' : (runtime.state.status === 'NEEDS_INPUT' ? 'blocked' : 'review'),
+          result: answer,
+          ...(completed ? {} : { blockers: [`Agent ended with ${runtime.state.status} without a substantive final answer`] })
         });
       }
 
@@ -563,7 +604,7 @@ export class NativeSwarm {
         instanceId,
         templateId,
         status: runtime.state.status,
-        answer: runtime.state.answer || runtime.state.summary || 'Completed'
+        answer: finalRunResponse(runtime.state)
       };
     } finally {
       signal?.removeEventListener('abort', abort);
@@ -786,13 +827,9 @@ export class NativeSwarm {
     if (!targetAgentId) {
       if (this.activeAgentId === this.primaryAgent) {
         // Fast tool-free response lane check before entering full multi-agent planning
-        const requiresTools = /(?:write|edit|create\s+file|delete|run|npm|test|bash|shell|exec|search\s+in|list\s+dir|browse|fetch\s+url)/i.test(actualTask);
-        const highStakes = /(?:security|vulnerability|exploit|audit|authorization|access control|smart contract|web3|scope|triage|severity|production|credential|secret)/i.test(actualTask);
-        const requiresVerification = /(?:verify|independent|checker|triage|reproduce|false positive|duplicate|severity)/i.test(actualTask);
+        const classified = dispatchFlags(actualTask);
         const flags = {
-          requiresTools,
-          highStakes,
-          requiresVerification,
+          ...classified,
           forceWork: !this.adaptive
         };
 
@@ -812,7 +849,7 @@ export class NativeSwarm {
               }
             );
 
-            if (fastResult?.handled) {
+            if (fastResult?.handled && !isGenericCompletionText(fastResult.text)) {
               if (!onToken) process.stdout.write('\n');
               this.sharedWorkspace.postMessage({ from: 'admin', to: 'user', content: fastResult.text });
               this.sharedWorkspace.save(this.swarmDir);
@@ -847,7 +884,7 @@ export class NativeSwarm {
       runtime.startTask(actualTask);
       await runtime.run();
 
-      const answer = runtime.state.answer || runtime.state.summary || 'Completed';
+      const answer = finalRunResponse(runtime.state);
       this.sharedWorkspace.setAgentStatus(targetAgentId, 'IDLE');
       this.sharedWorkspace.postMessage({ from: targetAgentId, to: 'user', content: answer });
       this.sharedWorkspace.save(this.swarmDir);

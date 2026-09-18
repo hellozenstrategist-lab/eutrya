@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 — Jev research lane
+
+Added a separate strategist/executor research mode for local codebase review. The text model now plans at investigation boundaries while Jev drives several read-only semantic code lookups between replans. Added first-class invariant and hypothesis state, compact evidence packets, Jev escalation/stagnation decisions, and state-bound action tickets for research micro-steps.
+
+Added semantic code tools for surface mapping, symbol lookup, caller/reference tracing, function/modifier inspection, state read/write tracing, and structural function comparison, with Solidity-oriented structural extraction and lighter support for several common code extensions.
+
+Made the browser-content test hermetic instead of depending on public internet access. Current package verification is 220/220 tests passing.
+
 ## 0.2.0 — Provider and messaging foundation
 
 Added main-text adapters for OpenRouter, Vercel, compatible endpoints and Ollama while keeping Jev on its separate typed evaluation API. Added explicit per-request Jev ZDR opt-in without forcing it on incompatible plans.

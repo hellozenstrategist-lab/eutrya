@@ -2,7 +2,7 @@ import { insist, object, string, integer } from './util.mjs';
 
 const ID=/^[A-Za-z][A-Za-z0-9_-]{0,31}$/;
 function parseJson(raw,label){
-  if(typeof raw!=='string')return raw;const t=raw.trim().replace(/^\`\`\`(?:json)?\s*([\s\S]*?)\s*\`\`\`$/i,'$1');
+  if(typeof raw!=='string')return raw;const t=raw.trim().replace(/^```(?:json)?\s*([\s\S]*?)\s*```$/i,'$1');
   try{return JSON.parse(t);}catch{throw new Error(`${label} did not return valid JSON`);}
 }
 export function validateResearchPlan(raw){

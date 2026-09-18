@@ -119,7 +119,7 @@ test('resident compaction archives are isolated by persistent identity',async t=
   const swarm=new NativeSwarm({config,workspace:root,demo:true});t.after(()=>swarm.close());
   const admin=swarm.getRuntime('admin'),auditor=swarm.getRuntime('auditor');
   assert.ok(admin.compaction&&auditor.compaction);
-  assert.notEqual(admin.compaction.archive.key,engineer.compaction.archive.key);
+  assert.notEqual(admin.compaction.archive.key,auditor.compaction.archive.key);
   assert.notEqual(admin.store.dir,auditor.store.dir);
 });
 

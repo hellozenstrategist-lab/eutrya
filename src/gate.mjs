@@ -3,7 +3,7 @@ import { digest, uid, insist } from './util.mjs';
 export function semanticState(s) {
   return {id:s.id,workspace:s.workspace,revision:s.revision,task:s.task,directives:s.directives,
     summary:s.summary,hypotheses:s.hypotheses,unknowns:s.unknowns,lastMode:s.lastMode,
-    observations:s.observations,notebook:s.notebook,environment:s.environment};
+    observations:s.observations,notebook:s.notebook,research:s.research??null,environment:s.environment};
 }
 export class DecisionGate {
   #issued=new Map();

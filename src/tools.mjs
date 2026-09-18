@@ -48,7 +48,7 @@ function atomicWrite(file,content) {
   try {fs.writeFileSync(fd,content);fs.fsyncSync(fd);} finally {fs.closeSync(fd);}
   try {fs.renameSync(temp,file);} catch(e){try{fs.unlinkSync(temp);}catch{}throw e;}
 }
-export const isEffect = action => ['mkdir','write','edit','run','shell','remember','skill_draft','mcp'].includes(action.type);
+export const isEffect = action => ['mkdir','write','edit','run','shell','remember','skill_draft','mcp','hunt_create','hunt_card','hunt_route'].includes(action.type);
 export class Toolbox {
   constructor({workspace,store,config,approve=async()=>false,redact=x=>x,knowledge=null,mcp=null,readOnly=false,sharedWorkspace=null,swarm=null,agentId='admin',allowedTools=null}) {
     this.knowledge=knowledge;this.mcp=mcp;this.readOnly=readOnly;
@@ -61,7 +61,9 @@ export class Toolbox {
       ...(!this.readOnly?['mkdir','write','edit']:[]),...(this.config.allowExec&&!this.readOnly?['run','shell']:[]),
       ...(this.knowledge?['memory_search','skill',...(!this.readOnly?['remember','skill_draft']:[])]:[]),
       ...(this.mcp&&!this.readOnly?['mcp']:[]),
-      'delegate','send_message','publish_finding','record_decision','update_task','consult_swarm'];
+      'delegate','send_message','publish_finding','record_decision','update_task','consult_swarm',
+      ...(this.sharedWorkspace?['hunt_board']:[]),
+      ...(this.sharedWorkspace&&this.swarm&&this.agentId==='admin'?['hunt_create','hunt_card','hunt_route']:[])];
     if (this.allowedTools && Array.isArray(this.allowedTools)) {
       tools = tools.filter(t => this.allowedTools.includes(t));
     }
@@ -208,6 +210,32 @@ export class Toolbox {
       case 'consult_swarm': {
         const data = this.sharedWorkspace ? this.sharedWorkspace.summary() : { note: 'No shared workspace attached' };
         return { query: a.query, state: data };
+      }
+      case 'hunt_create': {
+        insist(this.sharedWorkspace, 'No shared workspace attached');
+        const hunt=this.sharedWorkspace.createHunt({
+          title:a.title,pageUrl:a.pageUrl,rules:a.rules,scope:a.scope,exclusions:a.exclusions,testingRules:a.testingRules,createdBy:this.agentId
+        });
+        this.sharedWorkspace.save(this.swarm?.swarmDir ?? this.store.dir);
+        return {created:true,hunt};
+      }
+      case 'hunt_card': {
+        insist(this.sharedWorkspace, 'No shared workspace attached');
+        const card=this.sharedWorkspace.createHuntCard({
+          huntId:a.huntId,title:a.title,objective:a.objective,priority:a.priority,preferredRoles:a.preferredRoles,dependsOn:a.dependsOn,createdBy:this.agentId
+        });
+        this.sharedWorkspace.save(this.swarm?.swarmDir ?? this.store.dir);
+        return {created:true,card};
+      }
+      case 'hunt_board': {
+        insist(this.sharedWorkspace, 'No shared workspace attached');
+        const board=this.sharedWorkspace.huntBoard(a.huntId);
+        insist(board, `Hunt not found: ${a.huntId}`);
+        return board;
+      }
+      case 'hunt_route': {
+        insist(this.swarm, 'Hunt routing requires the native swarm');
+        return await this.swarm.runHuntBoard(a.huntId,{source:'agent'});
       }
       default:throw new Error(`Unsupported action ${a.type}`);
     }

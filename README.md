@@ -2,9 +2,47 @@
 
 # Eutrya Native
 
+> **Public Alpha · v0.4.0** — developer release. The CLI is the primary supported interface; the desktop app is experimental and Linux-first. Eutrya has automated regression coverage, but it has **not** undergone an independent security audit.
+
 **A standalone terminal agent with Jev in its decision loop.**
 
 Eutrya owns its CLI, sessions, state, permissions, planning loop, and tool execution. It is not a Pi extension, a Hermes skill, or an agent that has to remember to consult Jev.
+
+## Quick Start
+
+Requirements: **Node.js 22+** and Git.
+
+```bash
+git clone https://github.com/hellozenstrategist-lab/eutrya.git
+cd eutrya
+npm ci
+npm link
+
+# No credentials or paid calls:
+eutrya demo
+```
+
+For a live session, configure your provider credentials and run setup:
+
+```bash
+# Jev evaluation uses Vercel AI Gateway.
+export AI_GATEWAY_API_KEY='YOUR_KEY'
+
+eutrya setup
+eutrya
+```
+
+Do not commit real credentials. See `.env.example` and [SECURITY.md](SECURITY.md) before using confidential workspaces or effectful tools.
+
+### Release status
+
+| Surface | Status |
+| --- | --- |
+| CLI / native security swarm | **Public alpha — primary interface** |
+| Jev hunt Kanban | **Alpha** |
+| Jev research lane | **Alpha** |
+| Desktop / Tauri UI | **Experimental — Linux-first** |
+| Production-hardened / independently audited | **No** |
 
 ```text
 Task + observed state

@@ -132,8 +132,11 @@ npm run desktop:build
 Omarchy / Arch installation:
 
 ```bash
+npm ci
 npm run install:omarchy
 ```
+
+The Omarchy installer builds the local Tauri executable with `--no-bundle` and installs that binary directly. It does **not** require AppImage/`linuxdeploy` packaging just to run Eutrya locally.
 
 The installer preserves **`eutrya` as the CLI command** and installs the graphical app as:
 
@@ -142,6 +145,53 @@ eutrya-desktop
 ```
 
 It also creates `eutrya-cli` as a CLI snapshot backed by the installed desktop runtime copy.
+
+## Desktop troubleshooting
+
+### `failed to run linuxdeploy` while installing on Arch / Omarchy
+
+Current `main` avoids this failure: `npm run install:omarchy` builds the raw Tauri executable with `cargo tauri build --no-bundle` and installs it directly.
+
+If you are on an older checkout that still tries to bundle an AppImage, update first:
+
+```bash
+git pull --ff-only origin main
+npm ci
+npm run install:omarchy
+```
+
+A successful Tauri compile followed by an AppImage/`linuxdeploy` error means the application binary itself built; the failure is in optional Linux packaging, not necessarily in Eutrya's code.
+
+### npm reports moderate/high vulnerabilities
+
+Do **not** blindly run:
+
+```bash
+npm audit fix --force
+```
+
+`--force` may introduce breaking dependency upgrades. Inspect the dependency chain first:
+
+```bash
+npm audit
+```
+
+The presence of an npm audit advisory does not by itself prove the Eutrya runtime is exploitable; impact depends on which package is affected and whether the vulnerable code path is reachable.
+
+### Desktop still shows an older UI after pulling
+
+The desktop frontend is bundled into the native binary. A Git pull, `npm link`, or runtime `/reload` does not replace those assets. Rebuild/reinstall:
+
+```bash
+npm ci
+npm run install:omarchy
+```
+
+Then launch:
+
+```bash
+eutrya-desktop
+```
 
 ## Start without credentials
 
@@ -356,7 +406,7 @@ See `docs/VERIFICATION.md` and `docs/test-results.tap` for the actual test run.
 
 The local core, mocked provider contracts, filesystem tools, process controls, CLI commands, and interactive terminal path were tested. **A live Vercel/Jev call was not run here**, and the actual AI SDK package could not be installed in this build environment because external DNS resolution failed. Consequently, the included adapter is documentation-aligned and fixture-tested, not end-to-end certified against your account or the installed SDK.
 
-There is no generated dependency lockfile. Run `npm install`, check `doctor --live`, and commit the resulting lockfile once the installed SDK/provider combination has been verified in your environment.
+`package-lock.json` is tracked. CI and the public install flow use `npm ci` so dependency resolution is reproducible from the committed lockfile.
 
 ## Source layout
 

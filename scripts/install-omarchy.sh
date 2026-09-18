@@ -36,7 +36,7 @@ fi
 printf 'Building Eutrya desktop...\n'
 (
   cd "$ROOT/desktop"
-  cargo tauri build
+  cargo tauri build --no-bundle
 )
 
 mkdir -p "$RUNTIME/desktop" "$BIN_DIR" "$APP_DIR"
@@ -48,13 +48,8 @@ cp "$ROOT/desktop/review-board.mjs" "$RUNTIME/desktop/review-board.mjs"
 cp -a "$ROOT/node_modules" "$RUNTIME/node_modules"
 cp "$ROOT/desktop/src-tauri/icons/icon.png" "$SHARE/icon.png"
 
-APPIMAGE="$(find "$ROOT/desktop/src-tauri/target/release/bundle/appimage" -maxdepth 1 -type f -name '*.AppImage' -print -quit 2>/dev/null || true)"
 RAW_BIN="$ROOT/desktop/src-tauri/target/release/eutrya-desktop"
-if [[ -n "$APPIMAGE" ]]; then
-  cp "$APPIMAGE" "$SHARE/Eutrya.AppImage"
-  chmod +x "$SHARE/Eutrya.AppImage"
-  GUI="$SHARE/Eutrya.AppImage"
-elif [[ -x "$RAW_BIN" ]]; then
+if [[ -x "$RAW_BIN" ]]; then
   cp "$RAW_BIN" "$SHARE/eutrya-desktop-bin"
   chmod +x "$SHARE/eutrya-desktop-bin"
   GUI="$SHARE/eutrya-desktop-bin"

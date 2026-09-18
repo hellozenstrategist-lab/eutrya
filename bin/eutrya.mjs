@@ -116,6 +116,10 @@ const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to 
 /context [N|64k]        Show or set maxPromptChars (4k..200k serialized characters)
 /autocompact [on|off]   Show or toggle automatic Jev compaction
 /yolo [on|off]          Session-only auto-approval for local run/shell commands
+/queue                  Show follow-up messages waiting behind the active turn
+/queue clear            Clear queued follow-up messages
+/stop                   Interrupt active resident run(s)
+/steer TEXT             Inject guidance at the next decision boundary
 /continue               Continue a paused task with a fresh Jev decision cycle
 /stop                   Cancel an in-flight model call or local process
 /steer TEXT             Queue guidance; discard obsolete plans before execution
@@ -306,12 +310,14 @@ Type / for available commands.
 `);
     }
 
+    let workActive=false;
+    const followups=[];
     const finish=()=>{
       if(quitting)return;
       if(terminal && !terminal.rl.closed) {
         const activeName = swarm.getAgent(swarm.activeAgentId)?.name ?? swarm.activeAgentId;
-        terminal.rl.setPrompt(`eutrya [@${activeName}] › `);
-        terminal.prompt();
+        terminal.rl.setPrompt(workActive?`working [@${activeName}] › `:`eutrya [@${activeName}] › `);
+        terminal.rl.prompt();
       }
     };
 
@@ -376,10 +382,55 @@ Type / for available commands.
       terminal.rl.prompt();
     };
 
+    const queueSummary=()=>followups.length
+      ? followups.map((text,i)=>`${i+1}. ${clip(text,120)}`).join('\n')
+      : 'Queue is empty.';
+    const drainFollowups=async()=>{
+      if(workActive||quitting)return;
+      workActive=true;
+      finish();
+      try {
+        while(followups.length&&!quitting) {
+          const task=followups.shift();
+          try { await swarm.dispatch(task); }
+          catch(e) { print(`Error: ${e.message}`); }
+        }
+      } finally {
+        workActive=false;
+        if(!quitting)finish();
+      }
+    };
+    const enqueueFollowup=text=>{
+      followups.push(text);
+      if(workActive) print(`Queued follow-up #${followups.length}: ${clip(text,100)}`);
+      void drainFollowups();
+    };
+
     await new Promise(resolve=>{
       terminal.rl.on('close',()=>{quitting=true;resolve();});
       terminal.onLine=async line=>{
         if(line==='/quit') {quitting=true;terminal.finishApproval(false);terminal.close();resolve();return;}
+        if(workActive) {
+          if(line==='/stop') {
+            const stopped=swarm.stopActiveRuns();
+            print(stopped.length?`Stop requested for: ${stopped.map(x=>'@'+x.name).join(', ')}`:'No resident runtime is currently executing; the active orchestration step will finish at its next boundary.');
+            finish();return;
+          }
+          if(line.startsWith('/steer ')) {
+            const text=line.slice(7).trim();
+            if(!text){print('Usage: /steer TEXT');finish();return;}
+            const steered=swarm.steerActiveRuns(text);
+            print(steered.length?`Steering queued for: ${steered.map(x=>'@'+x.name).join(', ')}`:'No resident runtime is currently at a steerable execution boundary.');
+            finish();return;
+          }
+          if(line==='/queue') {print(queueSummary());finish();return;}
+          if(line==='/queue clear') {followups.splice(0);print('Queued follow-ups cleared.');finish();return;}
+          if(line && !line.startsWith('/')) {
+            followups.push(line);
+            print(`Queued follow-up #${followups.length}: ${clip(line,100)}`);
+            finish();return;
+          }
+        }
         if(modelMenu) {
           const choice=line.trim().toLowerCase();
           if(choice==='q'||choice==='quit'||choice==='/cancel') {
@@ -556,6 +607,20 @@ Type / for available commands.
           } catch(e) {print(`YOLO setting failed: ${e.message}`);}
           finish();return;
         }
+        if(line==='/queue'){print(queueSummary());finish();return;}
+        if(line==='/queue clear'){followups.splice(0);print('Queued follow-ups cleared.');finish();return;}
+        if(line==='/stop'){
+          const stopped=swarm.stopActiveRuns();
+          print(stopped.length?`Stop requested for: ${stopped.map(x=>'@'+x.name).join(', ')}`:'No active resident run.');
+          finish();return;
+        }
+        if(line==='/steer'||line.startsWith('/steer ')){
+          const text=line.slice(6).trim();
+          if(!text){print('Usage: /steer TEXT');finish();return;}
+          const steered=swarm.steerActiveRuns(text);
+          print(steered.length?`Steering queued for: ${steered.map(x=>'@'+x.name).join(', ')}`:'No active resident run to steer.');
+          finish();return;
+        }
         if(line==='/status'||line==='/usage'){
           const r=swarm.getRuntime(swarm.activeAgentId);
           print(statusText(r.state));
@@ -626,12 +691,8 @@ Type / for available commands.
 
         if(line.startsWith('/')){print('Unknown command. Use /help.');finish();return;}
 
-        try {
-          await swarm.dispatch(line);
-        } catch(e) {
-          print(`Error: ${e.message}`);
-        }
-        if(quitting)resolve();else finish();
+        enqueueFollowup(line);
+        finish();
       };
       finish();
     });

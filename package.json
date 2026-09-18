@@ -1,7 +1,7 @@
 {
   "name": "eutrya-native",
-  "version": "0.2.0",
-  "description": "Jev-native standalone agent with providers, messaging, memory, skills and scheduling",
+  "version": "0.3.0",
+  "description": "Jev-native standalone agent with a strategist/Jev code-research lane, providers, messaging, memory, skills and scheduling",
   "type": "module",
   "bin": {
     "eutrya": "bin/eutrya.mjs"

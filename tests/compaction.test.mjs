@@ -117,10 +117,10 @@ test('resident compaction archives are isolated by persistent identity',async t=
   const root=fs.mkdtempSync(path.join(os.tmpdir(),'eutrya-compaction-swarm-'));t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
   const config=loadConfig(undefined,{sessionRoot:path.join(root,'state'),mainModel:'mock/text'});
   const swarm=new NativeSwarm({config,workspace:root,demo:true});t.after(()=>swarm.close());
-  const admin=swarm.getRuntime('admin'),engineer=swarm.getRuntime('engineer');
-  assert.ok(admin.compaction&&engineer.compaction);
+  const admin=swarm.getRuntime('admin'),auditor=swarm.getRuntime('auditor');
+  assert.ok(admin.compaction&&auditor.compaction);
   assert.notEqual(admin.compaction.archive.key,engineer.compaction.archive.key);
-  assert.notEqual(admin.store.dir,engineer.store.dir);
+  assert.notEqual(admin.store.dir,auditor.store.dir);
 });
 
 test('small adaptive fast-lane reply performs no full-work compaction or resident wake-up',async t=>{

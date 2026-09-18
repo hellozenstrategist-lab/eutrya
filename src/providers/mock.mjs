@@ -58,6 +58,13 @@ export class MockJev {
           const t = state.task ? state.task.toLowerCase() : '';
           const isWork = /security|audit|vulnerability|exploit|triage|scope|severity|verify|reproduce|fuzz|code|bug|pipeline|build|impl|test|write|edit|threat model|architecture|research/i.test(t);
           pick = isWork ? 'work' : 'fast';
+        } else if (k === 'hunt_assignee') {
+          const t = state.task ? state.task.toLowerCase() : '';
+          if (state.card?.status === 'review' && choices.includes('sentinel')) pick = 'sentinel';
+          else if (/reproduce|execute|run|fuzz|harness|validation|tooling/i.test(t) && choices.includes('operator')) pick = 'operator';
+          else if (/research|architecture|threat model|specification|synthesi|report/i.test(t) && choices.includes('analyst')) pick = 'analyst';
+          else if (choices.includes('auditor')) pick = 'auditor';
+          else if (choices.includes('sentinel')) pick = 'sentinel';
         } else if (state.task) {
           const t = state.task.toLowerCase();
           if (/verify|triage|false positive|duplicate|severity|scope review|independent review|evidence quality/i.test(t) && choices.includes('sentinel')) pick = 'sentinel';

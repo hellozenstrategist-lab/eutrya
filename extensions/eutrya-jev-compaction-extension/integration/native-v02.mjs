@@ -2,9 +2,38 @@ import path from 'node:path';
 import {createCompactor,FileArchive,nativeJevAsker} from '../src/index.mjs';
 import {assert,hash,clone,aborted,canonical} from '../src/util.mjs';
 
+function clipString(value,max) {
+  const text=String(value ?? '');
+  return text.length<=max?text:text.slice(0,Math.max(0,max-16))+'…[bounded]';
+}
+
+export function projectPreviousTasks(previousTasks,{maxItems=4,maxChars=6400}={}) {
+  const rows=Array.isArray(previousTasks)?previousTasks:[];
+  const selected=[];
+  let used=2;
+  for(let i=rows.length-1;i>=0 && selected.length<maxItems;i--) {
+    const row=rows[i]??{};
+    const projected={
+      task:clipString(row.task,700),
+      status:String(row.status??'UNKNOWN'),
+      answer:clipString(row.answer,900)
+    };
+    const chars=JSON.stringify(projected).length+(selected.length?1:0);
+    if(selected.length && used+chars>maxChars) break;
+    selected.unshift(projected);used+=chars;
+  }
+  return {
+    recent:selected,
+    total:rows.length,
+    omitted:Math.max(0,rows.length-selected.length),
+    note:'Deterministic recent-task handoff window. Older task turns remain in durable session/chat history and are not injected into every active prompt.'
+  };
+}
+
 /** Packet builder replaces BOTH the old last-12 slice and blind result clipping. */
-export function nativePacket(state,observations=state.observations) {
-  return {taskContext:state.taskContext??null,task:state.task,directives:state.directives,previousTasks:state.previousTasks,
+export function nativePacket(state,observations=state.observations,{previousTaskChars=6400,previousTaskItems=4}={}) {
+  const history=projectPreviousTasks(state.previousTasks,{maxItems:previousTaskItems,maxChars:previousTaskChars});
+  return {taskContext:state.taskContext??null,task:state.task,directives:state.directives,previousTasks:history.recent,previousTaskArchive:{total:history.total,omitted:history.omitted,note:history.note},
     modelSummary:{text:state.summary,hypotheses:state.hypotheses,unknowns:state.unknowns,trust:'model-generated; not observed facts'},
     observations:observations.map(o=>({id:o.id,action:o.action.type,arguments:o.action.type==='write'?{path:o.action.path}:o.action,result:o.result})),
     notebook:state.notebook,availableObservationIds:observations.map(o=>o.id),
@@ -13,8 +42,8 @@ export function nativePacket(state,observations=state.observations) {
     totalSteps:state.totalSteps,remainingCalls:null,
     note:'Jev-selected active evidence. Results marked _eutryaCompaction are incomplete previews, not complete tool outputs. Full originals remain in the observation archive. Summaries, preferences and notebook entries are not independent evidence.'};
 }
-function protectedOf(s) {
-  const {observations,availableObservationIds,observationArchive,remainingCalls,...context}=nativePacket(s,[]);
+function protectedOf(s,packetOptions={}) {
+  const {observations,availableObservationIds,observationArchive,remainingCalls,...context}=nativePacket(s,[],packetOptions);
   return context;
 }
 export function nativeMessages(state) {
@@ -56,11 +85,15 @@ export function installNativeCompaction(runtime,{scope,archiveRoot=null,options=
     assert(!runtime.state.pending,'PENDING','Resolve an uncertain action before compaction');
     aborted(signal);runtime.boundary(signal);
     const base=materialFingerprint(runtime.state),snapshot=clone(runtime.state.observations);
-    const messages=nativeMessages(runtime.state),protectedContext=clone(protectedOf(runtime.state));
-    // A shrinking projection uses a fixed-length placeholder until the archive ID exists.
-    const measure=ms=>JSON.stringify(nativePacket(runtime.state,projectNative(ms,snapshot,'0'.repeat(64)))).length;
     const hardLimit=limit??Math.max(3000,maxChars-7000);
     assert(Number.isSafeInteger(hardLimit)&&hardLimit>=3000&&hardLimit<=maxChars,'BUDGET','Invalid native packet limit');
+    const packetOptions={
+      previousTaskChars:Math.max(512,Math.min(6400,Math.floor(hardLimit*0.16))),
+      previousTaskItems:4
+    };
+    const messages=nativeMessages(runtime.state),protectedContext=clone(protectedOf(runtime.state,packetOptions));
+    // A shrinking projection uses a fixed-length placeholder until the archive ID exists.
+    const measure=ms=>JSON.stringify(nativePacket(runtime.state,projectNative(ms,snapshot,'0'.repeat(64)),packetOptions)).length;
     const result=await compactor.compact({messages,goal:runtime.state.task,protectedContext,
       archiveExtra:{nativeObservations:snapshot},budget:{limit:hardLimit,measure,unit:'serialized packet characters'},force,signal});
     runtime.boundary(signal);
@@ -79,7 +112,11 @@ export function installNativeCompaction(runtime,{scope,archiveRoot=null,options=
     compactor,archive,
     async packet(signal,{limit=Math.max(3000,maxChars-7000)}={}) {
       const result=await doCompact({signal,limit});
-      const packet=nativePacket(runtime.state);
+      const packetOptions={
+        previousTaskChars:Math.max(512,Math.min(6400,Math.floor(limit*0.16))),
+        previousTaskItems:4
+      };
+      const packet=nativePacket(runtime.state,runtime.state.observations,packetOptions);
       // Check EXACT serialized packet characters here, not the upstream token heuristic.
       assert(JSON.stringify(packet).length<=limit,'CONTEXT_FULL',
         'Protected or Jev-retained context is still too large. No blind truncation/summarizer fallback ran. Use a larger reviewed context budget, smaller tool outputs, or a new task with explicit handoff.');

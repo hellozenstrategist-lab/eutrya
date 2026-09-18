@@ -50,7 +50,7 @@ export async function codexSubscriptionModels({signal}={}) {
         })));
       }
     });
-    child.stdin.write(JSON.stringify({method:'initialize',id:1,params:{clientInfo:{name:'eutrya',title:'Eutrya',version:'0.2.0'}}})+'\n');
+    child.stdin.write(JSON.stringify({method:'initialize',id:1,params:{clientInfo:{name:'eutrya',title:'Eutrya',version:'0.3.0'}}})+'\n');
   });
 }
 

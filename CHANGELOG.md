@@ -2,6 +2,8 @@
 
 ## 0.4.1 — Desktop hunt review workspace
 
+Fixed the Omarchy/Arch installer to build and install the raw Tauri executable instead of requiring AppImage/linuxdeploy packaging. Added install troubleshooting and npm-audit guidance.
+
 Updated the actual Studio entry point with Hunt Kanban, live assignments and routing history, card evidence/review dialogs, manual intake and notes, guarded status edits, pause controls, and exports. Added security-profile defaults, current tool groups, accurate work-item counts and backend-derived version labels. New desktop records start paused/parked and no automatic target-testing launcher is provided. Fixed dispatch after a board is paused and prevented incomplete workers from marking work complete.
 
 ## 0.4.0 — Jev-routed hunt Kanban

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import http from 'node:http';
 import { rig, proposal } from './helpers.mjs';
 import { safePath } from '../src/tools.mjs';
 import { textHash } from '../src/util.mjs';
@@ -135,13 +136,14 @@ test('shell command environment does not receive the Gateway API key', async t =
 });
 
 test('browser action fetches and formats web page content', async t => {
-  const { runtime } = rig(t, {
-    actions: [{ type: 'browser', url: 'https://example.com' }]
-  });
+  const server=http.createServer((_req,res)=>{res.writeHead(200,{'content-type':'text/html'});res.end('<html><head><title>Eutrya Fixture</title></head><body><h1>Hello</h1><a href="/next">Next</a></body></html>');});
+  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));t.after(()=>server.close());
+  const address=server.address();const url=`http://127.0.0.1:${address.port}/`;
+  const { runtime } = rig(t, { actions: [{ type: 'browser', url }] });
   await runtime.run();
   const r = runtime.state.observations[0].result;
-  assert.equal(r.url, 'https://example.com');
-  assert.match(r.title, /Example Domain/);
-  assert.ok(r.content.length > 0);
+  assert.equal(r.url, url);
+  assert.match(r.title, /Eutrya Fixture/);
+  assert.match(r.content, /Hello/);
   assert.ok(Array.isArray(r.links));
 });

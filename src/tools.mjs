@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { ACTION_HELP, validateAction } from './schema.mjs';
 import { insist, textHash, uid, throwIfAborted, UncertainEffect, clip, htmlToText } from './util.mjs';
 import { lookPuzzle, pressPuzzle, verifyPuzzle } from './puzzle.mjs';
+import { codeSurface, codeSymbol, codeReferences, codeInspect, codeState, codeCompare } from './research-code.mjs';
 
 const HIDDEN=new Set(['.git','.ssh','.aws','.azure','.config','.local','.eutrya','node_modules','.venv','venv','dist','coverage']);
 function sensitive(part) {
@@ -56,7 +57,7 @@ export class Toolbox {
   }
   available() {
     if(this.store.state.environment) return ['look','press','note','recall','ask','finish'];
-    let tools=['list','read','search','browser','note','recall','ask','finish',
+    let tools=['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','note','recall','ask','finish',
       ...(!this.readOnly?['mkdir','write','edit']:[]),...(this.config.allowExec&&!this.readOnly?['run','shell']:[]),
       ...(this.knowledge?['memory_search','skill',...(!this.readOnly?['remember','skill_draft']:[])]:[]),
       ...(this.mcp&&!this.readOnly?['mcp']:[]),
@@ -102,6 +103,12 @@ export class Toolbox {
         const text=readText(safePath(this.root,a.path)),lines=text.split('\n');
         return {path:a.path,sha256:textHash(text),totalLines:lines.length,startLine:a.startLine,endLine:Math.min(a.endLine,lines.length),content:lines.slice(a.startLine-1,a.endLine).map((v,i)=>`${a.startLine+i}|${v}`).join('\n')};
       }
+      case 'code_surface': return codeSurface(this.root,a.path);
+      case 'code_symbol': return codeSymbol(this.root,a.path,a.query);
+      case 'code_references': return codeReferences(this.root,a.path,a.symbol);
+      case 'code_inspect': return codeInspect(this.root,a.path,a.symbol);
+      case 'code_state': return codeState(this.root,a.path,a.symbol);
+      case 'code_compare': return codeCompare(this.root,a.path,a.symbols);
       case 'search': {
         const start=safePath(this.root,a.path); const queue=[start],matches=[];let scanned=0,bytes=0,limited=false;
         while(queue.length && matches.length<60 && scanned<500 && bytes<2097152) {
@@ -287,7 +294,7 @@ export class Toolbox {
     }
     if(!html) {
       const res=await fetch(url,{
-        headers:{'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Eutrya/0.2.0'},
+        headers:{'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Eutrya/0.3.0'},
         signal:signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000)
       });
       insist(res.ok,`HTTP ${res.status} ${res.statusText}`);

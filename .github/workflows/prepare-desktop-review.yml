@@ -39,7 +39,7 @@ jobs:
         run: npm test > "$RUNNER_TEMP/desktop-review-tests.tap" 2>&1 || { cat "$RUNNER_TEMP/desktop-review-tests.tap"; exit 1; }
       - name: Commit generated edits on feature branch
         run: |
-          git rm scripts/prepare-desktop-review.mjs .github/workflows/prepare-desktop-review.yml
+          git rm -f scripts/prepare-desktop-review.mjs .github/workflows/prepare-desktop-review.yml
           git add desktop src tests bin package.json package-lock.json README.md CHANGELOG.md scripts/install-omarchy.sh docs
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

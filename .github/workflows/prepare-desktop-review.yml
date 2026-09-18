@@ -1,0 +1,60 @@
+name: Prepare desktop review integration
+
+on:
+  push:
+    branches: [feat/desktop-hunt-review-v0.4.1]
+    paths: [.github/workflows/prepare-desktop-review.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    if: github.repository == 'hellozenstrategist-lab/eutrya'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Apply verified entry-point changes
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const p='scripts/prepare-desktop-review.mjs';
+          let s=fs.readFileSync(p,'utf8');
+          s=s.replace("s=once(s,'hunts: swarm.sharedWorkspace.listHunts(),',", "s=s.replaceAll('hunts: swarm.sharedWorkspace.listHunts(),',");
+          fs.writeFileSync(p,s);
+          NODE
+          node scripts/prepare-desktop-review.mjs
+          cat >> desktop/web/css/hunts.css <<'CSS'
+          .hunt-page .ghost-button,.hunt-dialog .ghost-button,.hunt-page .primary-button,.hunt-dialog .primary-button{font:12px/1.4 system-ui,sans-serif;padding:10px 13px;border:1px solid #adbca6;border-radius:3px;cursor:pointer;background:#eeefe4;color:#273b2b;min-height:38px}
+          .hunt-page .primary-button,.hunt-dialog .primary-button{background:#304b39;color:#fafaf0;border-color:#304b39}
+          .hunt-page .ghost-button:hover,.hunt-dialog .ghost-button:hover{background:#dde5d2}
+          CSS
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run check
+      - name: Run regression tests
+        run: npm test > "$RUNNER_TEMP/desktop-review-tests.tap" 2>&1 || { cat "$RUNNER_TEMP/desktop-review-tests.tap"; exit 1; }
+      - name: Commit generated edits on feature branch
+        run: |
+          git rm scripts/prepare-desktop-review.mjs .github/workflows/prepare-desktop-review.yml
+          git add desktop src tests bin package.json package-lock.json README.md CHANGELOG.md scripts/install-omarchy.sh docs
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'feat: wire Hunt review workspace into active Studio frontend'
+          git push origin HEAD:feat/desktop-hunt-review-v0.4.1
+      - name: Export source snapshot for visual checks
+        if: always()
+        run: |
+          git add desktop src tests bin package.json package-lock.json README.md CHANGELOG.md scripts/install-omarchy.sh docs
+          git archive --format=zip "$(git write-tree)" -o "$RUNNER_TEMP/eutrya-desktop-src.zip"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: desktop-review-source
+          path: |
+            ${{ runner.temp }}/eutrya-desktop-src.zip
+            ${{ runner.temp }}/desktop-review-tests.tap
+          retention-days: 7

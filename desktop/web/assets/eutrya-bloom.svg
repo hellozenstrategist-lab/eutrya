@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="420" viewBox="0 0 320 420" fill="none">
+  <g opacity=".9" stroke="currentColor">
+    <circle cx="164" cy="226" r="104" stroke-width="1"/>
+    <circle cx="164" cy="226" r="72" stroke-width="1" opacity=".65"/>
+    <circle cx="164" cy="226" r="7" fill="currentColor" stroke="none"/>
+    <path d="M164 330C150 289 154 244 179 205C198 175 215 145 220 104" stroke-width="2"/>
+    <path d="M178 208C144 188 120 163 112 132" stroke-width="1.5"/>
+    <path d="M183 191C211 174 232 151 244 122" stroke-width="1.5"/>
+    <path d="M151 243C124 235 100 220 84 198" stroke-width="1.5"/>
+    <path d="M174 260C202 254 228 239 247 216" stroke-width="1.5"/>
+    <ellipse cx="106" cy="127" rx="28" ry="12" transform="rotate(34 106 127)" stroke-width="1.2"/>
+    <ellipse cx="238" cy="111" rx="31" ry="13" transform="rotate(-30 238 111)" stroke-width="1.2"/>
+    <ellipse cx="79" cy="197" rx="26" ry="11" transform="rotate(24 79 197)" stroke-width="1.2"/>
+    <ellipse cx="252" cy="214" rx="29" ry="12" transform="rotate(-22 252 214)" stroke-width="1.2"/>
+    <path d="M20 62H300M20 110H300M20 158H300M20 206H300M20 254H300M20 302H300M20 350H300" stroke-width=".6" opacity=".28"/>
+    <path d="M44 20V398M92 20V398M140 20V398M188 20V398M236 20V398M284 20V398" stroke-width=".6" opacity=".28"/>
+    <path d="M40 52H76M58 34V70M256 334H292M274 316V352" stroke-width="1"/>
+  </g>
+</svg>

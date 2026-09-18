@@ -46,6 +46,11 @@ export function renderEvent(event,write=console.log,{showThinking=false}={}) {
     case 'verification.failed':out(`  Check ${d.reason}`);break;
     case 'input.required':out(`\n${d.question}`);break;
     case 'answer':out(`\n${prefix}${d.answer}\n\n[${d.status}]`);break;
+    case 'hunt.card_started':out(`  Hunt  ${d.cardId} → @${d.agent} · ${d.stage}`);break;
+    case 'hunt.card_stage_complete':out(`  Hunt  ${d.cardId} · ${d.stage} → ${d.nextStatus}`);break;
+    case 'hunt.card_blocked':out(`  Hunt  ${d.cardId} BLOCKED · ${d.error}`);break;
+    case 'hunt.waiting':out(`  Hunt  ${d.cardId} waiting · ${d.reason}`);break;
+    case 'hunt.completed':out(`  Hunt  ${d.huntId} completed`);break;
     case 'provider.error':out(`  Provider error: ${d.error}`);break;
   }
 }
@@ -76,6 +81,27 @@ export function swarmStatusText(matrix) {
   }
   return lines.join('\n');
 }
+export function huntBoardText(board) {
+  if(!board) return '\nHUNT BOARD\n  No hunts yet.';
+  const {hunt,cards,agents}=board;
+  const columns=['intake','ready','active','review','blocked','done','parked'];
+  const labels={intake:'INTAKE',ready:'READY',active:'ACTIVE',review:'REVIEW',blocked:'BLOCKED',done:'DONE',parked:'PARKED'};
+  const lines=[`\nE U T R Y A   H U N T   B O A R D\n${hunt.title} [${hunt.id}] · ${hunt.status}\n${hunt.pageUrl}`];
+  const live=(agents??[]).filter(a=>a.id!=='admin').map(a=>`@${a.name}:${a.status}${a.currentTask?' ['+clip(a.currentTask,35)+']':''}`).join('  ');
+  if(live) lines.push(`Agents: ${live}`);
+  for(const col of columns) {
+    const rows=cards.filter(c=>c.status===col);
+    lines.push(`\n${labels[col]} — ${rows.length}`);
+    if(!rows.length){lines.push('  ·');continue;}
+    for(const c of rows) {
+      const who=c.assignedTo?` @${c.assignedTo}`:(c.worker&&col==='review'?` worker:@${c.worker}`:'');
+      const deps=c.dependsOn?.length?` deps:${c.dependsOn.join(',')}`:'';
+      lines.push(`  [${c.id}] [${c.priority.toUpperCase()}]${who} ${c.title}${deps}`);
+    }
+  }
+  return lines.join('\n');
+}
+
 export function statusText(s) {
   const m=s.meter;
   return `Session ${s.id}\n${s.status} · ${s.totalSteps} executed/denied steps\n`+

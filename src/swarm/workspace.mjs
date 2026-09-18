@@ -163,7 +163,7 @@ export class SharedWorkspace {
       priority,
       preferredRoles: Array.isArray(preferredRoles) ? [...new Set(preferredRoles.map(String))].slice(0, 8) : [],
       dependsOn: Array.isArray(dependsOn) ? [...new Set(dependsOn.map(String))].slice(0, 20) : [],
-      status: 'ready',
+      status: dependsOn.length ? 'intake' : 'ready',
       assignedTo: null,
       worker: null,
       reviewer: null,
@@ -197,6 +197,22 @@ export class SharedWorkspace {
 
   dependenciesSatisfied(card) {
     return card.dependsOn.every(id => this.huntCards.get(id)?.status === 'done');
+  }
+
+  refreshHuntReadiness(huntId) {
+    const changed=[];
+    for(const card of this.listHuntCards({huntId})) {
+      if(card.status==='intake' && this.dependenciesSatisfied(card)) {
+        card.status='ready';
+        card.updatedAt=new Date().toISOString();
+        changed.push(card.id);
+      }
+    }
+    if(changed.length) {
+      const hunt=this.hunts.get(huntId);
+      if(hunt) hunt.updatedAt=new Date().toISOString();
+    }
+    return changed;
   }
 
   updateHuntCard(id, patch = {}) {

@@ -1,5 +1,5 @@
 TAP version 13
-# Eutrya Native v0.3.0 local release verification summary
+# Eutrya Native v0.3.1 security-swarm verification summary
 # Command: npm test
 # Environment: Linux, Node.js v22.16.0
 # Date: 2026-09-18
@@ -12,5 +12,6 @@ ok 1 - complete local release test suite
 # cancelled 0
 # skipped 0
 # todo 0
-# NOTE: This repository copy is a compact summary of the release verification.
-# The v0.3.0 release package was also syntax-checked across 52 JavaScript modules.
+# NOTE: Compact repository summary of the local v0.3.1 verification run.
+# Security role routing, adaptive runtime identity, resident compaction identity,
+# and the existing Jev research lane were included in the passing suite.

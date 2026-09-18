@@ -31,9 +31,16 @@ export class Eutrya {
     insist(!this.busy,'Agent is already running; steer it instead');
     insist(!this.state.pending,'Resolve the pending action before starting another task');
     insist(typeof task==='string' && task.trim().length>0 && task.length<=8000,'Task must contain 1..8000 characters');
-    if(this.state.task)this.state.previousTasks.push({task:this.state.task,status:this.state.status,answer:this.compaction?(this.state.answer??''):clip(this.state.answer??'',1200)});
+    if(this.state.task)this.state.previousTasks.push({
+      task:clip(this.state.task,1200),
+      status:this.state.status,
+      answer:clip(this.state.answer??'',1600)
+    });
+    // Durable state keeps a bounded recent history. Full answers/events remain in
+    // the append-only trace/shared chat; active packets project a smaller handoff.
+    this.state.previousTasks=this.state.previousTasks.slice(-24);
     Object.assign(this.state,{task:this.redact(task.trim()),status:'IDLE',answer:null,reason:null,summary:'',hypotheses:[],unknowns:[],directives:[],lastMode:null});
-    if(!this.compaction)this.state.previousTasks=this.state.previousTasks.slice(-8);this.state.revision++;
+    this.state.revision++;
     this.store.save();this.emit('task.started',{task:this.state.task});
   }
   steer(message) {

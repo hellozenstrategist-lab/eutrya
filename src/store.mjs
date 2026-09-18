@@ -9,7 +9,7 @@ export function newState(workspace, id = uid(), environment = null) {
   return {
     schemaVersion:1,id,workspace:fs.realpathSync(workspace),createdAt:new Date().toISOString(),
     revision:0,status:'IDLE',task:'',directives:[],previousTasks:[],summary:'',hypotheses:[],unknowns:[],
-    lastMode:null,observations:[],notebook:[],nextObservation:1,totalSteps:0,
+    lastMode:null,observations:[],notebook:[],nextObservation:1,totalSteps:0,research:null,
     pending:null,environment,answer:null,reason:null,
     meter:{calls:0,jevCalls:0,cortexCalls:0,inputTokens:0,outputTokens:0,knownCostUsd:0,unpricedCalls:0,usageMissingCalls:0}
   };

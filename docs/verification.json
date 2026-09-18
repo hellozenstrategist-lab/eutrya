@@ -7,29 +7,32 @@
     "node": "22"
   },
   "tests": {
-    "total": 226,
-    "passed": 226,
+    "total": 227,
+    "passed": 227,
     "failed": 0,
-    "skipped": 0,
-    "mode": "offline/local CI"
+    "skipped": 0
   },
   "syntax": {
-    "modules": 53,
-    "passed": 53,
-    "typecheck": false
+    "javascript_modules": 65,
+    "shell_scripts": "pass",
+    "tauri_manifest": "pass",
+    "tauri_config_json": "pass"
+  },
+  "desktop": {
+    "bridge_test": "pass",
+    "shared_root_runtime": true,
+    "duplicated_backend": false
   },
   "hunt_board": {
     "persistence": "pass",
     "busy_agent_exclusion": "pass",
     "independent_review": "pass",
     "multi_card_distribution": "pass",
-    "dependency_promotion": "pass",
-    "jev_router": true
+    "dependency_promotion": "pass"
   },
   "research_lane": {
     "status": "pass",
     "read_only": true
   },
-  "live_inference": false,
-  "paid_calls": 0
+  "live_inference": false
 }

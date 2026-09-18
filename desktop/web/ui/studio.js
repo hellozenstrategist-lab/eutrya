@@ -107,9 +107,9 @@
     if(!ready()||state.chatBusy)return;
     const text=state.chatDraft.trim();if(!text)return;
     const target=state.selectedAgent==='admin'?null:state.selectedAgent;
-    state.chatDraft='';state.chatBusy=true;state.outbox=text;render(true);
+    state.chatDraft='';state.chatBusy=true;state.outbox=text;state.outboxAt=Date.now();render(true);
     await perform('chat',()=>api.chat(text,target));
-    state.chatBusy=false;state.outbox=null;render(true);$('#chat-draft')?.focus();
+    state.chatBusy=false;state.outbox=null;state.outboxAt=0;render(true);$('#chat-draft')?.focus();
   }
   async function saveConfig(){
     const d=state.configDraft||{};

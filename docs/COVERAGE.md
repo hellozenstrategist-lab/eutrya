@@ -4,11 +4,12 @@ This release extends the attached Eutrya Native v0.1.0 implementation. It does n
 
 **Implemented** means code exists in this package and its stated behavior has local tests. It does not mean a live external integration was certified. **Partial** identifies an explicit boundary. **Not included** is not a hidden stub advertised as a working feature.
 
-| Feature area | Status in 0.3.1 | Boundary |
+| Feature area | Status in 0.4.0 | Boundary |
 | --- | --- | --- |
 | Standalone CLI + one-shot mode | Implemented | Readline terminal, not full-screen TUI |
 | Jev-native attention and action selection | Implemented | Model-step boundaries, not hidden token computation |
 | Strategist + Jev local code-research lane | Implemented | Read-only local semantic code analysis; no compiler-grade AST guarantee or automatic vulnerability proof |
+| Jev-routed security hunt Kanban | Implemented | Persistent authorized-program rules/cards; routes only to currently idle resident specialists; no claim that routing quality guarantees valid findings |
 | Vercel AI Gateway | Implemented adapter | Text + separate SDK evaluation; live unverified |
 | OpenRouter | Implemented text adapter | No OAuth; explicit API key |
 | Local/Ollama and compatible APIs | Implemented adapter | Server/model must produce valid constrained JSON |

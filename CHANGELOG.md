@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.4 — Substantive completion responses
+
+Fixed chat turns that could surface a bare `Completed`, `Done`, or `Finished` instead of the agent's actual result. Bug-bounty/hunt prompts now bypass the tool-free fast reply lane. Generic completion labels are rejected as final responses, and runtime fallbacks expose the substantive answer, meaningful summary, stop/input reason, or an explicit status-aware diagnostic instead of claiming success.
+
+Delegated tasks are no longer marked completed unless the resident actually produced a substantive answer in an answered/verified state.
+
+# Changelog
+
 ## 0.4.3 — Desktop chat outbox deduplication
 
 Fixed a Studio chat rendering race where a just-sent user message could briefly appear twice while the backend had already persisted the message but the long-running chat request was still in flight. The optimistic outbox now carries a send timestamp and is reconciled as soon as the matching newly persisted workspace message arrives. Re-sending identical text later still renders correctly because old matching messages do not suppress the new optimistic bubble.

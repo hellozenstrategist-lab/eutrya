@@ -2,7 +2,7 @@
 
 # Eutrya Native
 
-> **Public Alpha · v0.4.5** — developer release. The CLI is the primary supported interface; the desktop app is experimental and Linux-first. Eutrya has automated regression coverage, but it has **not** undergone an independent security audit.
+> **Public Alpha · v0.4.6** — developer release. The CLI is the primary supported interface; the desktop app is experimental and Linux-first. Eutrya has automated regression coverage, but it has **not** undergone an independent security audit.
 
 **A standalone terminal agent with Jev in its decision loop.**
 
@@ -66,7 +66,7 @@ State-bound, single-use decision ticket + tool permission
 Execute → record observation → repeat
 ```
 
-Version: **0.4.5**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
+Version: **0.4.6**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
 
 
 ## Jev research lane

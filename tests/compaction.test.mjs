@@ -8,6 +8,7 @@ import { NativeSwarm } from '../src/swarm/swarm.mjs';
 import { loadConfig } from '../src/config.mjs';
 import { Store, workspaceBucket } from '../src/store.mjs';
 import { makeEngine } from '../src/bootstrap.mjs';
+import { nativePacket, projectPreviousTasks } from '../extensions/eutrya-jev-compaction-extension/integration/native-v02.mjs';
 
 const scope={profileId:'fixture',userId:'owner',agentId:'admin'};
 
@@ -160,4 +161,42 @@ test('explicit disable switch is the only path back to legacy windowing',t=>{
   assert.equal(result.status,'legacy_compacted');
   assert.equal(r.runtime.state.observations.length,12);
   assert.equal(r.runtime.state.meter.calls,0);
+});
+
+
+test('compaction packet bounds accumulated previous task history without mutating durable state',t=>{
+  const r=attached(t,{config:{maxPromptChars:12000}});
+  r.runtime.state.previousTasks=Array.from({length:80},(_,i)=>({
+    task:`prior-task-${i} `+'q'.repeat(3000),
+    status:'ANSWERED',
+    answer:`prior-answer-${i} `+'a'.repeat(7000)
+  }));
+  const before=structuredClone(r.runtime.state.previousTasks);
+  const packet=nativePacket(r.runtime.state,[]);
+  assert.deepEqual(r.runtime.state.previousTasks,before,'packet projection must not rewrite durable history');
+  assert.ok(packet.previousTasks.length<=4);
+  assert.equal(packet.previousTaskArchive.total,80);
+  assert.ok(packet.previousTaskArchive.omitted>=76);
+  assert.ok(JSON.stringify(packet.previousTasks).length<=7000);
+});
+
+test('previous task projection retains the newest handoffs deterministically',()=>{
+  const rows=Array.from({length:10},(_,i)=>({task:`task-${i}`,status:'ANSWERED',answer:`answer-${i}`}));
+  const projected=projectPreviousTasks(rows,{maxItems:3,maxChars:6400});
+  assert.deepEqual(projected.recent.map(x=>x.task),['task-7','task-8','task-9']);
+  assert.equal(projected.total,10);
+  assert.equal(projected.omitted,7);
+});
+
+test('new task remains runnable after a large legacy previousTasks history',async t=>{
+  const r=attached(t,{config:{maxPromptChars:12000}});
+  r.runtime.state.previousTasks=Array.from({length:100},(_,i)=>({
+    task:`legacy-${i} `+'x'.repeat(3000),
+    status:'ANSWERED',
+    answer:'y'.repeat(6000)
+  }));
+  r.runtime.startTask('Fresh bounded task');
+  await r.runtime.run();
+  assert.equal(r.runtime.state.status,'ANSWERED');
+  assert.ok(r.runtime.state.previousTasks.length<=24);
 });

@@ -6,6 +6,8 @@ export function renderEvent(event,write=console.log,{showThinking=false}={}) {
   const prefix=event.agent ? `[${event.agent}] ` : '';
   switch(event.type) {
     case 'jev.control':out(`  ${prefix}${d.source==='mock'?'MOCK':'Jev '}  ${d.mode}  · choice mass ${Math.round(d.probability*100)}%`);break;
+    case 'research.plan':out(`  Strategy round ${d.round} · ${d.status} · ${clip(d.objective,100)} · ${d.microSteps} Jev micro-steps`);break;
+    case 'research.decision':out(`  Jev research ${d.selected} · ${d.action.type} · ${Math.round(d.probability*100)}% · ${clip(d.summary,90)}`);break;
     case 'cortex.proposal':
       out(`  ${prefix}AI    ${d.proposal.candidates.length} candidate(s)${showThinking && d.proposal?.summary ? ' · '+d.proposal.summary : ''}`);
       break;

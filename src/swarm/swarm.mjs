@@ -170,9 +170,28 @@ export class NativeSwarm {
     this.activeTemplate = swarmConfig.activeTemplate ?? 'default';
     this.primaryAgent = swarmConfig.primaryAgent ?? 'admin';
 
+    const managedWebProfiles = new Set([
+      ...Object.keys(DEFAULT_PROFILES),
+      'engineer', 'legal', 'lawyer', 'finance', 'researcher'
+    ]);
+
     for (const [id, prof] of Object.entries(swarmConfig.agents ?? DEFAULT_PROFILES)) {
       try {
-        const validated = validateProfile(prof);
+        const migrated = structuredClone(prof);
+        // Older Eutrya installs persisted their profile allowlists before the
+        // read-only browser tool existed. Preserve user customizations, but
+        // upgrade Eutrya-managed/legacy resident profiles so a normal update
+        // does not leave them permanently offline.
+        if (
+          loaded &&
+          managedWebProfiles.has(id) &&
+          Array.isArray(migrated.tools) &&
+          migrated.tools.includes('search') &&
+          !migrated.tools.includes('browser')
+        ) {
+          migrated.tools.push('browser');
+        }
+        const validated = validateProfile(migrated);
         this.profiles.set(id, validated);
         this.sharedWorkspace.initAgent(id, { name: validated.name, role: validated.role });
       } catch (err) {

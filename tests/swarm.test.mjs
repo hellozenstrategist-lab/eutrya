@@ -271,3 +271,52 @@ test('Jev cognitive layer evaluates and selects which profile to use for unmenti
   assert.equal(dispatched.agentId, 'auditor');
   assert.equal(dispatched.agent, 'Auditor');
 });
+
+
+test('Legacy persisted Eutrya profiles inherit read-only browser access without resetting custom profiles', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'eutrya-swarm-migrate-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const config = loadConfig(undefined, { sessionRoot: path.join(root, 'state'), mainModel: 'mock/text' });
+
+  const first = new NativeSwarm({ config, workspace: root, demo: true });
+  const configFile = path.join(first.swarmDir, 'swarm-config.json');
+  const persisted = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+
+  persisted.agents.admin.tools = persisted.agents.admin.tools.filter(t => t !== 'browser');
+  persisted.agents.engineer = {
+    id: 'engineer',
+    name: 'Engineer',
+    role: 'Legacy Engineer',
+    profession: 'Legacy Engineering',
+    instructions: 'Preserve this customized legacy profile.',
+    model: null,
+    tools: ['list','read','search','run','note','finish'],
+    enabled: true
+  };
+  persisted.agents.offline_custom = {
+    id: 'offline_custom',
+    name: 'Offline Custom',
+    role: 'Custom local-only profile',
+    profession: 'Local-only analysis',
+    instructions: 'Intentionally has no network capability.',
+    model: null,
+    tools: ['list','read','search','note','finish'],
+    enabled: true
+  };
+  fs.writeFileSync(configFile, JSON.stringify(persisted, null, 2) + '\n');
+  first.close();
+
+  const upgraded = new NativeSwarm({ config, workspace: root, demo: true });
+  t.after(() => upgraded.close());
+
+  assert.ok(upgraded.getAgent('admin').tools.includes('browser'));
+  assert.ok(upgraded.getAgent('engineer').tools.includes('browser'));
+  assert.equal(upgraded.getAgent('engineer').instructions, 'Preserve this customized legacy profile.');
+  assert.ok(upgraded.getRuntime('engineer').toolbox.available().includes('browser'));
+
+  assert.equal(upgraded.getAgent('offline_custom').tools.includes('browser'), false);
+  assert.equal(upgraded.getRuntime('offline_custom').toolbox.available().includes('browser'), false);
+
+  const saved = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+  assert.ok(saved.agents.engineer.tools.includes('browser'));
+});

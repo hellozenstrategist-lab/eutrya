@@ -32,3 +32,5 @@
 .hunt-page .ghost-button,.hunt-dialog .ghost-button,.hunt-page .primary-button,.hunt-dialog .primary-button{font:12px/1.4 system-ui,sans-serif;padding:10px 13px;border:1px solid #adbca6;border-radius:3px;cursor:pointer;background:#eeefe4;color:#273b2b;min-height:38px}
 .hunt-page .primary-button,.hunt-dialog .primary-button{background:#304b39;color:#fafaf0;border-color:#304b39}
 .hunt-page .ghost-button:hover,.hunt-dialog .ghost-button:hover{background:#dde5d2}
+
+.hunt-column-jumps{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0}.hunt-column-jumps button{font:11px/1.5 monospace;min-height:32px;padding:5px 10px;border:1px solid #bfc8b6;border-radius:3px;background:#f4f4eb;color:#344c3d;cursor:pointer}.hunt-column-jumps b{margin-left:6px;font-weight:400;color:#72816a}.hunt-column-jumps button:hover{background:#e3e9d9}

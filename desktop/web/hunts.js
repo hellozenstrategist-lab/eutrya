@@ -73,6 +73,7 @@
       ${!m.hunt ? `<section class="hunt-welcome"><h2>Your review workspace starts here.</h2><p>Create a board to record a program page and its rules, or inspect boards already created through the CLI. No sample findings are displayed.</p>${tool('Create review board','create',!writable)}</section>` : `
       <section class="hunt-summary"><div><h2>${escape(m.hunt.title)}</h2><p>${escape(m.hunt.id)} · ${escape(m.hunt.pageUrl)}</p></div><div class="hunt-actions">${badge(m.hunt.status)}${tool('Rules & scope','rules')}${tool('New card','new-card',!writable || m.hunt.status !== 'paused')}${tool(m.hunt.status === 'paused' ? 'Resume board' : 'Pause board', m.hunt.status === 'paused' ? 'resume' : 'pause',!writable || m.hunt.status === 'completed')}${tool('Export board','export')}</div></section>
       <p class="hunt-notice">${m.shown.length} of ${m.cards.length} cards shown. New manual cards are parked. Board edits never start testing; runtime stages are not manually marked complete.</p>
+      <nav class="hunt-column-jumps" aria-label="Jump to Kanban column">${columns.map(col=>`<button type="button" data-hunt-jump="${col}">${labels[col]} <b>${m.groups[col].length}</b></button>`).join('')}</nav>
       <section class="hunt-residents" aria-label="Live agent assignments">${assignmentHtml(m)}</section>
       <section class="hunt-kanban" aria-label="Hunt Kanban board">${list.map(status => `<section class="hunt-column" data-hunt-column="${status}" ${writable && ['parked','blocked'].includes(status) ? 'data-hunt-drop="' + status + '"' : ''}><h3><span>${labels[status]}</span><b>${m.groups[status].length}</b></h3><div class="hunt-column-cards">${m.groups[status].map(c => cardHtml(c,m.byId)).join('') || empty('No cards')}</div></section>`).join('')}</section>
       <section class="hunt-history"><div class="hunt-section-title"><h2>Jev routing history</h2><span>Recorded decisions, not inferred activity</span></div>${history.length ? `<div class="hunt-history-list">${history.map(r => `<button type="button" data-hunt-card="${escape(r.card.id)}"><time>${escape(time(r.at))}</time><strong>${escape(r.card.title)}</strong><span>→ @${escape(r.agent)}</span><span>${escape(r.stage)} · ${escape(r.source || 'not recorded')}</span><small>${escape(routeWeight(r.probability))}</small></button>`).join('')}</div><p class="hunt-notice">Choice weights are not calibrated confidence, evidence of correctness, or permission to execute.</p>` : empty('Routing decisions will appear here when reported by the backend.')}</section>`}
@@ -129,7 +130,8 @@
       <label>Priority<select name="priority">${['low','medium','high','critical'].map(p => `<option ${p==='medium'?'selected':''}>${p}</option>`).join('')}</select></label>
       <label>Preferred role (hint only)<select name="role"><option value="">None</option>${m.agents.filter(a=>a.id!=='admin').map(a=>`<option value="${escape(a.id)}">${escape(a.name||a.id)}</option>`).join('')}</select></label>
       <label>Dependency<select name="dependency"><option value="">None</option>${m.cards.map(c=>`<option value="${escape(c.id)}">${escape(c.title)} · ${escape(c.status)}</option>`).join('')}</select></label><footer><button class="primary-button" type="submit">Add parked card</button></footer>`, async v => {
-        await request('POST',`/api/review/hunts/${encodeURIComponent(h.id)}/cards`,{title:v.title,objective:v.objective,priority:v.priority,preferredRoles:v.role?[v.role]:[],dependsOn:v.dependency?[v.dependency]:[],expectedToken:h.editToken})
+        const added=await request('POST',`/api/review/hunts/${encodeURIComponent(h.id)}/cards`,{title:v.title,objective:v.objective,priority:v.priority,preferredRoles:v.role?[v.role]:[],dependsOn:v.dependency?[v.dependency]:[],expectedToken:h.editToken})
+        window.EutryaStudio.state.huntRevealCard=added.card.id
       })
   }
   function cardDetail(id, desiredStatus) {
@@ -147,6 +149,7 @@
       ${writable ? `<footer><button class="primary-button" type="submit" value="note">Save note</button>${canMove(card)?'<button class="ghost-button" type="submit" value="parked">Park card</button><button class="ghost-button" type="submit" value="blocked">Flag blocked</button>':''}</footer><p class="hunt-notice">Notes do not approve a finding or mark work complete. Blocking a card requires an explanation.</p>` : '<p class="hunt-notice">Read-only while disconnected.</p>'}`
     const d = show(card.title, content, async (v, action) => {
       await request('PATCH',`/api/review/cards/${encodeURIComponent(card.id)}`,{expectedToken:card.editToken,note:v.note,...(action!=='note'?{status:action}:{})})
+      window.EutryaStudio.state.huntRevealCard=card.id
     })
     if (desiredStatus) {
       const error = d.querySelector('[role="alert"]')
@@ -175,6 +178,23 @@
   function bind(callbacks) {
     hooks = callbacks
     const s=window.EutryaStudio.state
+    const board=document.querySelector('.hunt-kanban'), boardId=s.selectedHunt||'none'
+    s.huntScrollPositions??={}
+    const jump=column=>{if(board&&column)board.scrollLeft+=column.getBoundingClientRect().left-board.getBoundingClientRect().left}
+    if(board){
+      board.scrollLeft=s.huntScrollPositions[boardId]||0
+      board.addEventListener('scroll',()=>{s.huntScrollPositions[boardId]=board.scrollLeft},{passive:true})
+      const reveal=s.huntRevealCard
+      if(reveal){
+        const card=[...board.querySelectorAll('[data-hunt-card]')].find(el=>el.dataset.huntCard===reveal)
+        if(card)jump(card.closest('[data-hunt-column]'))
+        delete s.huntRevealCard
+      }
+    }
+    document.querySelectorAll('[data-hunt-jump]').forEach(el=>el.addEventListener('click',()=>{
+      const column=[...document.querySelectorAll('[data-hunt-column]')].find(c=>c.dataset.huntColumn===el.dataset.huntJump)
+      jump(column)
+    }))
     document.querySelectorAll('[data-hunt-card]').forEach(el=>{
       el.addEventListener('click',()=>cardDetail(el.dataset.huntCard))
       el.addEventListener('dragstart',e=>{if(el.draggable){e.dataTransfer.setData('application/x-eutrya-card',el.dataset.huntCard);e.dataTransfer.effectAllowed='move'}})

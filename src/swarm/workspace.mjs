@@ -319,12 +319,22 @@ export class SharedWorkspace {
   // --- Messages ---
   postMessage({ from, to, event, content, replyTo = null }) {
     insist(from && to && content, 'Message from, to, and content are required');
+    const sender=String(from);
+    const recipient=String(to);
+    let text=String(content).trim();
+    if (
+      recipient === 'user' &&
+      sender !== 'user' &&
+      /^(?:completed?|done|finished|success(?:ful(?:ly)?)?)\.?$/i.test(text)
+    ) {
+      text='The agent ended without a substantive response. Review the latest runtime status/events and retry the request; this message is not evidence that the task completed.';
+    }
     const msg = {
       id: `msg-${uid().slice(0, 8)}`,
-      from: String(from),
-      to: String(to),
+      from: sender,
+      to: recipient,
       event: String(event || 'DIRECT_MESSAGE'),
-      content: clip(String(content).trim(), 4000),
+      content: clip(text, 4000),
       replyTo: replyTo ? String(replyTo) : null,
       timestamp: new Date().toISOString()
     };

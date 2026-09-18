@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.5 — Agent message boundary hardening
+
+Hardened the shared chat persistence boundary so no agent/backend path can write a bare `Completed`, `Done`, `Finished`, or equivalent success label as an agent-to-user chat response. If an internal path still produces one, the stored message is replaced with an explicit diagnostic saying no substantive response was produced.
+
+Desktop health data now exposes the active runtime root alongside the bridge version, making stale installed runtime snapshots immediately diagnosable.
+
+# Changelog
+
 ## 0.4.4 — Substantive completion responses
 
 Fixed chat turns that could surface a bare `Completed`, `Done`, or `Finished` instead of the agent's actual result. Bug-bounty/hunt prompts now bypass the tool-free fast reply lane. Generic completion labels are rejected as final responses, and runtime fallbacks expose the substantive answer, meaningful summary, stop/input reason, or an explicit status-aware diagnostic instead of claiming success.

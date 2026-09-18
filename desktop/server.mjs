@@ -130,6 +130,7 @@ function readiness() {
     error: readinessError ?? startupError,
     node: process.versions.node,
     bridgeVersion: BUILD_VERSION,
+    runtimeRoot: path.resolve(HERE,'..'),
   };
 }
 async function ensureRuntime({ force = false } = {}) {

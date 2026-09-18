@@ -1,0 +1,42 @@
+{
+  "agents": {
+    "admin": {
+      "enabled": true,
+      "role": "Primary user interface and task coordinator. Use the existing host Admin identity.",
+      "manualOnly": false,
+      "allowedEvents": ["TASK_ASSIGNED", "BLOCKED"],
+      "canDelegate": true,
+      "allowedTemplates": ["local-helper"]
+    },
+    "engineer": {
+      "enabled": true,
+      "role": "Bounded implementation work. Preserve the existing Engineer's private history.",
+      "manualOnly": false,
+      "allowedEvents": ["ENGINEERING_REQUIRED"],
+      "canDelegate": true,
+      "allowedTemplates": ["local-helper"]
+    },
+    "reviewer": {
+      "enabled": true,
+      "role": "Review a prepared result only when review is requested.",
+      "manualOnly": false,
+      "allowedEvents": ["REVIEW_REQUIRED"],
+      "canDelegate": false,
+      "allowedTemplates": []
+    }
+  },
+  "templates": {
+    "local-helper": {
+      "enabled": true,
+      "role": "Temporary helper for a bounded supplied subtask.",
+      "canDelegate": false,
+      "allowedTemplates": []
+    }
+  },
+  "activation": {
+    "maxConcurrent": 4,
+    "maxDepth": 2,
+    "maxChildren": 3,
+    "maxRootActivations": 16
+  }
+}

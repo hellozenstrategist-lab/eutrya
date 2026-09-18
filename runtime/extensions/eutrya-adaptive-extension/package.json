@@ -1,0 +1,11 @@
+{
+  "name": "@eutrya/adaptive-extension",
+  "version": "0.1.0",
+  "description": "Drop-in decision stabilization, correction memory, fast replies and Jev-gated resident activation for Eutrya",
+  "type": "module",
+  "private": true,
+  "engines": {"node": ">=22"},
+  "exports": {".": "./src/index.mjs", "./native": "./integration/native-v02.mjs", "./stream": "./src/chat-stream.mjs"},
+  "scripts": {"test": "node --test tests/*.test.mjs", "check": "node scripts-check.mjs", "demo": "node examples/demo.mjs"},
+  "license": "MIT"
+}

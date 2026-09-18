@@ -1,0 +1,10 @@
+[
+  {
+    "task": "Read the README and identify unclear setup instructions. Do not modify files.",
+    "workspace": "/REPLACE/WITH/PROJECT/PATH"
+  },
+  {
+    "task": "Read the test files and summarize missing edge-case coverage. Do not run commands or modify files.",
+    "workspace": "/REPLACE/WITH/PROJECT/PATH"
+  }
+]

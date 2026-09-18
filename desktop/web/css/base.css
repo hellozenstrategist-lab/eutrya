@@ -4,7 +4,7 @@
   --paper:#eceae4;--paper-2:#e4e2dc;--ink:#17191d;--muted:#70747a;--line:#c6c5bf;--line-dark:#999b9b;
   --navy:#092e69;--navy-2:#0b3d86;--green:#2e8b70;--black:#111419;--shadow:rgba(27,29,35,.16);
 }
-*{box-sizing:border-box} html,body,#root,#app{margin:0;width:100%;height:100%;overflow:hidden} button,input,select,textarea{font:inherit}button{color:inherit}
+*{box-sizing:border-box} html,body,#root{margin:0;width:100%;height:100%;overflow:hidden} button,input,select,textarea{font:inherit}button{color:inherit}
 body{background:radial-gradient(circle at 30% 20%,#f0eee8 0,#dad8d2 42%,#c9c6bf 100%)}
 .app-shell{width:100vw;height:100vh;min-width:1120px;min-height:720px;background:var(--paper);position:relative;overflow:hidden;box-shadow:0 24px 80px var(--shadow)}
 .app-shell:before,.app-shell:after{content:"";position:absolute;inset:34px 0 0;pointer-events:none;opacity:.2;z-index:0}

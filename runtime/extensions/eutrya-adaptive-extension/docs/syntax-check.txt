@@ -1,0 +1,5 @@
+
+> @eutrya/adaptive-extension@0.1.0 check
+> node scripts-check.mjs
+
+Syntax checked 21 JavaScript modules.

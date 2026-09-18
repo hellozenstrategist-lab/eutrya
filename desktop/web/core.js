@@ -35,7 +35,8 @@
 
   const state = {
     page:'dashboard', reloads:0, chat:[], selectedAgent:'admin', selectedProfile:'engineer', selectedTool:'Web Browser',
-    memoryQuery:'', settingsCategory:'General',
+    memoryQuery:'', settingsCategory:'General', busy:false, pendingText:'', notice:'',
+    backend:{connected:false,readiness:{ready:false,mode:'starting',error:null},config:null,swarm:null,memory:{items:[],skills:[]},approvals:[],events:[]},
     toolEnabled:{'Web Browser':true,'Code Interpreter':true,'File System':true,'Memory':true,'Search':true,'API Connector':true,'Database':true,'Email':true,'External Apps':true,'Custom Tool':true},
     prefs:{startup:false,restore:true,last:true,updates:false,analytics:false}
   }
@@ -88,11 +89,18 @@
 
   function header() {
     const m=meta[state.page]
+    const r=state.backend?.readiness??{}
+    const matrix=state.backend?.swarm?.matrix
+    const online=(matrix?.agents??[]).filter(a=>['IDLE','THINKING','WORKING','WAITING','REVIEWING'].includes(a.status)).length
+    const total=(matrix?.agents??[]).length || agents.length
+    const provider=state.backend?.config?.mainProvider??'runtime'
+    const model=state.backend?.config?.mainModel||'not configured'
+    const status=r.ready?'READY':(r.mode==='setup'?'SETUP':'CONNECTING')
     return `<header class="page-header">
       <div class="header-copy"><div class="eyebrow">PROJECT &nbsp;›&nbsp; ${m.eyebrow}</div><div class="page-title">${m.title}</div><div class="page-subtitle">${m.subtitle}</div></div>
       <div class="concept-strip" style="background-image:linear-gradient(90deg,rgba(233,231,224,.12),rgba(233,231,224,.76)),url('${concepts[state.page]}')"><div class="concept-annotation">INTELLIGENCE<br>GROWS<br>TOGETHER.</div></div>
-      <button class="reload-btn" id="reload">↻ <span>/Reload</span></button>
-      <div class="sys-mini"><span class="dot navy"></span> SYS. ONLINE<br>5/5 AGENTS<br>JEV v3.2<br>READY</div>
+      <button class="reload-btn" id="reload" ${state.busy?'disabled':''}>↻ <span>/Reload</span></button>
+      <div class="sys-mini"><span class="dot ${r.ready?'green':'navy'}"></span> SYS. ${r.ready?'ONLINE':'LOCAL'}<br>${online}/${total} AGENTS<br>${esc(provider)} · ${esc(model)}<br>${status}</div>
     </header>`
   }
 
@@ -104,12 +112,13 @@
     const selected=opts.selected?'selected':''
     const compact=opts.compact?'compact':''
     return `<button class="agent-card ${selected} ${compact}" data-agent="${a.id}">
-      <div class="agent-top"><span>${a.index}</span><span class="status ${a.status}">${a.status}</span></div>
+      <div class="agent-top"><span>${a.index}</span><span class="status ${String(a.status).toLowerCase()}">${String(a.status).toLowerCase()}</span></div>
       <div class="agent-name">${a.name}</div><div class="agent-verbs">${a.verbs.map(v=>`<span>${v}</span>`).join('')}</div>
       <div class="agent-art"><span></span><span></span><span></span></div><div class="jev"><strong>Jev</strong><small>NATIVE THINKING LAYER</small></div>
       ${opts.compact?'':`<div class="agent-bottom"><span>${a.role}</span><span>${a.tasks} tasks</span></div>`}
     </button>`
   }
+
 
   window.EutryaCore = {PAGES,nav,agents,concepts,meta,state,memoryNodes,toolDefs,settingCategories,$,$$,esc,chrome,sidebar,header,panel,agentCard}
 })()

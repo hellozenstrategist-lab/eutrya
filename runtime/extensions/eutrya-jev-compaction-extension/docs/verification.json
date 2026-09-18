@@ -1,0 +1,17 @@
+{
+  "package": "eutrya-jev-compaction-extension",
+  "version": "0.1.0",
+  "node": "v22.16.0",
+  "tests": {
+    "extension_unit": 82,
+    "actual_native_integration": 19,
+    "original_native_regressions": 179,
+    "failed": 0
+  },
+  "javascript_modules": 15,
+  "live_api_verified": false,
+  "new_swarm_integrated": false,
+  "upstream_commit": "e3f262a7f4d42bd8dd32ced30d26176f7cb545b0",
+  "supplied_native_zip_sha256": "f8121907ac47cc4d3b9f1aac5c19f0ba177c824de24fa645886fe00b239c85a1",
+  "dependencies_added": []
+}

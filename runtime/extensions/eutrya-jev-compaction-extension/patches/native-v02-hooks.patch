@@ -1,0 +1,59 @@
+--- a/src/runtime.mjs
++++ b/src/runtime.mjs
+@@ -11,6 +11,7 @@
+   constructor({store,cortex,jev,toolbox,config,onEvent=()=>{},redact=redactor(),contextProvider=null,budgetPool=null}) {
+     this.store=store;this.cortex=cortex;this.jev=jev;this.toolbox=toolbox;this.config=config;this.onEvent=onEvent;this.redact=redact;
+     this.contextProvider=contextProvider;this.budgetPool=budgetPool;
++    this.compactionSeamVersion=1;this.compaction=null;
+     this.gate=new DecisionGate();this.busy=false;this.steering=[];this.abortController=null;
+     insist(['jev','mock'].includes(jev.source),'Unknown evaluator source; no implicit fallback allowed');
+   }
+@@ -43,6 +44,7 @@
+   boundary(signal) {throwIfAborted(signal);if(this.steering.length)throw new Replan('Operator changed direction');}
+   compact() {
+     insist(!this.busy,'Stop or wait for a decision boundary before compacting');
++    if(this.compaction)return this.compaction.manual();
+     compactState(this.state);this.gate.revokeAll();this.store.save();this.emit('memory.compacted',{retained:this.state.observations.length});
+   }
+   resolve(note) {
+@@ -56,7 +58,7 @@
+     const s=this.state;
+     const observation=this.redact({id:`o${s.nextObservation++}`,at:new Date().toISOString(),action,result});
+     s.observations.push(observation);this.emit('observation',observation);
+-    if(s.observations.length>48)s.observations=s.observations.slice(-24);
++    if(!this.compaction && s.observations.length>48)s.observations=s.observations.slice(-24);
+     if(action.type==='note') {s.notebook.push({observationId:observation.id,text:action.text,verified:false});s.notebook=s.notebook.slice(-8);}
+     s.revision++;return observation;
+   }
+@@ -107,7 +109,8 @@
+         this.applySteering();this.boundary(signal);
+         try {
+           if(this.contextProvider)this.state.taskContext=this.redact(this.contextProvider());
+-          const packet=packetOf(this.state,Math.max(3000,this.config.maxPromptChars-7000));
++          const packet=this.compaction ? await this.compaction.packet(signal) : packetOf(this.state,Math.max(3000,this.config.maxPromptChars-7000));
++          this.boundary(signal);
+           packet.remainingCalls=this.config.maxCalls-this.state.meter.calls;
+           const controlRaw=await this.call('jev.control',{state:packet,questions:attentionQuestions()},s=>this.jev.control(packet,s),signal);
+           this.boundary(signal);
+--- a/bin/eutrya.mjs
++++ b/bin/eutrya.mjs
+@@ -237,7 +237,7 @@
+           if(line==='/memory'){print(JSON.stringify(runtime.toolbox.knowledge?.memories()??[],null,2));finish();return;}
+           if(line.startsWith('/remember ')){insist(runtime.toolbox.knowledge,'Persistent memory is not part of the puzzle fixture');print(JSON.stringify(runtime.toolbox.knowledge.remember(line.slice(10),{approved:true})));finish();return;}
+           if(line==='/skills'){print(JSON.stringify(runtime.toolbox.knowledge?.listSkills()??[],null,2));finish();return;}
+-          if(line==='/compact'){runtime.compact();print('Context compacted; observation archive and budget retained.');finish();return;}
++          if(line==='/compact'){const r=await runtime.compact();print(r ? `Jev compaction: ${r.status}; ${r.stats.before} -> ${r.stats.after} ${r.stats.unit}. Original archive and budget retained.` : 'Context compacted; observation archive and budget retained.');finish();return;}
+           if(line.startsWith('/resolve ')){runtime.resolve(line.slice(9));finish();return;}
+           if(line.startsWith('/model ')) {
+             const model=line.slice(7).trim();textModelReady({...config,mainModel:model});
+--- a/src/gateway/router.mjs
++++ b/src/gateway/router.mjs
+@@ -94,7 +94,7 @@
+         if(cmd.name==='new'){
+           insist(!engine.state.pending,'Resolve the uncertain action before starting a new session');entry.store.close();this.routes.delete(key);this.db.transaction(s=>{delete s.routes[key];});entry=this.open(key,m);await this.deliver(m,'New session created. Approved route memory is retained.');return;
+         }
+-        if(cmd.name==='compact'){engine.compact();await this.deliver(m,'Context compacted. Usage and observation archive retained.');return;}
++        if(cmd.name==='compact'){const r=await engine.compact();await this.deliver(m,r ? `Jev compaction: ${r.status}; ${r.stats.before} -> ${r.stats.after} ${r.stats.unit}. Original archive and usage retained.` : 'Context compacted. Usage and observation archive retained.');return;}
+         if(cmd.name==='model'){insist(cmd.arg&&cmd.arg.length<=200&&!/\s/.test(cmd.arg)&&!cmd.arg.startsWith('typesafe-ai/'),'Provide a text-model ID');entry.config.mainModel=cmd.arg;engine.state.engine.mainModel=cmd.arg;engine.state.revision++;entry.store.save();this.db.transaction(s=>{s.routes[key].mainModel=cmd.arg;});await this.deliver(m,'Text model set to '+cmd.arg+'. Jev remains mandatory.');return;}
+         if(cmd.name==='resolve'){engine.resolve(cmd.arg);await this.deliver(m,'Reconciliation recorded. Use /continue after inspecting the outcome.');return;}
+         if(cmd.name!=='continue'){await this.deliver(m,'Unknown command. '+GATEWAY_HELP);return;}

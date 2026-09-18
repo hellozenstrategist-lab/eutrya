@@ -1,0 +1,25 @@
+{
+  "servers": {
+    "reviewed-local": {
+      "enabled": false,
+      "trusted": false,
+      "transport": "stdio",
+      "command": "REPLACE_WITH_REVIEWED_EXECUTABLE",
+      "args": [],
+      "allowedTools": [
+        "REPLACE_WITH_EXACT_TOOL_NAME"
+      ],
+      "passEnv": []
+    },
+    "reviewed-http": {
+      "enabled": false,
+      "trusted": false,
+      "transport": "http",
+      "url": "https://REPLACE_WITH_SERVER/mcp",
+      "tokenEnv": "MY_MCP_SERVICE_TOKEN",
+      "allowedTools": [
+        "REPLACE_WITH_EXACT_TOOL_NAME"
+      ]
+    }
+  }
+}

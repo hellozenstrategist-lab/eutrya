@@ -1,0 +1,19 @@
+{
+  "name": "eutrya",
+  "version": "0.2.0",
+  "description": "Eutrya native swarm harness with an integrated desktop interface",
+  "private": false,
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check": "npm --prefix runtime run check && node --check desktop/web/backend.js && node --check desktop/web/core.js && node --check desktop/web/app.js && node --check runtime/desktop/server.mjs",
+    "test:runtime": "npm --prefix runtime test",
+    "test:desktop-bridge": "node --test runtime/tests/desktop-bridge.test.mjs",
+    "demo:bridge": "EUTRYA_DESKTOP_DEMO=1 node runtime/desktop/server.mjs --demo --port 32117",
+    "desktop:dev": "npm --prefix runtime install && cd desktop && cargo tauri dev",
+    "desktop:build": "npm --prefix runtime install && cd desktop && cargo tauri build",
+    "install:omarchy": "bash scripts/install-omarchy.sh"
+  }
+}

@@ -1,0 +1,88 @@
+Source ZIP extracted to a new temporary directory. No npm install performed.
+
+
+ok 93 - configuration rejects silently ignored permission/config typos
+  ---
+  duration_ms: 0.403047
+  type: 'test'
+  ...
+# Subtest: configuration requires a separate text-model slot
+ok 94 - configuration requires a separate text-model slot
+  ---
+  duration_ms: 0.189783
+  type: 'test'
+  ...
+1..94
+# tests 94
+# suites 0
+# pass 94
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 925.390594
+
+
+> eutrya-native@0.1.0 check
+> node scripts-check.mjs
+
+Syntax checked 21 JavaScript modules.
+
+
+E U T R Y A  ·  Jev-native CLI 0.1.0
+OFFLINE FIXTURES — no real models and no paid calls
+Workspace: /tmp/eutrya-distribution-qa-zydy5ls8/eutrya
+Session: 779e82a6-4c5d-4a2c-bcd9-ce1353ff49d1
+Trace: /tmp/eutrya-distribution-qa-zydy5ls8/sessions/3167def190636eb8/779e82a6-4c5d-4a2c-bcd9-ce1353ff49d1/events.jsonl
+
+  MOCK  observe  · choice mass 100%
+  AI    1 candidate(s) · Offline fixture planner responding to attention=observe; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  look → o1
+        lamps: ○ ○ ○ ●
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 0 → o2
+        lamps: ○ ● ○ ○
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 1 → o3
+        lamps: ○ ● ● ○
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 2 → o4
+        lamps: ● ○ ● ●
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 3 → o5
+        lamps: ● ○ ○ ○
+  MOCK  deepen  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=deepen; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  press 0 → o6
+        lamps: ● ● ○ ●
+  MOCK  deepen  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=deepen; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  press 1 → o7
+        lamps: ● ● ● ●
+  MOCK  verify  · choice mass 100%
+  AI    1 candidate(s) · Offline fixture planner responding to attention=verify; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  finish → o8
+
+All four lamps are lit. The independent switchboard checker can verify the result.
+
+[VERIFIED]
+
+Session 779e82a6-4c5d-4a2c-bcd9-ce1353ff49d1
+VERIFIED · 8 executed/denied steps
+24 reserved provider attempts (16 evaluator, 8 text)
+Reported tokens: 0 input / 0 output; missing on 0 attempts
+Known reported API cost: $0.000000; 0 attempts unpriced (not zero-cost)
+Attention: verify
+

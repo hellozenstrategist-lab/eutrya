@@ -1,0 +1,5 @@
+
+> eutrya-jev-compaction-extension@0.1.0 check
+> node scripts/check.mjs
+
+15 JavaScript modules passed syntax checks.

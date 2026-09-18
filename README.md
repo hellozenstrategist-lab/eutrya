@@ -1,153 +1,220 @@
-# KAH Ledger System
+# Eutrya
 
-A ledger-first coordination layer for Hermes Agent workflows.
+**A Jev-native multi-agent harness with a real desktop control surface.**
 
-KAH started as an internal mod to the Kitsune Agent Harness. The original problem was volume: many agents were exploring lanes, hypotheses, invariants, proof ideas, and dead ends at the same time. Without a shared operational memory layer, agents could repeat the same work, lose why a lane had already been killed, or promote an idea before checking prior context.
+Eutrya now ships as one project: the v0.2 native runtime, adaptive layer, Jev compaction, persistent swarm, local memory, tools, scheduler, messaging gateway, and the desktop interface are fused behind a localhost-only bridge.
 
-This repository is a sanitized public slice of that system. It shows the core pattern without private targets, bounty evidence, exploit code, vendor communications, credentials, or unpublished vulnerability details.
+The project is MIT licensed and intended to stay free and forkable.
 
-## What KAH does
-
-KAH gives agents a simple operating memory:
-
-- record work as structured append-only ledger entries;
-- derive stable fingerprints for duplicate-family detection;
-- preserve status, evidence notes, and kill reasons;
-- generate compact digests that can be injected into future Hermes prompts;
-- rebuild indexes from the ledger instead of trusting fragile local state.
-
-The current public version is intentionally small. It is a reference implementation of the pattern, not the full private control plane.
-
-## How it fits with Hermes Agent
-
-Hermes Agent already provides the execution environment: tools, skills, profiles, memory, cron jobs, messaging gateways, and terminal/file access.
-
-KAH sits on top as a workflow control layer. It gives Hermes agents a shared source of truth for repeated multi-agent work. Before an agent spends time on a task, it can check the ledger, see related lanes, and decide whether the work is new, already dead, or supporting evidence for an existing thread.
-
-In practice:
+## What is fused
 
 ```text
-Hermes Agent = agent runtime and tool access
-KAH          = structured operational memory for high-volume agent work
+┌────────────────────────────────────────────────────────────┐
+│                    EUTRYA DESKTOP                          │
+│ Dashboard · Swarm · Profiles · Memory · Tools · Settings  │
+└───────────────────────┬────────────────────────────────────┘
+                        │ localhost desktop bridge
+                        │ approvals / state / chat / config
+┌───────────────────────▼────────────────────────────────────┐
+│                   EUTRYA NATIVE v0.2                      │
+│ NativeSwarm · Jev · Adaptive RSI · Compaction · Tools     │
+│ Memory · Shared Workspace · Scheduler · Gateway · MCP     │
+└───────────────────────┬────────────────────────────────────┘
+                        │
+        ┌───────────────┼────────────────┐
+        ▼               ▼                ▼
+   Vercel/Jev      Text provider      Local tools
+   evaluator       or ChatGPT         + workspace
 ```
 
-## Why not just use an Obsidian brain?
+The desktop is not a fake skin over mock data anymore. It reads and mutates the same `NativeSwarm`, `SharedWorkspace`, profiles, memory, permissions, model config, events, and approval gates used by the CLI.
 
-Obsidian is a strong human knowledge base. KAH is an operational state layer.
+## Desktop screens
 
-I still like Obsidian for narrative notes, long-form thinking, and human review. The problem is that Markdown notes do not reliably enforce workflow when multiple agents are running. Agents need a smaller, stricter format they can read and write without guessing.
+- **Dashboard** — live swarm state, actual shared messages, runtime readiness, task counts and event feed.
+- **Swarm** — persistent agents, active focus, templates, live tasks, blockers and routing state.
+- **Library** — edit, add and remove real swarm profiles. Profile changes persist in the backend.
+- **Memory** — search, add and forget real operator-approved persistent memory.
+- **Tools** — shows tool availability from agent profiles and the backend permission model.
+- **Settings** — provider/model selection, Jev key storage, runtime permissions, budgets, workspace switching and bridge restart.
+- **Approvals** — writes, local commands and other gated effects appear as a native one-time approval dialog in the desktop UI.
 
-| Need | Obsidian brain | KAH ledger system |
-| --- | --- | --- |
-| Human notes | Excellent | Basic |
-| Agent-readable state | Inconsistent Markdown | Structured JSONL records |
-| Duplicate detection | Search-dependent | Stable lane fingerprints |
-| Workflow status | Usually manual | Explicit states like `candidate`, `dead`, `proved` |
-| Audit trail | Depends on note discipline | Append-only by default |
-| Prompt injection | Large vault context or manual excerpts | Compact generated digests |
-| Automation | Possible, but loose | Designed for agents and scripts |
+## Runtime behavior
 
-Short version:
+The existing v0.2 backend remains the authority. In particular:
 
-> Obsidian stores what we know. KAH operationalizes what we know.
+- Jev still evaluates attention and candidates before tool execution.
+- effectful actions still pass the state-bound decision gate;
+- writes and process execution still follow backend permission policy;
+- the desktop never receives API key values;
+- credentials entered in Settings are stored by the backend's existing private env writer;
+- the desktop bridge binds to `127.0.0.1` only;
+- closing the desktop terminates its local bridge child process.
 
-Or even simpler:
+## Omarchy / Arch quick start
 
-> Obsidian is the library. KAH is air traffic control.
+### 1. Install system prerequisites
 
-## Why ledger-first?
-
-I chose append-only JSONL ledgers over a mutable task database for the first version.
-
-That was deliberate. The expensive failure mode was not an ugly UI. The expensive failure mode was losing context, repeating dead work, or letting an agent act on an idea that had already failed. JSONL gave me a cheap source of truth that agents could update, humans could inspect, and scripts could rebuild into better views later.
-
-A lane fingerprint is derived from the stable parts of the work:
-
-```text
-surface + invariant + impact sink + root-cause shape -> fingerprint
-```
-
-That means two agents can describe the same idea differently but still collide if the underlying lane is the same.
-
-## Non-security uses
-
-KAH is not limited to cybersecurity. The same pattern works anywhere agents explore many possibilities and need shared memory.
-
-Examples:
-
-- sales research: track accounts, outreach angles, dead leads, and duplicate company research;
-- recruiting: track candidates, role fit, rejection reasons, and outreach history;
-- product operations: collect feature requests, group duplicates, and preserve decision history;
-- customer support: track recurring issues, attempted fixes, and escalation paths;
-- software engineering: record flaky tests, refactor lanes, failed fixes, and architectural risks;
-- market research: preserve hypotheses, source trails, confidence, and dead ends.
-
-The common problem is not the domain. It is agent coordination under volume.
-
-## Quick start
+Tauri 2's current Arch prerequisites are:
 
 ```bash
-python -m venv .venv
-. .venv/bin/activate
-pip install -e . pytest
-pytest -q
-
-kah-ledger init --root /tmp/kah-demo
-
-kah-ledger add-lane --root /tmp/kah-demo \
-  --agent scout-1 \
-  --surface "state variable reads" \
-  --invariant "state derived from invalidated writes must not authorize value movement" \
-  --sink "direct loss of funds" \
-  --root-cause "missing freshness check" \
-  --hypothesis "downstream component may trust stale state"
-
-kah-ledger digest --root /tmp/kah-demo
+sudo pacman -S --needed \
+  webkit2gtk-4.1 \
+  base-devel \
+  curl \
+  wget \
+  file \
+  openssl \
+  appmenu-gtk-module \
+  libappindicator-gtk3 \
+  librsvg \
+  xdotool
 ```
 
-Example digest:
+You also need Node.js **22+** and Rust/Cargo.
+
+Official Tauri prerequisites: https://v2.tauri.app/start/prerequisites/
+
+### 2. Build + install
+
+From the repository root:
+
+```bash
+./scripts/install-omarchy.sh
+```
+
+The installer:
+
+1. verifies Node and the Arch dependencies;
+2. installs the runtime npm dependencies (including the AI SDK used by Jev);
+3. installs the Tauri CLI if necessary;
+4. builds the desktop app;
+5. installs a local copy under `~/.local/share/eutrya`;
+6. creates two commands:
+
+```bash
+eutrya       # desktop app
+eutrya-cli   # original terminal harness
+```
+
+The desktop wrapper records the absolute Node path so an Omarchy launcher does not have to guess your shell's Node installation.
+
+## Development
+
+### Backend tests
+
+```bash
+npm run test:runtime
+```
+
+### Desktop bridge integration test
+
+```bash
+npm run test:desktop-bridge
+```
+
+### Static checks
+
+```bash
+npm run check
+```
+
+### Desktop development
+
+```bash
+npm --prefix runtime install
+cd desktop
+cargo tauri dev
+```
+
+For a completely offline UI/runtime smoke test:
+
+```bash
+EUTRYA_DESKTOP_DEMO=1 cargo tauri dev
+```
+
+The demo mode is visibly marked as a fixture mode and does not silently replace missing live credentials.
+
+## Live setup
+
+The desktop can store the Jev/Vercel gateway credential for you in the existing Eutrya private environment file. It never reads the secret value back into the UI.
+
+Or configure it manually:
+
+```bash
+mkdir -p ~/.config/eutrya
+chmod 700 ~/.config/eutrya
+printf 'AI_GATEWAY_API_KEY=%q\n' 'YOUR_KEY' > ~/.config/eutrya/.env
+chmod 600 ~/.config/eutrya/.env
+```
+
+Then select your text provider and model in **Settings**.
+
+The evaluator remains `typesafe-ai/jev`. The text model can use the backend's supported providers (`vercel`, `chatgpt`, `openrouter`, `compatible`, or `ollama`).
+
+## Workspaces
+
+Eutrya runs against a workspace directory. When launched from a terminal, the desktop initially uses the current directory unless `EUTRYA_WORKSPACE` is set.
+
+You can switch workspaces from the Settings screen. The desktop restarts its bridge for the selected path; backend session state remains stored under Eutrya's normal state directories.
+
+```bash
+cd ~/code/my-project
+eutrya
+```
+
+or:
+
+```bash
+EUTRYA_WORKSPACE=~/code/my-project eutrya
+```
+
+## Repository layout
 
 ```text
-KAH_LEDGER_DIGEST:
-  lanes: 1
-  families: 1
-  status_counts: candidate=1
-  recent_lanes:
-    - lane_... [candidate] fp=... sink=direct loss of funds; surface=state variable reads; root=missing freshness check
+runtime/                         Eutrya Native v0.2 backend
+  bin/eutrya.mjs                 original CLI
+  src/                           runtime / providers / tools / swarm
+  extensions/                    adaptive + Jev compaction extensions
+  desktop/server.mjs             localhost desktop bridge
+  tests/desktop-bridge.test.mjs  desktop↔runtime integration test
+
+desktop/
+  web/                           dependency-free HTML/CSS/JS frontend
+  src-tauri/                     native Tauri shell + Node bridge launcher
+  web/assets/                    Eutrya concept-art textures
+scripts/
+  install-omarchy.sh             build/install desktop + CLI wrappers
+  dev-desktop.sh                 development launcher
 ```
 
-## Repository map
+## Architecture boundary
+
+The localhost bridge exists to keep the visual layer simple and the backend authoritative.
+
+The frontend can request operations such as:
 
 ```text
-kah_ledger/
-  cli.py        terminal interface
-  ledger.py     append-only JSONL store
-  models.py     lane schema and fingerprinting
-  digest.py     agent-readable summaries
-examples/
-  sanitized_lanes.jsonl
-  agent_prompt_context.md
-docs/
-  answer-to-dan.md
-  obsidian-vs-kah.md
-  applications-beyond-security.md
-tests/
-  test_ledger.py
+GET    /api/state
+POST   /api/chat
+POST   /api/focus
+POST   /api/template
+PATCH  /api/agents/:id
+POST   /api/memory
+POST   /api/approvals/:id
+PATCH  /api/settings
+POST   /api/credentials
+POST   /api/reload
+POST   /api/stop
 ```
 
-## Design boundaries
+The bridge does **not** create a second execution path. Chat dispatch still enters `NativeSwarm.dispatch()`, and tool effects still go through the existing runtime/toolbox/decision-gate path.
 
-This repository is a workflow/tooling artifact.
+## Free and open source
 
-It is not:
+MIT. Use it, fork it, change the design, build your own profiles, or wire your own model/provider stack underneath it.
 
-- a vulnerability report;
-- an exploit release;
-- a target repository;
-- a replacement for human review;
-- a full replica of the private Kitsune system.
-
-The examples are generic by design.
+The frontend concept art is included as product artwork/reference texture. The functional interface is implemented in ordinary HTML/CSS/JavaScript so contributors can modify it without adopting a frontend framework.
 
 ## License
 

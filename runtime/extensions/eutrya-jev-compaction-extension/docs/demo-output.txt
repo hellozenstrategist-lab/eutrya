@@ -1,0 +1,34 @@
+
+> eutrya-jev-compaction-extension@0.1.0 demo
+> node examples/demo.mjs
+
+OFFLINE FIXTURE — not real Jev inference or a speed/quality benchmark
+{
+  "status": "compacted",
+  "source": "mock",
+  "stats": {
+    "before": 60848,
+    "after": 24434,
+    "limit": 40000,
+    "target": 22000,
+    "unit": "characters",
+    "requests": 1,
+    "reductionRatio": 0.5984420194583224,
+    "hardOverflow": false,
+    "targetMet": false,
+    "pinned": 3,
+    "candidates": 7,
+    "kept": 4,
+    "resultsPruned": 0,
+    "pairsDropped": 6,
+    "stateTokensEstimated": 2210,
+    "stateStage": "full-text",
+    "elapsedMs": 16
+  },
+  "exactTextPreserved": [
+    "Explain the parser bug. Keep my exact requirement: preserve empty fields.",
+    "The exact error is ParserError: empty field."
+  ],
+  "archiveRestoresOriginal": true
+}
+Restored 21 original messages. Temporary demo archive removed on exit.

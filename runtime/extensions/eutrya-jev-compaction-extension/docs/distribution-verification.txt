@@ -1,0 +1,9 @@
+Distribution verification
+=========================
+The release archive was extracted into a fresh directory, independent of the build source tree.
+All SHA-256 entries in MANIFEST.sha256 verified.
+Fresh-extraction npm test: 82 passed, 0 failed, 0 skipped.
+Fresh-extraction npm run check: 15 JavaScript modules passed.
+Fresh-extraction npm run demo: mock compaction completed; exact text and original archive restoration checked.
+No dependency installation, provider credential or live inference was required for these checks.
+Actual-native compatibility results (179 original + 19 integration tests) are in native-verification.tap.

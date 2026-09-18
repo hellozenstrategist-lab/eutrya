@@ -1,0 +1,47 @@
+{
+  "mode": "OFFLINE FIXTURES ONLY; no live external inference",
+  "checks": {
+    "foreground_gateway_example_client": {
+      "status": "pass",
+      "signed_local_HTTP": true,
+      "evaluator_calls": 2,
+      "text_calls": 1,
+      "mode": "mock",
+      "reply_label": "OFFLINE FIXTURE"
+    },
+    "gateway_SIGTERM_shutdown": {
+      "status": "pass",
+      "exit_code": 0,
+      "lock_removed": true
+    },
+    "scheduler_SIGTERM_shutdown": {
+      "status": "pass",
+      "exit_code": 0
+    },
+    "interactive_terminal": {
+      "status": "pass",
+      "steps": [
+        "status",
+        "task",
+        "independent VERIFIED result",
+        "new session",
+        "quit"
+      ],
+      "exit_code": 0
+    },
+    "interactive_masked_setup": {
+      "status": "pass",
+      "keys_not_echoed": true,
+      "env_file_mode": "0600",
+      "key_values": "dummy fixture values, deleted after test"
+    },
+    "seeded_fixture_checker": {
+      "status": "pass",
+      "verified": 20,
+      "total": 20,
+      "comparison": false,
+      "live_models": false
+    }
+  },
+  "node": "v22.16.0"
+}

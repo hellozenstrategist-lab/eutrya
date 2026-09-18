@@ -1,0 +1,89 @@
+{
+  "version": "0.2.0",
+  "built_at": "2026-09-17T18:00:31.896093-07:00",
+  "environment": {
+    "os": "Linux",
+    "node": "22.16.0",
+    "npm": "10.9.2"
+  },
+  "tests": {
+    "total": 179,
+    "passed": 179,
+    "failed": 0,
+    "skipped": 0,
+    "original_tests": 94,
+    "new_tests": 85,
+    "mode": "offline"
+  },
+  "syntax": {
+    "modules": 41,
+    "passed": 41,
+    "typecheck": false
+  },
+  "smoke": {
+    "foreground_gateway_example_client": {
+      "status": "pass",
+      "signed_local_HTTP": true,
+      "evaluator_calls": 2,
+      "text_calls": 1,
+      "mode": "mock",
+      "reply_label": "OFFLINE FIXTURE"
+    },
+    "gateway_SIGTERM_shutdown": {
+      "status": "pass",
+      "exit_code": 0,
+      "lock_removed": true
+    },
+    "scheduler_SIGTERM_shutdown": {
+      "status": "pass",
+      "exit_code": 0
+    },
+    "interactive_terminal": {
+      "status": "pass",
+      "steps": [
+        "status",
+        "task",
+        "independent VERIFIED result",
+        "new session",
+        "quit"
+      ],
+      "exit_code": 0
+    },
+    "interactive_masked_setup": {
+      "status": "pass",
+      "keys_not_echoed": true,
+      "env_file_mode": "0600",
+      "key_values": "dummy fixture values, deleted after test"
+    },
+    "seeded_fixture_checker": {
+      "status": "pass",
+      "verified": 20,
+      "total": 20,
+      "comparison": false,
+      "live_models": false
+    }
+  },
+  "dependency_install": {
+    "attempted": true,
+    "exit_code": 1,
+    "error": "EAI_AGAIN registry.npmjs.org",
+    "installed_sdk_verified": false,
+    "lockfile_generated": false
+  },
+  "live_inference": false,
+  "live_messaging_accounts": false,
+  "live_MCP": false,
+  "paid_calls": 0,
+  "full_Hermes_parity": false,
+  "nous_services_included": false,
+  "distribution_check": {
+    "source_extracted": true,
+    "tests": {
+      "pass": 179,
+      "fail": 0
+    },
+    "syntax_modules": 41,
+    "demo": "VERIFIED; OFFLINE FIXTURES",
+    "dependencies_installed": false
+  }
+}

@@ -1,0 +1,38 @@
+
+> @eutrya/adaptive-extension@0.1.0 demo
+> node examples/demo.mjs
+
+
+EUTRYA ADAPTIVE EXTENSION • OFFLINE FIXTURE ONLY
+
+1. Sleeping residents: admin=SLEEPING, engineer=SLEEPING
+
+2. User correction: “Answer first. This is too long.”
+  Persisted: {
+  verbosity: 'brief',
+  answerFirst: true,
+  notes: [
+    {
+      id: 'feedback_d8111b8c-7eed-4bf7-8742-504510099fa9',
+      text: 'Answer first. This is too long.'
+    }
+  ]
+}
+
+3. Fast text lane (one evaluator + one text call):
+  [MOCK Jev] route ordinary explanation
+A stack is a last-in, first-out collection: the last item added is the first removed.
+  NOT_INDEPENDENTLY_VERIFIED
+
+4. Jev-gated resident → temporary subagent:
+  [MOCK Jev] authorize one activation
+  Existing resident admin woke.
+  [MOCK Jev] authorize one activation
+  Temporary subagent helper woke.
+  Model invocation callbacks: 2 (idle peers were never called)
+
+5. Verified-outcome policy stabilization:
+  Learned bounded bias: 0.02727272727272727
+
+No live Jev performance or five-second latency claim is demonstrated.
+

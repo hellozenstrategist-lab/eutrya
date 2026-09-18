@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.8 — Session-only YOLO execution mode
+
+Added `/yolo [on|off]` to interactive CLI sessions.
+
+- `/yolo on` temporarily enables local execution tools and skips approval prompts for `run` and `shell` actions only.
+- `/yolo off` restores normal approval behavior and restores the prior `allowExec` state when YOLO mode enabled it.
+- YOLO mode is intentionally session-only and is not persisted across Eutrya restarts.
+- File writes, memory writes, MCP actions, credential changes, and unrelated approvals are not auto-approved by YOLO mode.
+
 ## 0.4.7 — Interactive context controls
 
 Added persistent interactive CLI controls for runtime context budgeting and Jev compaction.

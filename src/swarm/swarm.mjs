@@ -665,7 +665,7 @@ export class NativeSwarm {
     return `${rules}\n\nKANBAN CARD: ${card.title}\nOBJECTIVE: ${card.objective}\nPRIORITY: ${card.priority}\n\nWork only on this bounded card within the hunt rules. Gather concrete evidence, preserve competing explanations, and do not expand scope or perform destructive actions merely to strengthen a finding. Return a concise result with evidence and unresolved questions for independent review.`;
   }
 
-  async executeHuntCard(cardId,agentId,stage) {
+  async executeHuntCard(cardId,agentId,stage,route={source:'jev',probability:null}) {
     const card=this.sharedWorkspace.getHuntCard(cardId);
     const hunt=this.sharedWorkspace.getHunt(card.huntId);
     const prof=this.profiles.get(agentId);
@@ -674,7 +674,7 @@ export class NativeSwarm {
     this.sharedWorkspace.updateHuntCard(cardId,{
       status:stage==='ready'?'active':'review',
       assignedTo:agentId,
-      routeEvent:{agent:agentId,stage,source:'jev'},
+      routeEvent:{agent:agentId,stage,source:route.source,probability:route.probability},
       incrementAttempts:true
     });
     this.sharedWorkspace.save(this.swarmDir);
@@ -720,7 +720,7 @@ export class NativeSwarm {
         const route=await this.routeHuntCard(card.id,signal);
         if(!route) continue;
         routed++;
-        jobs.push(this.executeHuntCard(card.id,route.agentId,card.status));
+        jobs.push(this.executeHuntCard(card.id,route.agentId,card.status,route));
       }
       if(!jobs.length) break;
       const settled=await Promise.all(jobs);

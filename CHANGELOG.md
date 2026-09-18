@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 — Jev-routed hunt Kanban
+
+Added persistent hunt boards that store the authorized program page, normalized rules, scope, exclusions, testing constraints, and bounded hunt cards. Admin can create boards/cards through native tools after reviewing the user-supplied hunt page and rules.
+
+Added availability-aware Jev routing. Busy, blocked, or otherwise non-idle specialists are excluded from the next assignment choice, so work is routed among the remaining Auditor, Operator, Sentinel, and Analyst residents rather than queued behind one agent. Ready work moves through active execution and independent review; review avoids the original worker when another specialist is available.
+
+Added `/hunt`, `/hunt run`, pause/resume controls, a terminal Kanban view, persistent route history, board state in shared context, and hunt routing regression tests.
+
+
 ## 0.3.1 — Security-native default swarm
 
 Replaced the generic default Engineer, Legal, Finance, and Researcher profiles with Auditor, Operator, Sentinel, and Analyst while retaining Admin as the primary orchestrator. Updated Jev profile routing, security event destinations, mock routing, tool examples, tests, and documentation. The new roles separate vulnerability discovery, controlled execution, independent verification, and architecture/research synthesis.

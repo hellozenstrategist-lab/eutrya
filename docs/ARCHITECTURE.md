@@ -1,4 +1,4 @@
-# Eutrya Native architecture · 0.2.0
+# Eutrya Native architecture · 0.3.0
 
 ```text
 CLI / messaging ingress / explicit job / explicit task batch
@@ -42,6 +42,8 @@ These controls guarantee consultation and action-path enforcement, not that Jev 
 | `bin/eutrya.mjs`, `src/ui.mjs` | Standalone CLI, sessions, human controls, terminal approvals |
 | `src/commands.mjs` | Setup, profiles, provider inventory, memory/skills, gateway/jobs/team/MCP commands |
 | `src/runtime.mjs` | Mandatory control/propose/rank/execute loop |
+| `src/research-runtime.mjs`, `src/research-schema.mjs` | Strategist/Jev research boundaries, structured invariant/hypothesis ledger |
+| `src/research-code.mjs` | Read-only semantic code surface/symbol/reference/state/function analysis |
 | `src/gate.mjs`, `src/policy.mjs` | Single-use tickets, validated probability distributions, deterministic selection |
 | `src/providers/gateway.mjs` | Explicit text-provider endpoint/key routing; no tool execution |
 | `src/providers/jev.mjs` | SDK typed evaluation adapter; no silent text/mock fallback |
@@ -53,6 +55,36 @@ These controls guarantee consultation and action-path enforcement, not that Jev 
 | `src/gateway/*` | Transport normalization, authentication, queues, isolated routes, approvals, delivery |
 | `src/scheduler.mjs` | Claim-before-run cron/one-shot jobs and bounded explicit read-only batches |
 | `src/environment.mjs`, `src/local-state.mjs`, `src/http.mjs` | Credential parsing, atomic control state, bounded HTTP primitives |
+
+## Jev research lane
+
+```text
+Strategist text model
+  global objective / invariants / hypotheses / search seeds
+                        │
+                        ▼
+              Jev local decision loop
+                        │
+         ┌──────────────┼──────────────┐
+         ▼              ▼              ▼
+   symbol/surface   caller/state   compare/inspect
+         │              │              │
+         └──────────────┼──────────────┘
+                        ▼
+               evidence observations
+                        │
+                Jev continue/escalate
+                        │
+                        ▼
+             compact evidence packet
+                        │
+                        ▼
+                strategist replan
+```
+
+The research lane is intentionally separate from the normal proposal/rank loop. It uses only read-only local semantic code tools. The strategist does not micromanage file operations; it defines the investigation state. A deterministic frontier generator turns that state plus observed code relationships into bounded candidate actions, and Jev selects the next action. After a configured micro-step boundary, meaningful escalation, or stagnation, the strategist receives compact evidence and updates stable invariant/hypothesis objects.
+
+Research decisions use the same single-use state-bound ticket machinery as ordinary actions. Research state is included in the semantic state hash, so a ticket becomes stale when the ledger changes.
 
 ## Messaging flow
 

@@ -56,14 +56,14 @@ export class MockJev {
         let pick = choices[0];
         if (k === 'route') {
           const t = state.task ? state.task.toLowerCase() : '';
-          const isWork = /audit|contract|compliance|liability|regulation|legal|finance|model|revenue|code|bug|pipeline|build|impl|test|write|edit/i.test(t);
+          const isWork = /security|audit|vulnerability|exploit|triage|scope|severity|verify|reproduce|fuzz|code|bug|pipeline|build|impl|test|write|edit|threat model|architecture|research/i.test(t);
           pick = isWork ? 'work' : 'fast';
         } else if (state.task) {
           const t = state.task.toLowerCase();
-          if (/code|bug|engineer|test|build|ts|js|python|impl|system/i.test(t) && choices.includes('engineer')) pick = 'engineer';
-          else if (/legal|contract|regulation|policy|compliance|risk/i.test(t) && choices.includes('legal')) pick = 'legal';
-          else if (/finance|cost|price|unit economics|margin|budget|market|revenue/i.test(t) && choices.includes('finance')) pick = 'finance';
-          else if (/research|investigate|study|paper|hypothesis|strategy/i.test(t) && choices.includes('researcher')) pick = 'researcher';
+          if (/verify|triage|false positive|duplicate|severity|scope review|independent review|evidence quality/i.test(t) && choices.includes('sentinel')) pick = 'sentinel';
+          else if (/reproduce|execute|operator|run|command|shell|fuzz|harness|local validation|test environment|tooling|implementation/i.test(t) && choices.includes('operator')) pick = 'operator';
+          else if (/audit|vulnerability|security review|code review|access control|authorization|smart contract|web3|invariant|asset flow|bug/i.test(t) && choices.includes('auditor')) pick = 'auditor';
+          else if (/research|investigate|architecture|threat model|study|specification|hypothesis|strategy|synthesi|report/i.test(t) && choices.includes('analyst')) pick = 'analyst';
           else if (choices.includes('admin')) pick = 'admin';
         }
         answers[k] = oneHotChoice(pick, choices);

@@ -80,8 +80,8 @@ fn runtime_dir(app: &tauri::AppHandle) -> PathBuf {
     }
   }
 
-  // Development fallback: desktop/src-tauri -> repository root/runtime.
-  PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../runtime")
+  // Development fallback: desktop/src-tauri -> repository root.
+  PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
 fn normalize_workspace(value: Option<String>) -> Result<PathBuf, String> {

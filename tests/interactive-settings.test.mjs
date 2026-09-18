@@ -88,3 +88,32 @@ test('swarm live settings can temporarily expose and hide execution tools',async
   runtime=swarm.getRuntime('admin');
   assert.equal(runtime.toolbox.available().includes('run'),false);
 });
+
+
+test('swarm stop and steer controls target only busy resident runtimes',async t=>{
+  const root=fs.mkdtempSync(path.join(os.tmpdir(),'eutrya-operator-controls-'));
+  t.after(()=>fs.rmSync(root,{recursive:true,force:true}));
+  const config=loadConfig(undefined,{sessionRoot:path.join(root,'state'),mainModel:'mock/text'});
+  const swarm=new NativeSwarm({config,workspace:root,demo:true});
+  t.after(()=>swarm.close());
+
+  let stopped=0,steered=[];
+  swarm.runtimes.set('admin',{
+    busy:true,
+    stop(){stopped++;},
+    steer(text){steered.push(text);}
+  });
+  swarm.runtimes.set('auditor',{
+    busy:false,
+    stop(){throw new Error('idle runtime should not stop');},
+    steer(){throw new Error('idle runtime should not steer');}
+  });
+
+  const steerTargets=swarm.steerActiveRuns('change direction');
+  assert.deepEqual(steerTargets.map(x=>x.agentId),['admin']);
+  assert.deepEqual(steered,['change direction']);
+
+  const stopTargets=swarm.stopActiveRuns();
+  assert.deepEqual(stopTargets.map(x=>x.agentId),['admin']);
+  assert.equal(stopped,1);
+});

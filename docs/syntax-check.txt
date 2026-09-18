@@ -1,4 +1,7 @@
 > eutrya-native@0.4.0 check
 > node scripts-check.mjs
 
-Syntax checked 53 JavaScript modules.
+Syntax checked 65 JavaScript modules.
+Shell scripts: bash -n passed.
+Tauri manifest: cargo metadata passed.
+Tauri config JSON: parse passed.

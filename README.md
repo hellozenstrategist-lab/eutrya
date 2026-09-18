@@ -28,7 +28,22 @@ State-bound, single-use decision ticket + tool permission
 Execute → record observation → repeat
 ```
 
-Version: **0.1.0**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
+Version: **0.3.0**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
+
+
+## Jev research lane
+
+For local codebase investigations where the text model should plan globally and Jev should drive the tactical search loop:
+
+```bash
+eutrya research "Map every asset-reducing path and compare authorization assumptions" --cwd /path/to/repo
+```
+
+Research mode is deliberately read-only. The strategist produces a compact objective, invariants, explicit hypotheses, discriminating questions, and search seeds. Jev then chooses among deterministic semantic code operations for several micro-steps before returning a compact evidence packet to the strategist for replanning. This changes the expensive-model cadence from roughly one text-model proposal per tool step to one strategist call per research boundary.
+
+Built-in semantic operations cover code-surface mapping, symbol lookup, reference/caller tracing, function/modifier inspection, state read/write tracing, and structural function comparison. Smart-contract Solidity is parsed with a bounded local structural scanner; TypeScript/JavaScript/Rust/Move receive lighter function discovery. These are research aids, not a compiler or proof engine.
+
+The research ledger stores invariants and hypotheses as first-class state with stable IDs and statuses (`open`, `supported`, `weakened`, `closed`). Structural asymmetry is intentionally treated as a lead requiring context, not as automatic proof of a vulnerability.
 
 ## Start without credentials
 

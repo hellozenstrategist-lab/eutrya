@@ -1,0 +1,38 @@
+name: Publish version release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Publish versioned public-alpha release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "$TAG already exists; nothing to publish."
+            exit 0
+          fi
+          NOTES="docs/release-v$VERSION.md"
+          test -f "$NOTES"
+          gh release create "$TAG" \
+            --target "$GITHUB_SHA" \
+            --title "Eutrya $TAG — Public Alpha" \
+            --notes-file "$NOTES" \
+            --prerelease

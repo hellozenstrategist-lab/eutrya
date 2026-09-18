@@ -93,7 +93,7 @@ OpenRouter text models additionally need OPENROUTER_API_KEY. No Nous login is us
 Chat commands: /help /status /trace /compact /continue /stop /steer TEXT
                /resolve NOTE /model ID /new /memory /skills /usage /swarm /agents
                /agent NAME /tasks /findings /hunt [ID|run ID|pause ID|resume ID] /template [NAME]
-               /context [N|64k] /autocompact [on|off] /thinking [on|off] /reload /quit
+               /context [N|64k] /autocompact [on|off] /yolo [on|off] /thinking [on|off] /reload /quit
 `;
 
 const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to a specialist.
@@ -115,6 +115,7 @@ const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to 
 /compact                Run Jev relevance pruning; originals remain recallable
 /context [N|64k]        Show or set maxPromptChars (4k..200k serialized characters)
 /autocompact [on|off]   Show or toggle automatic Jev compaction
+/yolo [on|off]          Session-only auto-approval for local run/shell commands
 /continue               Continue a paused task with a fresh Jev decision cycle
 /stop                   Cancel an in-flight model call or local process
 /steer TEXT             Queue guidance; discard obsolete plans before execution
@@ -279,11 +280,16 @@ async function runAgent() {
 
   // Native Swarm Mode (Default for chat and tasks)
   if(!explicitDemo) requireLive();
+  let yoloExec=false;
+  let yoloRestoreAllowExec=null;
+  const approveAction = terminal
+    ? (action,signal) => (yoloExec && ['run','shell'].includes(action?.type) ? true : terminal.approve(action,signal))
+    : async()=>false;
   const swarm = new NativeSwarm({
     config,
     workspace: cwd,
     demo: explicitDemo,
-    approve: terminal ? (a,s)=>terminal.approve(a,s) : async()=>false,
+    approve: approveAction,
     onEvent: emit,
     redact
   });
@@ -517,6 +523,37 @@ Type / for available commands.
               print(`Auto-compaction: ${live.jevCompaction?'on':'off'}. Applied to the next agent turn and saved to ${configFile}.`);
             }
           } catch(e) {print(`Auto-compaction setting failed: ${e.message}`);}
+          finish();return;
+        }
+        if(line==='/yolo'||line.startsWith('/yolo ')){
+          try {
+            const raw=line.slice(5).trim().toLowerCase();
+            if(!raw) {
+              print(`YOLO mode: ${yoloExec?'on':'off'}. When on, local run/shell approvals are skipped for this CLI session only.`);
+            } else if(['on','true','yes','1'].includes(raw)) {
+              if(!yoloExec) {
+                yoloRestoreAllowExec=config.allowExec;
+                if(!config.allowExec) {
+                  config.allowExec=true;
+                  await swarm.applyRuntimeSettings({allowExec:true});
+                }
+                yoloExec=true;
+              }
+              print('YOLO mode: on. Local run/shell commands will execute without approval prompts for this CLI session.');
+            } else if(['off','false','no','0'].includes(raw)) {
+              if(yoloExec) {
+                yoloExec=false;
+                if(yoloRestoreAllowExec===false && config.allowExec) {
+                  config.allowExec=false;
+                  await swarm.applyRuntimeSettings({allowExec:false});
+                }
+                yoloRestoreAllowExec=null;
+              }
+              print('YOLO mode: off. Local run/shell commands require normal approval again.');
+            } else {
+              throw new Error('Use /yolo on or /yolo off');
+            }
+          } catch(e) {print(`YOLO setting failed: ${e.message}`);}
           finish();return;
         }
         if(line==='/status'||line==='/usage'){

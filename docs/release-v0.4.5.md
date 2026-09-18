@@ -9,5 +9,7 @@ This patch hardens user-facing chat at the persistence boundary.
 - Substantive messages such as `Completed scope mapping; three cards are ready.` remain unchanged.
 - User-authored text is never rewritten by this guard.
 - Desktop health now exposes both `bridgeVersion` and the active `runtimeRoot` to make stale installed runtime copies easy to identify.
+- Long-lived CLI sessions no longer inject an unbounded `previousTasks` array into every Jev-protected packet. The active prompt gets a deterministic recent-task handoff window, while durable state/trace history remains separate.
+- Legacy sessions with very large accumulated prior-task text can start a fresh task without immediately tripping `CONTEXT_FULL` solely because of old turns.
 
 This is defense in depth on top of the v0.4.4 dispatch/final-response fixes.

@@ -63,15 +63,15 @@ fi
 
 cat > "$BIN_DIR/eutrya-desktop" <<WRAPPER
 #!/usr/bin/env bash
-export EUTRYA_NODE="${EUTRYA_NODE:-${NODE_BIN}}"
-export EUTRYA_RUNTIME_DIR="${EUTRYA_RUNTIME_DIR:-${RUNTIME}}"
-exec "${GUI}" "$@"
+export EUTRYA_NODE="\${EUTRYA_NODE:-$NODE_BIN}"
+export EUTRYA_RUNTIME_DIR="\${EUTRYA_RUNTIME_DIR:-$RUNTIME}"
+exec "$GUI" "\$@"
 WRAPPER
 chmod +x "$BIN_DIR/eutrya-desktop"
 
 cat > "$BIN_DIR/eutrya-cli" <<WRAPPER
 #!/usr/bin/env bash
-exec "${NODE_BIN}" "${RUNTIME}/bin/eutrya.mjs" "$@"
+exec "$NODE_BIN" "$RUNTIME/bin/eutrya.mjs" "\$@"
 WRAPPER
 chmod +x "$BIN_DIR/eutrya-cli"
 

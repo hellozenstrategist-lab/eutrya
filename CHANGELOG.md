@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.2 — Persisted web-tool migration
+
+Fixed upgrades from older Eutrya workspaces where saved resident-profile tool allowlists could permanently hide the live `browser` capability even after the runtime gained it. Eutrya-managed legacy profiles that already have local search now inherit the read-only browser tool on load while preserving custom names, instructions, models, and other tool choices. Intentionally custom/local-only profiles are left unchanged.
+
+Clarified the action catalog so agents know `browser` reads live public HTTP(S) pages without requiring process execution, and that operator-approved `run` actions can invoke tools such as `git`, `npm`, tests, and analyzers (including their normal network behavior when explicitly approved).
+
 ## 0.4.1 — Desktop hunt review workspace
 
 Fixed the Omarchy/Arch installer to build and install the raw Tauri executable instead of requiring AppImage/linuxdeploy packaging. Added install troubleshooting and npm-audit guidance.

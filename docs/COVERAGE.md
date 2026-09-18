@@ -4,10 +4,11 @@ This release extends the attached Eutrya Native v0.1.0 implementation. It does n
 
 **Implemented** means code exists in this package and its stated behavior has local tests. It does not mean a live external integration was certified. **Partial** identifies an explicit boundary. **Not included** is not a hidden stub advertised as a working feature.
 
-| Feature area | Status in 0.2.0 | Boundary |
+| Feature area | Status in 0.3.0 | Boundary |
 | --- | --- | --- |
 | Standalone CLI + one-shot mode | Implemented | Readline terminal, not full-screen TUI |
 | Jev-native attention and action selection | Implemented | Model-step boundaries, not hidden token computation |
+| Strategist + Jev local code-research lane | Implemented | Read-only local semantic code analysis; no compiler-grade AST guarantee or automatic vulnerability proof |
 | Vercel AI Gateway | Implemented adapter | Text + separate SDK evaluation; live unverified |
 | OpenRouter | Implemented text adapter | No OAuth; explicit API key |
 | Local/Ollama and compatible APIs | Implemented adapter | Server/model must produce valid constrained JSON |
@@ -30,13 +31,13 @@ This release extends the attached Eutrya Native v0.1.0 implementation. It does n
 | Remote skill marketplace/hub | Not included | Explicit local file imports |
 | Persona/project instructions | Partial | Root AGENTS.md, profile SOUL.md, approved references |
 | Local filesystem and process tools | Implemented | Processes need approval, not OS-sandboxed |
-| Browser/web search/native computer-use | Not included | An explicitly trusted external MCP tool may supply a capability, but no browser bundle is claimed |
+| Browser navigation | Implemented/partial | Bounded headless Chromium with HTTP fallback; readable page extraction, not full computer-use automation |
 | MCP client | Implemented/partial | Stdio + Streamable HTTP, local sessions only; exact allowlists + approval |
 | MCP resources/prompts, OAuth, sampling, elicitation, server auto-installation | Not included | No alternative agent loop through servers |
 | Cron/one-shot scheduling | Implemented/partial | Single-machine serial worker, numeric five-field cron; documented missed-minute/DST semantics |
 | Scheduled messaging delivery | Implemented | Existing allowlisted route, persisted claim/outbox; unknown outcomes not auto-retried |
 | Parallel subtask execution | Partial | User-specified read-only batches, shared cap; no recursive delegation |
-| Live multi-agent group chat / swarm | Not included | Not a Hermes swarm implementation |
+| Native multi-agent swarm | Implemented/partial | Persistent specialist profiles, shared workspace and bounded routing; not Hermes runtime parity |
 | Docker/SSH/Singularity/Modal/Daytona/Vercel Sandbox backends | Not included | No sandbox is implied by approvals |
 | Process persistence/pty management/background command sessions | Not included | Individual bounded local processes only |
 | Session recovery and trace export | Implemented | Pending effects require inspection; no exactly-once claims |

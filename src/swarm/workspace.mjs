@@ -4,11 +4,16 @@ import { uid, insist, clip } from '../util.mjs';
 
 export const AGENT_STATUSES = Object.freeze(['IDLE', 'THINKING', 'WORKING', 'WAITING', 'BLOCKED', 'REVIEWING']);
 export const TASK_STATUSES = Object.freeze(['backlog', 'in_progress', 'review', 'blocked', 'completed']);
+export const HUNT_STATUSES = Object.freeze(['active', 'paused', 'completed']);
+export const HUNT_CARD_STATUSES = Object.freeze(['intake', 'ready', 'active', 'review', 'blocked', 'done', 'parked']);
+export const HUNT_PRIORITIES = Object.freeze(['critical', 'high', 'medium', 'low']);
 
 export class SharedWorkspace {
   constructor({ workspaceDir = null } = {}) {
     this.workspaceDir = workspaceDir;
     this.tasks = new Map();
+    this.hunts = new Map();
+    this.huntCards = new Map();
     this.findings = [];
     this.decisions = [];
     this.artifacts = [];
@@ -96,6 +101,142 @@ export class SharedWorkspace {
     if (filter.status) list = list.filter(t => t.status === filter.status);
     if (filter.assignedTo) list = list.filter(t => t.assignedTo === filter.assignedTo);
     return list;
+  }
+
+  // --- Hunt Boards ---
+  createHunt({ title, pageUrl, rules = '', scope = [], exclusions = [], testingRules = [], createdBy = 'admin' }) {
+    insist(title && typeof title === 'string', 'Hunt title must be a nonempty string');
+    insist(typeof pageUrl === 'string' && /^https?:\/\//i.test(pageUrl), 'Hunt pageUrl must be http or https');
+    const id = `hunt-${uid().slice(0, 8)}`;
+    const hunt = {
+      id,
+      title: clip(title.trim(), 300),
+      pageUrl: clip(pageUrl.trim(), 2048),
+      rules: clip(String(rules), 12000),
+      scope: Array.isArray(scope) ? scope.slice(0, 80).map(x => clip(String(x), 300)) : [],
+      exclusions: Array.isArray(exclusions) ? exclusions.slice(0, 80).map(x => clip(String(x), 300)) : [],
+      testingRules: Array.isArray(testingRules) ? testingRules.slice(0, 80).map(x => clip(String(x), 500)) : [],
+      status: 'active',
+      createdBy: String(createdBy || 'admin'),
+      cardIds: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.hunts.set(id, hunt);
+    return hunt;
+  }
+
+  getHunt(id) {
+    return this.hunts.get(id) ?? null;
+  }
+
+  listHunts({ status = null } = {}) {
+    let rows = Array.from(this.hunts.values());
+    if (status) rows = rows.filter(h => h.status === status);
+    return rows.sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
+  }
+
+  updateHunt(id, { status = null } = {}) {
+    const hunt = this.hunts.get(id);
+    insist(hunt, `Hunt not found: ${id}`);
+    if (status) {
+      insist(HUNT_STATUSES.includes(status), `Invalid hunt status: ${status}`);
+      hunt.status = status;
+    }
+    hunt.updatedAt = new Date().toISOString();
+    return hunt;
+  }
+
+  createHuntCard({ huntId, title, objective, priority = 'medium', preferredRoles = [], dependsOn = [], createdBy = 'admin' }) {
+    const hunt = this.hunts.get(huntId);
+    insist(hunt, `Hunt not found: ${huntId}`);
+    insist(hunt.status === 'active', 'Cannot add cards to a non-active hunt');
+    insist(title && typeof title === 'string', 'Hunt card title is required');
+    insist(objective && typeof objective === 'string', 'Hunt card objective is required');
+    insist(HUNT_PRIORITIES.includes(priority), `Invalid hunt priority: ${priority}`);
+    const id = `card-${uid().slice(0, 8)}`;
+    const card = {
+      id,
+      huntId,
+      title: clip(title.trim(), 400),
+      objective: clip(objective.trim(), 5000),
+      priority,
+      preferredRoles: Array.isArray(preferredRoles) ? [...new Set(preferredRoles.map(String))].slice(0, 8) : [],
+      dependsOn: Array.isArray(dependsOn) ? [...new Set(dependsOn.map(String))].slice(0, 20) : [],
+      status: 'ready',
+      assignedTo: null,
+      worker: null,
+      reviewer: null,
+      workerResult: null,
+      reviewResult: null,
+      blockers: [],
+      routeHistory: [],
+      attempts: 0,
+      createdBy: String(createdBy || 'admin'),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    this.huntCards.set(id, card);
+    hunt.cardIds.push(id);
+    hunt.updatedAt = card.updatedAt;
+    return card;
+  }
+
+  getHuntCard(id) {
+    return this.huntCards.get(id) ?? null;
+  }
+
+  listHuntCards({ huntId = null, status = null, assignedTo = null } = {}) {
+    let rows = Array.from(this.huntCards.values());
+    if (huntId) rows = rows.filter(c => c.huntId === huntId);
+    if (status) rows = rows.filter(c => c.status === status);
+    if (assignedTo) rows = rows.filter(c => c.assignedTo === assignedTo);
+    const rank = { critical: 0, high: 1, medium: 2, low: 3 };
+    return rows.sort((a,b) => (rank[a.priority] - rank[b.priority]) || a.createdAt.localeCompare(b.createdAt));
+  }
+
+  dependenciesSatisfied(card) {
+    return card.dependsOn.every(id => this.huntCards.get(id)?.status === 'done');
+  }
+
+  updateHuntCard(id, patch = {}) {
+    const card = this.huntCards.get(id);
+    insist(card, `Hunt card not found: ${id}`);
+    if (patch.status !== undefined) {
+      insist(HUNT_CARD_STATUSES.includes(patch.status), `Invalid hunt card status: ${patch.status}`);
+      card.status = patch.status;
+    }
+    for (const key of ['assignedTo','worker','reviewer']) {
+      if (patch[key] !== undefined) card[key] = patch[key] === null ? null : String(patch[key]);
+    }
+    if (patch.workerResult !== undefined) card.workerResult = patch.workerResult === null ? null : clip(String(patch.workerResult), 12000);
+    if (patch.reviewResult !== undefined) card.reviewResult = patch.reviewResult === null ? null : clip(String(patch.reviewResult), 12000);
+    if (Array.isArray(patch.blockers)) card.blockers = patch.blockers.map(x => clip(String(x), 800)).slice(0, 20);
+    if (patch.routeEvent) {
+      card.routeHistory.push({
+        agent: String(patch.routeEvent.agent),
+        stage: String(patch.routeEvent.stage),
+        source: String(patch.routeEvent.source || 'jev'),
+        probability: Number.isFinite(patch.routeEvent.probability) ? patch.routeEvent.probability : null,
+        at: new Date().toISOString()
+      });
+      card.routeHistory = card.routeHistory.slice(-30);
+    }
+    if (patch.incrementAttempts) card.attempts++;
+    card.updatedAt = new Date().toISOString();
+    const hunt = this.hunts.get(card.huntId);
+    if (hunt) hunt.updatedAt = card.updatedAt;
+    return card;
+  }
+
+  huntBoard(huntId = null) {
+    const hunt = huntId ? this.hunts.get(huntId) : this.listHunts({ status: 'active' })[0] ?? this.listHunts()[0] ?? null;
+    if (!hunt) return null;
+    return {
+      hunt,
+      cards: this.listHuntCards({ huntId: hunt.id }),
+      agents: this.getAllAgentStatuses()
+    };
   }
 
   // --- Findings ---
@@ -219,6 +360,8 @@ export class SharedWorkspace {
     const recentDecisions = this.decisions.slice(-4);
     const activeBlockers = this.blockers.filter(b => !b.resolved);
     const statuses = Array.from(this.agentStatuses.values());
+    const activeHunts = this.listHunts({ status: 'active' }).slice(0, 3);
+    const huntCards = activeHunts.flatMap(h => this.listHuntCards({ huntId: h.id }).filter(c => !['done','parked'].includes(c.status)).slice(0, 12));
 
     return {
       agents: statuses.map(s => `${s.name} (${s.role}): ${s.status}${s.currentTask ? ' - "' + clip(s.currentTask, 60) + '"' : ''}`),
@@ -226,13 +369,17 @@ export class SharedWorkspace {
       completedTasks: completedTasks.slice(-5).map(t => `[${t.id}] ${t.title} -> ${clip(t.result ?? 'Done', 100)}`),
       recentFindings: recentFindings.map(f => `${f.topic} (by ${f.author}): ${clip(f.content, 120)}`),
       recentDecisions: recentDecisions.map(d => `${d.title} (by ${d.author}): ${clip(d.rationale, 100)}`),
-      activeBlockers: activeBlockers.map(b => `${b.agent} BLOCKED: ${b.description}`)
+      activeBlockers: activeBlockers.map(b => `${b.agent} BLOCKED: ${b.description}`),
+      activeHunts: activeHunts.map(h => `[${h.id}] ${h.title} (${h.status}) ${h.pageUrl}`),
+      huntCards: huntCards.map(c => `[${c.id}] ${c.title} (${c.status}, priority: ${c.priority}, assigned: ${c.assignedTo ?? 'unassigned'})`)
     };
   }
 
   serialize() {
     return {
       tasks: Array.from(this.tasks.entries()),
+      hunts: Array.from(this.hunts.entries()),
+      huntCards: Array.from(this.huntCards.entries()),
       findings: this.findings,
       decisions: this.decisions,
       artifacts: this.artifacts,
@@ -247,6 +394,8 @@ export class SharedWorkspace {
   restore(data) {
     if (!data || typeof data !== 'object') return;
     if (Array.isArray(data.tasks)) this.tasks = new Map(data.tasks);
+    if (Array.isArray(data.hunts)) this.hunts = new Map(data.hunts);
+    if (Array.isArray(data.huntCards)) this.huntCards = new Map(data.huntCards);
     if (Array.isArray(data.findings)) this.findings = data.findings;
     if (Array.isArray(data.decisions)) this.decisions = data.decisions;
     if (Array.isArray(data.artifacts)) this.artifacts = data.artifacts;

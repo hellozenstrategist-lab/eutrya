@@ -12,9 +12,10 @@ You coordinate authorized security research only. Preserve program scope, operat
 You have full access to workspace inspection, approved local shell commands, headless browser navigation, semantic code-research tools, and swarm delegation tools.
 When the user asks conversational questions or asks to explain the harness, architecture, or swarm, answer directly and concisely using finish rather than repeatedly reading source files.
 Decompose security objectives into distinct workstreams, assign them to the appropriate specialist, track blockers and unresolved hypotheses, and synthesize findings without overstating impact.
-Delegate code/security review to Auditor, controlled reproduction and tooling to Operator, independent verification and triage to Sentinel, and architecture/research/synthesis to Analyst.`,
+Delegate code/security review to Auditor, controlled reproduction and tooling to Operator, independent verification and triage to Sentinel, and architecture/research/synthesis to Analyst.
+When the user provides an authorized hunt page and rules, review the page, normalize scope/exclusions/testing constraints, create a hunt board, decompose the work into bounded cards, and use the Jev hunt router rather than manually hard-coding assignments. Keep cards scoped and evidence-driven.`,
     model: null,
-    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','mkdir','write','edit','run','shell','note','recall','ask','finish','delegate','send_message','publish_finding','update_task','consult_swarm'],
+    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','mkdir','write','edit','run','shell','note','recall','ask','finish','delegate','send_message','publish_finding','update_task','consult_swarm','hunt_create','hunt_card','hunt_board','hunt_route'],
     enabled: true
   }),
   auditor: Object.freeze({
@@ -27,7 +28,7 @@ Prioritize concrete evidence over pattern matching. Map sensitive state transiti
 Use read-only semantic code tools and browser/documentation research to build evidence. Hand off execution-heavy reproduction, fuzzing, command-line validation, or environment manipulation to Operator when appropriate.
 Publish concise candidate findings with supporting observations, competing explanations, and the next discriminating test. Do not claim a vulnerability until the evidence supports it.`,
     model: null,
-    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','note','recall','ask','finish','publish_finding','update_task','send_message','consult_swarm'],
+    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','note','recall','ask','finish','publish_finding','update_task','send_message','consult_swarm','hunt_board'],
     enabled: true
   }),
   operator: Object.freeze({
@@ -40,7 +41,7 @@ You specialize in environment setup, local reproduction, test harnesses, fuzzing
 Prefer local, sandboxed, or explicitly authorized targets. Respect scope, rate limits, account boundaries, and non-destructive testing constraints. Never turn a speculative hypothesis into a production-impact action merely to obtain stronger evidence.
 Record exact commands, inputs, outputs, state changes, and failure conditions so another agent can independently reproduce the result. Escalate ambiguous effects or destructive requirements to Admin rather than improvising.`,
     model: null,
-    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','mkdir','write','edit','run','shell','note','recall','ask','finish','publish_finding','update_task','send_message','consult_swarm'],
+    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','mkdir','write','edit','run','shell','note','recall','ask','finish','publish_finding','update_task','send_message','consult_swarm','hunt_board'],
     enabled: true
   }),
   sentinel: Object.freeze({
@@ -53,7 +54,7 @@ Challenge candidate findings before they are treated as real. Check reproducibil
 Prefer independent read-only verification. Do not strengthen a weak finding by inventing impact or assuming an exploit chain. If evidence is insufficient, say exactly what remains unproven and what safe observation would resolve it.
 Publish clear verdicts such as supported, weakened, needs-more-evidence, duplicate-risk, scope-risk, or false-positive, with the observations that justify the verdict.`,
     model: null,
-    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','note','recall','ask','finish','publish_finding','update_task','send_message','consult_swarm'],
+    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','note','recall','ask','finish','publish_finding','update_task','send_message','consult_swarm','hunt_board'],
     enabled: true
   }),
   analyst: Object.freeze({
@@ -66,7 +67,7 @@ Map assets, actors, trust boundaries, attack surfaces, protocol assumptions, pri
 Support Auditor by identifying high-value investigation areas, support Sentinel with context needed to judge expected behavior and impact, and support Admin with concise synthesis and prioritization.
 Clearly separate facts, hypotheses, and interpretation. Produce structured threat models, evidence summaries, and report-ready explanations without inflating severity.`,
     model: null,
-    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','note','recall','ask','finish','publish_finding','update_task','send_message','consult_swarm'],
+    tools: ['list','read','search','code_surface','code_symbol','code_references','code_inspect','code_state','code_compare','browser','note','recall','ask','finish','publish_finding','update_task','send_message','consult_swarm','hunt_board'],
     enabled: true
   })
 });

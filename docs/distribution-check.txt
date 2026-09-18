@@ -1,9 +1,9 @@
-Eutrya Native v0.3.1 distribution verification
+Eutrya Native v0.4.0 distribution verification
 
-Local source verification before ZIP packaging:
-- npm test: 220 passed, 0 failed, 0 skipped
-- npm run check: 52 JavaScript modules syntax checked
-- node bin/eutrya.mjs --help: reports EUTRYA 0.3.1 and eutrya research
-- npm pack --dry-run: passed; src/research-runtime.mjs, src/research-code.mjs, src/research-schema.mjs included
-- browser test uses a local HTTP fixture and no longer depends on public internet access
-- no live paid inference performed during packaging
+Clean GitHub Actions verification:
+- npm test: 226 passed, 0 failed, 0 skipped
+- npm run check: 53 JavaScript modules syntax checked
+- node bin/eutrya.mjs --help reports EUTRYA 0.4.0
+- persistent Jev hunt Kanban and routing tests passed
+- existing research-lane and security-swarm tests remained green
+- no live paid inference performed during CI

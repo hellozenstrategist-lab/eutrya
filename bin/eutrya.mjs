@@ -13,7 +13,7 @@ import { GatewayCortex, availableModels, textModelReady, providerSettings } from
 import { GatewayJev } from '../src/providers/jev.mjs';
 import { DemoCortex, MockJev } from '../src/providers/mock.mjs';
 import { PUZZLE_TASK, makePuzzle } from '../src/puzzle.mjs';
-import { Terminal, renderEvent, statusText, swarmStatusText } from '../src/ui.mjs';
+import { Terminal, renderEvent, statusText, swarmStatusText, huntBoardText } from '../src/ui.mjs';
 import { NativeSwarm } from '../src/swarm/swarm.mjs';
 import { TEMPLATES } from '../src/swarm/profile.mjs';
 import { deadline, redactor, safeTerminal, insist, clip, digest } from '../src/util.mjs';
@@ -26,7 +26,7 @@ import { readJson } from '../src/local-state.mjs';
 import { McpTools } from '../src/mcp.mjs';
 import { handleAdaptiveCommand, capturePlainCorrection } from '../extensions/eutrya-adaptive-extension/src/commands.mjs';
 
-const HELP=`EUTRYA 0.3.1 — standalone Jev-native terminal agent & native swarm
+const HELP=`EUTRYA 0.4.0 — standalone Jev-native terminal agent & native swarm
 
 Usage:
   eutrya                                  Interactive swarm session (Admin orchestrator)
@@ -44,6 +44,7 @@ Usage:
   eutrya run "your task"                   One task, then exit
   eutrya research "objective"              Strategist + Jev local code-research lane
   eutrya swarm [status|agents|tasks]       Inspect the native swarm
+  eutrya hunts                             List persistent hunt boards
   eutrya agents                           List swarm agent profiles
   eutrya tasks                            List shared workspace tasks
   eutrya demo [--seed 7]                   Offline switchboard wiring demo; NO real models
@@ -88,16 +89,21 @@ Jev always needs AI_GATEWAY_API_KEY and AI SDK 7 with experimental_evaluate.
 OpenRouter text models additionally need OPENROUTER_API_KEY. No Nous login is used.
 Chat commands: /help /status /trace /compact /continue /stop /steer TEXT
                /resolve NOTE /model ID /new /memory /skills /usage /swarm /agents
-               /agent NAME /tasks /findings /template [NAME] /thinking [on|off] /reload /quit
+               /agent NAME /tasks /findings /hunt [ID|run ID|pause ID|resume ID] /template [NAME]
+               /thinking [on|off] /reload /quit
 `;
 
 const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to a specialist.
-@AgentName TEXT         Direct task to a specific specialist agent (e.g. @Engineer, @Finance)
+@AgentName TEXT         Direct task to a specific specialist agent (e.g. @Auditor, @Sentinel)
 /swarm                  Display live swarm organization status and tasks
 /agents                 List all swarm agents, specializations, and models
 /agent NAME             Switch direct interactive focus to an agent
 /tasks                  List shared workspace tasks and backlog
 /findings               List shared organizational findings
+/hunt [ID]              Show the current or selected Kanban hunt board
+/hunt run [ID]          Let Jev route and run ready/review cards across idle agents
+/hunt pause ID          Pause a hunt board
+/hunt resume ID         Resume a paused hunt board
 /template [NAME]        View or switch swarm template (default, engineering, startup, legal, research)
 /feedback TEXT          Provide persistent behavioral guidance and style corrections
 /adaptive [status|freeze|thaw]  Inspect or control experience-based policy adaptation
@@ -213,7 +219,7 @@ async function runResearch() {
     const cortex=new GatewayCortex(config),jev=new GatewayJev(config);
     const toolbox=new Toolbox({workspace:store.workspace,store,config,approve:async()=>false,redact,readOnly:true,allowedTools:['code_surface','code_symbol','code_references','code_inspect','code_state','code_compare']});
     const runner=new ResearchRunner({store,cortex,jev,toolbox,config,onEvent:emit,redact});
-    if(!values.json)print(`\nE U T R Y A  ·  Jev Research Lane 0.3.1\nStrategist: ${config.mainProvider}/${config.mainModel}\nExecutor: ${config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nRead-only semantic code tools only.\n`);
+    if(!values.json)print(`\nE U T R Y A  ·  Jev Research Lane 0.4.0\nStrategist: ${config.mainProvider}/${config.mainModel}\nExecutor: ${config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nRead-only semantic code tools only.\n`);
     runner.start(taskText);await runner.run();
     if(values.json)console.log(JSON.stringify({type:'research.result',status:runner.state.status,answer:runner.state.answer,reason:runner.state.reason,meter:runner.state.meter,session:runner.state.id,trace:store.trace}));
     else {print(`\n${statusText(runner.state)}\n`);if(runner.state.answer)print(runner.state.answer);}
@@ -245,7 +251,7 @@ async function runAgent() {
       store.save();
       if(values.mcp&&!demo){mcp=new McpTools(readJson(userPaths(configFile).mcp,{servers:{}}).servers);await mcp.connect();}
       runtime=engine(store,{demo,mcp,approve:terminal?(a,s)=>terminal.approve(a,s):async()=>false});
-      if(!values.json)print(`\nE U T R Y A  ·  Jev-native CLI 0.3.1\n${demo?'OFFLINE FIXTURES — no real models and no paid calls':'LIVE · '+config.mainProvider+' text model '+config.mainModel+' + '+config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nTrace: ${store.trace}\n`);
+      if(!values.json)print(`\nE U T R Y A  ·  Jev-native CLI 0.4.0\n${demo?'OFFLINE FIXTURES — no real models and no paid calls':'LIVE · '+config.mainProvider+' text model '+config.mainModel+' + '+config.jevModel}\nWorkspace: ${cwd}\nSession: ${store.state.id}\nTrace: ${store.trace}\n`);
       const finish=()=>{if(terminal)terminal.prompt();};
       const launch=async()=>{
         if(runtime.busy){print('Already running. Use /steer or /stop.');return;}
@@ -284,7 +290,7 @@ async function runAgent() {
       print(`\nE U T R Y A  ·  Native Swarm [${swarm.profiles.size} active agents: ${agentList}]
 LIVE · ${config.mainProvider} text model ${config.mainModel} + ${config.jevModel}
 Workspace: ${cwd}
-Primary: ${swarm.primaryAgent} (Use @AgentName to speak directly, e.g. @Engineer, @Finance)
+Primary: ${swarm.primaryAgent} (Use @AgentName to speak directly, e.g. @Auditor, @Sentinel)
 Type / for available commands.
 `);
     }
@@ -436,6 +442,27 @@ Type / for available commands.
           const findings=swarm.sharedWorkspace.listFindings();
           if(!findings.length)print('  None');
           else for(const f of findings)print(`  [${f.id}] ${f.topic} (by @${f.author}): ${f.content}`);
+          finish();return;
+        }
+        if(line==='/hunt'||line==='/board'||line.startsWith('/hunt ')||line.startsWith('/board ')){
+          const raw=(line.startsWith('/hunt')?line.slice(5):line.slice(6)).trim();
+          const parts=raw.split(/\s+/).filter(Boolean);
+          const action=parts[0]??'show';
+          if(action==='run'){
+            const huntId=parts[1]??swarm.sharedWorkspace.listHunts({status:'active'})[0]?.id;
+            insist(huntId,'No active hunt board. Give Admin the authorized hunt page/rules first.');
+            print(`Routing hunt ${huntId} with Jev across idle agents...\n`);
+            const result=await swarm.runHuntBoard(huntId,{source:'operator'});
+            print(huntBoardText(result.board));
+          } else if(action==='pause'||action==='resume'){
+            const huntId=parts[1];insist(huntId,`Usage: /hunt ${action} HUNT_ID`);
+            swarm.sharedWorkspace.updateHunt(huntId,{status:action==='pause'?'paused':'active'});
+            swarm.sharedWorkspace.save(swarm.swarmDir);
+            print(huntBoardText(swarm.sharedWorkspace.huntBoard(huntId)));
+          } else {
+            const huntId=action==='show'?null:action;
+            print(huntBoardText(swarm.sharedWorkspace.huntBoard(huntId)));
+          }
           finish();return;
         }
         if(line==='/template'||line.startsWith('/template ')){
@@ -595,6 +622,13 @@ async function main() {
       const tasks=sw.sharedWorkspace.listTasks();
       if(!tasks.length) print('No tasks in shared workspace.');
       else for(const t of tasks) print(`[${t.id}] ${t.title} (${t.status}, assigned: @${t.assignedTo})`);
+      sw.close();return;
+    }
+    case 'hunts':{
+      const sw=new NativeSwarm({config,workspace:cwd,demo:Boolean(values.demo),onEvent:emit,redact});
+      const hunts=sw.sharedWorkspace.listHunts();
+      if(!hunts.length) print('No hunt boards yet.');
+      else for(const h of hunts) print(`[${h.id}] ${h.title} (${h.status}) ${h.pageUrl}`);
       sw.close();return;
     }
     case 'research':await runResearch();return;

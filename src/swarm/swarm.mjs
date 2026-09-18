@@ -597,6 +597,146 @@ export class NativeSwarm {
     return this.primaryAgent || 'admin';
   }
 
+  availableHuntAgents(card) {
+    let agents=Array.from(this.profiles.values()).filter(p=>{
+      if(!p.enabled || p.id==='admin') return false;
+      const status=this.sharedWorkspace.getAgentStatus(p.id)?.status ?? 'IDLE';
+      const runtime=this.runtimes.get(p.id);
+      return status==='IDLE' && !runtime?.busy;
+    });
+    if(card.status==='review' && card.worker && agents.length>1) {
+      const independent=agents.filter(p=>p.id!==card.worker);
+      if(independent.length) agents=independent;
+    }
+    return agents;
+  }
+
+  async routeHuntCard(cardId, signal) {
+    const card=this.sharedWorkspace.getHuntCard(cardId);
+    insist(card, `Hunt card not found: ${cardId}`);
+    const hunt=this.sharedWorkspace.getHunt(card.huntId);
+    insist(hunt, `Hunt not found: ${card.huntId}`);
+    const candidates=this.availableHuntAgents(card);
+    if(!candidates.length) {
+      this.onEvent({type:'hunt.waiting',data:{huntId:hunt.id,cardId:card.id,reason:'No idle specialist is currently available'}});
+      return null;
+    }
+    const criteria=Object.fromEntries(candidates.map(p=>[
+      p.id,
+      `${p.name} — ${p.role}. Specialization: ${p.profession}. Preferred-role hint: ${card.preferredRoles.includes(p.id)?'yes':'no'}.`
+    ]));
+    const questions={
+      hunt_assignee:{
+        type:'choice',
+        instructions:`Choose the best AVAILABLE specialist for this authorized hunt card. Availability is a hard constraint: only the listed idle agents may be selected. Use the card objective, current stage, program rules, and specialist role. For review-stage cards prefer independent verification and do not send work back to the original worker when another capable agent is available. Preferred roles are hints, not mandates.`,
+        criteria
+      }
+    };
+    const busy=Array.from(this.profiles.values()).filter(p=>!candidates.some(x=>x.id===p.id)).map(p=>({
+      id:p.id,status:this.sharedWorkspace.getAgentStatus(p.id)?.status ?? (p.id==='admin'?'ORCHESTRATOR':'UNKNOWN')
+    }));
+    const state={
+      task:`${card.title}: ${card.objective}`,
+      hunt:{id:hunt.id,title:hunt.title,pageUrl:hunt.pageUrl,rules:hunt.rules,scope:hunt.scope,exclusions:hunt.exclusions,testingRules:hunt.testingRules},
+      card:{id:card.id,status:card.status,priority:card.priority,preferredRoles:card.preferredRoles,worker:card.worker,attempts:card.attempts},
+      available:candidates.map(p=>({id:p.id,name:p.name,role:p.role,profession:p.profession})),
+      unavailable:busy
+    };
+    const jev=this.demo?new MockJev():new GatewayJev(this.config);
+    const result=await jev.evaluate(state,questions,signal);
+    const choice=result.data?.hunt_assignee?.choice;
+    insist(choice && candidates.some(p=>p.id===choice),'Jev returned an unavailable hunt assignee');
+    const probability=result.data?.hunt_assignee?.probabilities?.[choice] ?? null;
+    return {agentId:choice,probability,source:jev.source};
+  }
+
+  huntTaskPrompt(hunt,card,stage) {
+    const rules=[
+      `HUNT: ${hunt.title}`,
+      `PROGRAM PAGE: ${hunt.pageUrl}`,
+      hunt.scope.length?`IN SCOPE: ${hunt.scope.join(' | ')}`:'',
+      hunt.exclusions.length?`EXCLUSIONS: ${hunt.exclusions.join(' | ')}`:'',
+      hunt.testingRules.length?`TESTING RULES: ${hunt.testingRules.join(' | ')}`:'',
+      hunt.rules?`NORMALIZED RULES: ${hunt.rules}`:''
+    ].filter(Boolean).join('\n');
+    if(stage==='review') {
+      return `${rules}\n\nKANBAN CARD: ${card.title}\nOBJECTIVE: ${card.objective}\nPRIOR WORKER: ${card.worker ?? 'unknown'}\nWORKER RESULT:\n${card.workerResult ?? '(no result)'}\n\nIndependently review this card within the hunt rules. Check evidence, scope, alternative explanations, and whether the result actually supports the claim. Do not expand scope or perform destructive validation. Return a concise review verdict and any remaining safe next question.`;
+    }
+    return `${rules}\n\nKANBAN CARD: ${card.title}\nOBJECTIVE: ${card.objective}\nPRIORITY: ${card.priority}\n\nWork only on this bounded card within the hunt rules. Gather concrete evidence, preserve competing explanations, and do not expand scope or perform destructive actions merely to strengthen a finding. Return a concise result with evidence and unresolved questions for independent review.`;
+  }
+
+  async executeHuntCard(cardId,agentId,stage,route={source:'jev',probability:null}) {
+    const card=this.sharedWorkspace.getHuntCard(cardId);
+    const hunt=this.sharedWorkspace.getHunt(card.huntId);
+    const prof=this.profiles.get(agentId);
+    insist(card && hunt && prof,`Cannot execute hunt card ${cardId}`);
+    this.sharedWorkspace.setAgentStatus(agentId,stage==='review'?'REVIEWING':'WORKING',card.title);
+    this.sharedWorkspace.updateHuntCard(cardId,{
+      status:stage==='ready'?'active':'review',
+      assignedTo:agentId,
+      routeEvent:{agent:agentId,stage,source:route.source,probability:route.probability},
+      incrementAttempts:true
+    });
+    this.sharedWorkspace.save(this.swarmDir);
+    this.onEvent({type:'hunt.card_started',data:{huntId:hunt.id,cardId,agentId,agent:prof.name,stage}});
+    try {
+      const runtime=this.getRuntime(agentId);
+      runtime.startTask(this.huntTaskPrompt(hunt,card,stage));
+      await runtime.run();
+      if(['ERROR','NEEDS_REVIEW'].includes(runtime.state.status)) throw new Error(runtime.state.reason || `Agent ended in ${runtime.state.status}`);
+      const answer=runtime.state.answer || runtime.state.summary || 'No substantive result returned';
+      if(stage==='review') {
+        this.sharedWorkspace.updateHuntCard(cardId,{status:'done',assignedTo:null,reviewer:agentId,reviewResult:answer,blockers:[]});
+      } else {
+        this.sharedWorkspace.updateHuntCard(cardId,{status:'review',assignedTo:null,worker:agentId,workerResult:answer,blockers:[]});
+      }
+      this.sharedWorkspace.setAgentStatus(agentId,'IDLE');
+      this.sharedWorkspace.save(this.swarmDir);
+      this.onEvent({type:'hunt.card_stage_complete',data:{huntId:hunt.id,cardId,agentId,stage,nextStatus:stage==='review'?'done':'review'}});
+      return {cardId,agentId,stage,status:stage==='review'?'done':'review',answer};
+    } catch(err) {
+      this.sharedWorkspace.updateHuntCard(cardId,{status:'blocked',assignedTo:null,blockers:[err.message]});
+      this.sharedWorkspace.setAgentStatus(agentId,'BLOCKED',err.message);
+      this.sharedWorkspace.addBlocker({agent:agentId,description:`Hunt card ${cardId}: ${err.message}`});
+      this.sharedWorkspace.save(this.swarmDir);
+      this.onEvent({type:'hunt.card_blocked',data:{huntId:hunt.id,cardId,agentId,stage,error:err.message}});
+      return {cardId,agentId,stage,status:'blocked',error:err.message};
+    }
+  }
+
+  async runHuntBoard(huntId,{source='operator',maxWaves=20,signal}={}) {
+    const hunt=this.sharedWorkspace.getHunt(huntId);
+    insist(hunt,`Hunt not found: ${huntId}`);
+    insist(hunt.status==='active','Hunt is not active');
+    let wave=0,routed=0;
+    const results=[];
+    while(wave<maxWaves) {
+      this.sharedWorkspace.refreshHuntReadiness(huntId);
+      const cards=this.sharedWorkspace.listHuntCards({huntId}).filter(c=>
+        ['ready','review'].includes(c.status) && this.sharedWorkspace.dependenciesSatisfied(c)
+      );
+      if(!cards.length) break;
+      const jobs=[];
+      for(const card of cards) {
+        const route=await this.routeHuntCard(card.id,signal);
+        if(!route) continue;
+        routed++;
+        jobs.push(this.executeHuntCard(card.id,route.agentId,card.status,route));
+      }
+      if(!jobs.length) break;
+      const settled=await Promise.all(jobs);
+      results.push(...settled);
+      wave++;
+    }
+    const remaining=this.sharedWorkspace.listHuntCards({huntId}).filter(c=>!['done','parked'].includes(c.status));
+    if(!remaining.length && this.sharedWorkspace.listHuntCards({huntId}).length) {
+      this.sharedWorkspace.updateHunt(huntId,{status:'completed'});
+      this.onEvent({type:'hunt.completed',data:{huntId,source}});
+    }
+    this.sharedWorkspace.save(this.swarmDir);
+    return {huntId,source,waves:wave,routed,results,board:this.sharedWorkspace.huntBoard(huntId)};
+  }
+
   // Primary user dispatch entrypoint.
   // Supports direct messages with @AgentName ... or default Admin routing.
   async dispatch(userInput, { onToken = null } = {}) {

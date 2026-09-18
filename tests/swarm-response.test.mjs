@@ -48,5 +48,5 @@ test('hunt routing without narrative gets a useful hunt-specific fallback', () =
   });
   assert.match(text,/Hunt routing ran/);
   assert.match(text,/Open Hunts/);
-  assert.equal(text,'Completed',false);
+  assert.notEqual(text,'Completed');
 });

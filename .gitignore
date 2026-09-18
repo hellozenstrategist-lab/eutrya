@@ -1,0 +1,7 @@
+node_modules/
+runtime/node_modules/
+desktop/src-tauri/target/
+.DS_Store
+*.log
+.env
+runtime/.env

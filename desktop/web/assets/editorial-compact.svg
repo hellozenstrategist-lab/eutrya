@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" role="img" aria-label="Eutrya compact botanical technical field">
+  <defs><pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#9ca1a5" stroke-opacity=".16"/></pattern></defs>
+  <rect width="720" height="520" fill="#f4f1ea"/><rect width="720" height="520" fill="url(#g)"/>
+  <g fill="none" stroke="#687078" stroke-opacity=".42"><circle cx="500" cy="255" r="112"/><circle cx="500" cy="255" r="166"/><circle cx="500" cy="255" r="216"/><path d="M285 255H718M500 35V500"/></g>
+  <g stroke="#252a2f" stroke-opacity=".78" fill="none" stroke-linecap="round">
+    <path d="M388 520c28-104 43-175 84-232 39-55 84-104 109-180"/>
+    <path d="M452 315c-70-34-109-76-135-130M492 262c78-43 120-86 148-157M523 213c43 9 84 0 120-24M424 388c-40-12-79-8-111 9"/>
+  </g>
+  <g fill="#252a2f" fill-opacity=".72">
+    <ellipse cx="342" cy="188" rx="31" ry="12" transform="rotate(34 342 188)"/><ellipse cx="402" cy="273" rx="36" ry="13" transform="rotate(24 402 273)"/>
+    <ellipse cx="455" cy="346" rx="34" ry="12" transform="rotate(-17 455 346)"/><ellipse cx="539" cy="239" rx="36" ry="12" transform="rotate(-31 539 239)"/>
+    <ellipse cx="602" cy="161" rx="31" ry="11" transform="rotate(-35 602 161)"/><ellipse cx="641" cy="112" rx="25" ry="10" transform="rotate(-28 641 112)"/>
+  </g>
+  <g fill="#252a2f" fill-opacity=".58"><circle cx="327" cy="177" r="19"/><circle cx="347" cy="165" r="13"/><circle cx="588" cy="145" r="18"/><circle cx="607" cy="156" r="12"/><circle cx="547" cy="247" r="15"/></g>
+  <g stroke="#20252a"><path d="M93 104h40M113 84v40M635 406h38M654 387v38M560 76h30M575 61v30"/></g>
+</svg>

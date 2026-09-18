@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { fileURLToPath } from 'node:url';
+const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../web');
+function ui(){const ctx=vm.createContext({window:{},console,Date,Set,Number});for(const name of ['icons','components','views'])vm.runInContext(fs.readFileSync(path.join(ROOT,'ui',name+'.js'),'utf8'),ctx);return ctx.window.EutryaUI}
+function state(){return {page:'dashboard',payload:null,connected:false,connecting:false,error:'Offline',agent:'admin',profile:'admin',profileDraft:null,profileDirty:false,settingsDraft:null,settingsDirty:false,settingsSection:'all',workspaceDraft:null,libraryQuery:'',libraryFilter:'all',libraryView:'grid',tool:'browser',toolQuery:'',toolCategory:'All',memoryQuery:'',source:'all',memorySelected:null,networkView:'map',zoom:1,chatDraft:'',chatAfter:null,busy:false,pendingText:'',prefs:{density:'comfortable',reducedMotion:false}}}
+test('entrypoint loads only the new component layout, not legacy override sheets',()=>{const html=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');assert.match(html,/css\/atelier\.css/);assert.doesNotMatch(html,/reference-dashboard\.css|editorial-pages\.css/);for(const match of html.matchAll(/(?:src|href)="\.\/([^\"]+)"/g))assert.ok(fs.existsSync(path.join(ROOT,match[1])),match[1]);});
+test('active scripts parse without evaluation or a live model',()=>{for(const name of ['icons','components','views','app'])new vm.Script(fs.readFileSync(path.join(ROOT,'ui',name+'.js'),'utf8'));});
+for(const page of ['dashboard','swarm','library','memory','tools','settings'])test(page+' renders its own editable composition while disconnected',()=>{const U=ui(),s=state();s.page=page;const html=U.views[page](s);assert.match(html,/<h1>/);assert.match(html,/RUNTIME OFFLINE/);assert.doesNotMatch(html,/undefined|NaN/);});
+test('disconnected dashboard never invents 248 memories or a completed conversation',()=>{const U=ui(),html=U.views.dashboard(state());assert.doesNotMatch(html,/248|Offline demo answer|Swarm reloaded|HEALTHY/);assert.match(html,/disabled/);});
+test('source counts are exact and do not inflate an empty memory store',()=>{const U=ui(),m=U.model(state());assert.equal(m.counts.memories,0);assert.equal(m.agents.length,0);assert.equal(m.tasks.length,0);});
+test('agent and memory labels escape user input',()=>{const U=ui();const html=U.agentCard({id:'admin',index:'01',name:'<b>Name</b>',role:'<i>Role</i>',status:'idle',tasks:0,verbs:[]});assert.match(html,/&lt;b&gt;Name&lt;\/b&gt;/);assert.doesNotMatch(html,/<b>Name<\/b>/);});
+test('network is generated from all supplied profiles, including a sixth agent',()=>{const U=ui();const agents=Array.from({length:6},(_,i)=>({id:i===0?'admin':'agent-'+i,name:'Agent '+i,status:'idle'}));const html=U.agentNetwork(agents,'admin');assert.equal((html.match(/role="button"/g)||[]).length,6);assert.match(html,/Agent 5/);});
+test('all reusable photographic assets are present',()=>{for(const name of ['agent-admin','agent-engineer','agent-lawyer','agent-finance','agent-researcher','dashboard-hero','sidebar-botanical'])assert.ok(fs.existsSync(path.join(ROOT,'assets',name+'.jpg')),name);});
+test('settings uses unique real runtime fields',()=>{const U=ui(),s=state();const html=U.views.settings(s);for(const name of ['mainProvider','mainModel','maxSteps','maxCalls','maxOutputTokens','timeoutMs','autoWrite','allowExec','jevCompaction'])assert.equal((html.match(new RegExp('name="'+name+'"','g'))||[]).length,1,name);});

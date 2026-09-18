@@ -711,6 +711,7 @@ export class NativeSwarm {
     let wave=0,routed=0;
     const results=[];
     while(wave<maxWaves) {
+      this.sharedWorkspace.refreshHuntReadiness(huntId);
       const cards=this.sharedWorkspace.listHuntCards({huntId}).filter(c=>
         ['ready','review'].includes(c.status) && this.sharedWorkspace.dependenciesSatisfied(c)
       );

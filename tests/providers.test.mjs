@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { GatewayJev, attentionQuestions, candidateQuestions } from '../src/providers/jev.mjs';
-import { GatewayCortex, cortexMessages, availableModels } from '../src/providers/gateway.mjs';
+import { GatewayJev, attentionQuestions, candidateQuestions, researchQuestions } from '../src/providers/jev.mjs';
+import { GatewayCortex, cortexMessages, researchMessages, availableModels } from '../src/providers/gateway.mjs';
 import { DEFAULTS } from '../src/config.mjs';
 import { proposal } from './helpers.mjs';
 import { usageOf, redactor, safeTerminal } from '../src/util.mjs';
@@ -19,6 +19,18 @@ test('Jev uses the typed evaluation entrypoint with the configured model',async(
   assert.equal(request.questions.mode.type,'choice');assert.deepEqual(request.state.taskState,packet);
   assert.equal(r.usage.inputTokens,12);assert.equal(r.usage.costUsd,null);
 });
+test('research Jev question chooses among explicit local candidates and can escalate',()=>{
+  const q=researchQuestions([{id:'r1',summary:'Inspect withdraw',expected:'Map calls',action:{type:'code_inspect',path:'Vault.sol',symbol:'withdraw'}},{id:'r2',summary:'Trace balances',expected:'Map writes',action:{type:'code_state',path:'.',symbol:'balances'}}]);
+  assert.equal(q.next.type,'choice');assert.deepEqual(Object.keys(q.next.criteria),['r1','r2']);assert.equal(q.escalate.type,'boolean');assert.equal(q.stagnation.type,'boolean');
+});
+test('research strategist uses the text provider only at planning boundaries',async()=>{
+  let url,options;const plan={status:'continue',summary:'s',objective:'o',invariants:[],hypotheses:[],questions:[],seeds:['withdraw'],microSteps:4,answer:''};
+  const cortex=new GatewayCortex(config,{apiKey:'test-key',fetchImpl:async(u,o)=>{url=u;options=o;return response({choices:[{message:{content:JSON.stringify(plan)},finish_reason:'stop'}],usage:{prompt_tokens:11,completion_tokens:7}});}});
+  const packet={task:'Trace withdrawals',research:{round:0},evidence:[],constraints:[]};const r=await cortex.researchPlan(packet,new AbortController().signal);const body=JSON.parse(options.body);
+  assert.equal(url,'https://ai-gateway.vercel.sh/v1/chat/completions');assert.equal(body.model,config.mainModel);assert.match(body.messages[0].content,/Jev-driven executor/);assert.equal(r.data,JSON.stringify(plan));assert.equal(r.usage.inputTokens,11);
+});
+test('research strategist prompt is strategy-only and read-only',()=>{const m=researchMessages({task:'x',forceComplete:false,research:{},evidence:[],constraints:[]});assert.match(m[0].content,/read-only/);assert.match(m[0].content,/do NOT navigate files one action at a time/);});
+
 test('candidate criteria are independent, atomic questions with retained score distributions',()=>{
   const p=proposal([{type:'note',text:'First'},{type:'finish',answer:'Final'}]);const q=candidateQuestions(p);
   assert.equal(Object.keys(q).length,9);assert.equal(q.c0_progress.type,'score');assert.equal(q.c0_progress.criteria.length,4);

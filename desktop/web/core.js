@@ -25,12 +25,12 @@
   }
 
   const meta = {
-    dashboard:{eyebrow:'LOCAL',title:'Eutrya',subtitle:'NATIVE SWARM HARNESS · SPECIALIZED AGENTS · SHARED INTELLIGENCE'},
-    swarm:{eyebrow:'SWARM › ACTIVE',title:'SWARM COMMAND',subtitle:'LIVE ORCHESTRATION · NATIVE AGENTS · SHARED CONTEXT · ROUTED INTELLIGENCE'},
-    library:{eyebrow:'SWARM › PROFILES',title:'PROFILE LIBRARY',subtitle:'PRE-MADE PROFESSIONAL PROFILES · POWERED BY JEV · READY TO DEPLOY'},
-    memory:{eyebrow:'MEMORY › ARCHIVE',title:'MEMORY ARCHIVE',subtitle:'PERSISTENT CONTEXT · RECALL · KNOWLEDGE GRAPH · COMPOUND INTELLIGENCE'},
-    tools:{eyebrow:'TOOLS › WORKBENCH',title:'TOOLS WORKBENCH',subtitle:'CONNECT SYSTEMS · ACCESS DATA · EXECUTE · EXTEND THE SWARM'},
-    settings:{eyebrow:'SETTINGS › SYSTEM',title:'SETTINGS',subtitle:'TAILOR EUTRYA TO YOUR WORKFLOW · AGENTS · INFRASTRUCTURE · PREFERENCES'}
+    dashboard:{eyebrow:'LOCAL',title:'Eutrya',subtitle:'Native swarm command surface'},
+    swarm:{eyebrow:'SWARM › ACTIVE',title:'Swarm Command',subtitle:'Live orchestration · shared context · routed intelligence'},
+    library:{eyebrow:'SWARM › PROFILES',title:'Profile Library',subtitle:'Persistent professional profiles · powered by Jev'},
+    memory:{eyebrow:'MEMORY › ARCHIVE',title:'Memory Archive',subtitle:'Persistent context · semantic recall · linked knowledge'},
+    tools:{eyebrow:'TOOLS › WORKBENCH',title:'Tools Workbench',subtitle:'Runtime tools · permissions · execution flow'},
+    settings:{eyebrow:'SETTINGS › SYSTEM',title:'Settings',subtitle:'Models · swarm defaults · runtime · privacy'}
   }
 
   const state = {
@@ -69,7 +69,7 @@
 
   function chrome() {
     return `<div class="chrome" data-tauri-drag-region>
-      <div class="chrome-mark" data-tauri-drag-region><span class="mark-grid"><i></i><i></i><i></i><i></i></span><span>EUTRYA v0.9.1</span><span class="muted">NATIVE SWARM HARNESS</span></div>
+      <div class="chrome-mark" data-tauri-drag-region><span class="mark-grid"><i></i><i></i><i></i><i></i></span><span>EUTRYA v0.2.0</span><span class="muted">NATIVE SWARM HARNESS</span></div>
       <div class="chrome-center" data-tauri-drag-region>HUMAN × SWARM × POSSIBILITY</div>
       <div class="window-controls"><button data-window="min">−</button><button data-window="max">□</button><button data-window="close">×</button></div>
     </div>`
@@ -82,7 +82,7 @@
       <nav class="nav-list">${nav.map(([key,icon,label]) => `<button class="nav-item ${state.page===key?'active':''}" data-page="${key}"><b>${icon}</b><span>${label}</span></button>`).join('')}</nav>
       <div class="sidebar-copy">FIVE MINDS.<br>ONE FLOW.<br>GREATER TOGETHER.</div>
       <div class="botanical-orbit"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="stem"></div></div>
-      <div class="sidebar-foot">EUTRYA<br>INTELLIGENCE<br>INFRASTRUCTURE<br>v0.9.1<span class="slash">//</span>NATURAL<br>INTELLIGENCE<br>SCALES<br>DIFFERENTLY.</div>
+      <div class="sidebar-foot">EUTRYA<br>INTELLIGENCE<br>INFRASTRUCTURE<br>v0.2.0<span class="slash">//</span>NATURAL<br>INTELLIGENCE<br>SCALES<br>DIFFERENTLY.</div>
       <div class="sidebar-index">${String(PAGES.indexOf(state.page)+1).padStart(2,'0')}</div>
     </aside>`
   }

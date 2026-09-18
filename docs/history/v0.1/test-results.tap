@@ -1,0 +1,578 @@
+
+> eutrya-native@0.1.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: CLI help documents the standalone loop and controls
+ok 1 - CLI help documents the standalone loop and controls
+  ---
+  duration_ms: 74.869338
+  type: 'test'
+  ...
+# Subtest: offline CLI demo works with no installed SDK and no key
+ok 2 - offline CLI demo works with no installed SDK and no key
+  ---
+  duration_ms: 172.459655
+  type: 'test'
+  ...
+# Subtest: live run without credentials fails instead of silently running fixtures
+ok 3 - live run without credentials fails instead of silently running fixtures
+  ---
+  duration_ms: 88.552245
+  type: 'test'
+  ...
+# Subtest: doctor does not make paid requests by default
+ok 4 - doctor does not make paid requests by default
+  ---
+  duration_ms: 80.680964
+  type: 'test'
+  ...
+# Subtest: CLI session listing and trace inspection work after a demo
+ok 5 - CLI session listing and trace inspection work after a demo
+  ---
+  duration_ms: 312.502798
+  type: 'test'
+  ...
+# Subtest: benchmark results label fixtures and do not claim model performance
+ok 6 - benchmark results label fixtures and do not claim model performance
+  ---
+  duration_ms: 164.243078
+  type: 'test'
+  ...
+# Subtest: gate accepts exactly one execution for an issued decision
+ok 7 - gate accepts exactly one execution for an issued decision
+  ---
+  duration_ms: 3.937404
+  type: 'test'
+  ...
+# Subtest: gate rejects missing tickets
+ok 8 - gate rejects missing tickets
+  ---
+  duration_ms: 0.765771
+  type: 'test'
+  ...
+# Subtest: gate rejects a copied ticket even with a correct nonce and hashes
+ok 9 - gate rejects a copied ticket even with a correct nonce and hashes
+  ---
+  duration_ms: 0.672508
+  type: 'test'
+  ...
+# Subtest: gate rejects a modified action
+ok 10 - gate rejects a modified action
+  ---
+  duration_ms: 0.521841
+  type: 'test'
+  ...
+# Subtest: gate rejects a changed state revision
+ok 11 - gate rejects a changed state revision
+  ---
+  duration_ms: 0.4094
+  type: 'test'
+  ...
+# Subtest: gate rejects changed evidence even if revision was not incremented
+ok 12 - gate rejects changed evidence even if revision was not incremented
+  ---
+  duration_ms: 1.109828
+  type: 'test'
+  ...
+# Subtest: tickets do not survive a new controller process
+ok 13 - tickets do not survive a new controller process
+  ---
+  duration_ms: 0.448265
+  type: 'test'
+  ...
+# Subtest: ticket expiry requires a new evaluation
+ok 14 - ticket expiry requires a new evaluation
+  ---
+  duration_ms: 0.375572
+  type: 'test'
+  ...
+# Subtest: revocation invalidates all pending tickets
+ok 15 - revocation invalidates all pending tickets
+  ---
+  duration_ms: 0.512084
+  type: 'test'
+  ...
+# Subtest: gate rejects mismatched evaluator selections
+ok 16 - gate rejects mismatched evaluator selections
+  ---
+  duration_ms: 0.466067
+  type: 'test'
+  ...
+# Subtest: probability distributions require complete outcomes
+ok 17 - probability distributions require complete outcomes
+  ---
+  duration_ms: 0.238907
+  type: 'test'
+  ...
+# Subtest: probability distributions reject negative mass and NaN
+ok 18 - probability distributions reject negative mass and NaN
+  ---
+  duration_ms: 0.22464
+  type: 'test'
+  ...
+# Subtest: probabilities cannot have an unnormalized large mass
+ok 19 - probabilities cannot have an unnormalized large mass
+  ---
+  duration_ms: 0.092729
+  type: 'test'
+  ...
+# Subtest: score is computed from absolute rung probabilities
+ok 20 - score is computed from absolute rung probabilities
+  ---
+  duration_ms: 0.283481
+  type: 'test'
+  ...
+# Subtest: score must agree with its distribution
+ok 21 - score must agree with its distribution
+  ---
+  duration_ms: 0.117745
+  type: 'test'
+  ...
+# Subtest: attention selection is validated
+ok 22 - attention selection is validated
+  ---
+  duration_ms: 0.170837
+  type: 'test'
+  ...
+# Subtest: attention rejects a claimed choice contradicted by its probabilities
+ok 23 - attention rejects a claimed choice contradicted by its probabilities
+  ---
+  duration_ms: 0.249855
+  type: 'test'
+  ...
+# Subtest: Jev scoring can select the second candidate over the main-model ordering
+ok 24 - Jev scoring can select the second candidate over the main-model ordering
+  ---
+  duration_ms: 0.945859
+  type: 'test'
+  ...
+# Subtest: disabled tool cannot win regardless of score
+ok 25 - disabled tool cannot win regardless of score
+  ---
+  duration_ms: 0.41598
+  type: 'test'
+  ...
+# Subtest: unsupported finish is excluded instead of marking completion
+ok 26 - unsupported finish is excluded instead of marking completion
+  ---
+  duration_ms: 0.215876
+  type: 'test'
+  ...
+# Subtest: proposal parser rejects missing candidate IDs
+ok 27 - proposal parser rejects missing candidate IDs
+  ---
+  duration_ms: 0.365976
+  type: 'test'
+  ...
+# Subtest: proposal parser rejects duplicate IDs
+ok 28 - proposal parser rejects duplicate IDs
+  ---
+  duration_ms: 0.366161
+  type: 'test'
+  ...
+# Subtest: proposal rejects invented evidence references
+ok 29 - proposal rejects invented evidence references
+  ---
+  duration_ms: 0.158337
+  type: 'test'
+  ...
+# Subtest: proposal does not accept embedded instructions around JSON
+ok 30 - proposal does not accept embedded instructions around JSON
+  ---
+  duration_ms: 0.27945
+  type: 'test'
+  ...
+# Subtest: proposal accepts a single JSON code fence but still validates its contents
+ok 31 - proposal accepts a single JSON code fence but still validates its contents
+  ---
+  duration_ms: 1.101603
+  type: 'test'
+  ...
+# Subtest: unknown tool types and batched nested calls are rejected
+ok 32 - unknown tool types and batched nested calls are rejected
+  ---
+  duration_ms: 0.274712
+  type: 'test'
+  ...
+# Subtest: write requires create-only null or a file SHA-256
+ok 33 - write requires create-only null or a file SHA-256
+  ---
+  duration_ms: 0.14914
+  type: 'test'
+  ...
+# Subtest: Jev uses the typed evaluation entrypoint with the configured model
+ok 34 - Jev uses the typed evaluation entrypoint with the configured model
+  ---
+  duration_ms: 2.533249
+  type: 'test'
+  ...
+# Subtest: candidate criteria are independent, atomic questions with retained score distributions
+ok 35 - candidate criteria are independent, atomic questions with retained score distributions
+  ---
+  duration_ms: 0.365853
+  type: 'test'
+  ...
+# Subtest: Jev returns its actual answers without text parsing or heuristic replacement
+ok 36 - Jev returns its actual answers without text parsing or heuristic replacement
+  ---
+  duration_ms: 0.224584
+  type: 'test'
+  ...
+# Subtest: Jev errors propagate without falling back to mock
+ok 37 - Jev errors propagate without falling back to mock
+  ---
+  duration_ms: 0.50637
+  type: 'test'
+  ...
+# Subtest: text adapter uses Gateway chat completions, not Jev evaluation
+ok 38 - text adapter uses Gateway chat completions, not Jev evaluation
+  ---
+  duration_ms: 21.120873
+  type: 'test'
+  ...
+# Subtest: text adapter refuses native tool_calls from a provider
+ok 39 - text adapter refuses native tool_calls from a provider
+  ---
+  duration_ms: 0.55413
+  type: 'test'
+  ...
+# Subtest: text adapter refuses truncated output
+ok 40 - text adapter refuses truncated output
+  ---
+  duration_ms: 0.607347
+  type: 'test'
+  ...
+# Subtest: HTTP errors carry a status but do not echo provider error secrets
+ok 41 - HTTP errors carry a status but do not echo provider error secrets
+  ---
+  duration_ms: 0.372517
+  type: 'test'
+  ...
+# Subtest: text model slot cannot silently select Jev
+ok 42 - text model slot cannot silently select Jev
+  ---
+  duration_ms: 0.420712
+  type: 'test'
+  ...
+# Subtest: text-model context labels untrusted summaries and constrains its action vocabulary
+ok 43 - text-model context labels untrusted summaries and constrains its action vocabulary
+  ---
+  duration_ms: 0.687887
+  type: 'test'
+  ...
+# Subtest: model catalog is fetched rather than guessed from a hardcoded list
+ok 44 - model catalog is fetched rather than guessed from a hardcoded list
+  ---
+  duration_ms: 8.987807
+  type: 'test'
+  ...
+# Subtest: unknown usage and cost remain null, not invented zero
+ok 45 - unknown usage and cost remain null, not invented zero
+  ---
+  duration_ms: 0.12869
+  type: 'test'
+  ...
+# Subtest: known environment secrets are redacted from strings and structured logs
+ok 46 - known environment secrets are redacted from strings and structured logs
+  ---
+  duration_ms: 0.349214
+  type: 'test'
+  ...
+# Subtest: untrusted terminal text cannot emit ANSI/OSC control sequences
+ok 47 - untrusted terminal text cannot emit ANSI/OSC control sequences
+  ---
+  duration_ms: 0.207493
+  type: 'test'
+  ...
+# Subtest: model discovery authenticates when a Gateway key is configured
+ok 48 - model discovery authenticates when a Gateway key is configured
+  ---
+  duration_ms: 0.439003
+  type: 'test'
+  ...
+# Subtest: runtime calls Jev before the model and before execution without voluntary invocation
+ok 49 - runtime calls Jev before the model and before execution without voluntary invocation
+  ---
+  duration_ms: 20.485707
+  type: 'test'
+  ...
+# Subtest: runtime enforces a different evaluator-selected candidate
+ok 50 - runtime enforces a different evaluator-selected candidate
+  ---
+  duration_ms: 9.570746
+  type: 'test'
+  ...
+# Subtest: control failure blocks main-model calls and all actions
+ok 51 - control failure blocks main-model calls and all actions
+  ---
+  duration_ms: 3.435395
+  type: 'test'
+  ...
+# Subtest: rank failure blocks execution after a main-model proposal
+ok 52 - rank failure blocks execution after a main-model proposal
+  ---
+  duration_ms: 6.103137
+  type: 'test'
+  ...
+# Subtest: malformed evaluation is fail-closed
+ok 53 - malformed evaluation is fail-closed
+  ---
+  duration_ms: 3.937308
+  type: 'test'
+  ...
+# Subtest: malformed proposal does not execute a tool
+ok 54 - malformed proposal does not execute a tool
+  ---
+  duration_ms: 17.371366
+  type: 'test'
+  ...
+# Subtest: hard provider-attempt budget counts calls before dispatch
+ok 55 - hard provider-attempt budget counts calls before dispatch
+  ---
+  duration_ms: 9.267072
+  type: 'test'
+  ...
+# Subtest: HTTP retries consume separate budget reservations
+ok 56 - HTTP retries consume separate budget reservations
+  ---
+  duration_ms: 166.143895
+  type: 'test'
+  ...
+# Subtest: timeout is not retried and cannot execute a delayed result
+ok 57 - timeout is not retried and cannot execute a delayed result
+  ---
+  duration_ms: 29.914441
+  type: 'test'
+  ...
+# Subtest: stop cancels an in-flight evaluation and pauses
+ok 58 - stop cancels an in-flight evaluation and pauses
+  ---
+  duration_ms: 13.35712
+  type: 'test'
+  ...
+# Subtest: steering received during a proposal discards that proposal before action
+ok 59 - steering received during a proposal discards that proposal before action
+  ---
+  duration_ms: 12.143954
+  type: 'test'
+  ...
+# Subtest: the actual selected attention mode is supplied to the main model
+ok 60 - the actual selected attention mode is supplied to the main model
+  ---
+  duration_ms: 7.759557
+  type: 'test'
+  ...
+# Subtest: generic answers are never automatically VERIFIED
+ok 61 - generic answers are never automatically VERIFIED
+  ---
+  duration_ms: 7.239079
+  type: 'test'
+  ...
+# Subtest: independent puzzle checker rejects a confident but premature finish
+ok 62 - independent puzzle checker rejects a confident but premature finish
+  ---
+  duration_ms: 6.875685
+  type: 'test'
+  ...
+# Subtest: offline switchboard demo learns through observations and reaches verified completion
+ok 63 - offline switchboard demo learns through observations and reaches verified completion
+  ---
+  duration_ms: 70.276323
+  type: 'test'
+  ...
+# Subtest: hidden puzzle state never enters a model/evaluator packet
+ok 64 - hidden puzzle state never enters a model/evaluator packet
+  ---
+  duration_ms: 1.728223
+  type: 'test'
+  ...
+# Subtest: compaction preserves metering and full observation archive
+ok 65 - compaction preserves metering and full observation archive
+  ---
+  duration_ms: 3.73437
+  type: 'test'
+  ...
+# Subtest: state/usage persist across a session restart
+ok 66 - state/usage persist across a session restart
+  ---
+  duration_ms: 12.435397
+  type: 'test'
+  ...
+# Subtest: pending effects prevent automatic replay on resume
+ok 67 - pending effects prevent automatic replay on resume
+  ---
+  duration_ms: 7.682979
+  type: 'test'
+  ...
+# Subtest: human reconciliation records an assertion rather than verified evidence
+ok 68 - human reconciliation records an assertion rather than verified evidence
+  ---
+  duration_ms: 6.819823
+  type: 'test'
+  ...
+# Subtest: denied writes produce an observation without creating files
+ok 69 - denied writes produce an observation without creating files
+  ---
+  duration_ms: 11.40637
+  type: 'test'
+  ...
+# Subtest: approved writes create a durable result, backup, and cleared journal
+ok 70 - approved writes create a durable result, backup, and cleared journal
+  ---
+  duration_ms: 8.048279
+  type: 'test'
+  ...
+# Subtest: repeated identical action/result pairs stop a loop
+ok 71 - repeated identical action/result pairs stop a loop
+  ---
+  duration_ms: 18.338907
+  type: 'test'
+  ...
+# Subtest: a disabled process is rejected even when the model proposes it
+ok 72 - a disabled process is rejected even when the model proposes it
+  ---
+  duration_ms: 13.756732
+  type: 'test'
+  ...
+# Subtest: workspace paths reject traversal and absolute paths
+ok 73 - workspace paths reject traversal and absolute paths
+  ---
+  duration_ms: 8.390019
+  type: 'test'
+  ...
+# Subtest: private files and state directories are not accessible through tools
+ok 74 - private files and state directories are not accessible through tools
+  ---
+  duration_ms: 3.74022
+  type: 'test'
+  ...
+# Subtest: symlinks and dangling symlinks are rejected
+ok 75 - symlinks and dangling symlinks are rejected
+  ---
+  duration_ms: 4.69909
+  type: 'test'
+  ...
+# Subtest: hard-linked files are rejected
+ok 76 - hard-linked files are rejected
+  ---
+  duration_ms: 2.094289
+  type: 'test'
+  ...
+# Subtest: read results preserve line ranges and source hashes
+ok 77 - read results preserve line ranges and source hashes
+  ---
+  duration_ms: 13.04999
+  type: 'test'
+  ...
+# Subtest: binary file reads are rejected
+ok 78 - binary file reads are rejected
+  ---
+  duration_ms: 7.876398
+  type: 'test'
+  ...
+# Subtest: literal search does not treat regex syntax as instructions
+ok 79 - literal search does not treat regex syntax as instructions
+  ---
+  duration_ms: 5.228146
+  type: 'test'
+  ...
+# Subtest: file edits require exactly one matching occurrence
+ok 80 - file edits require exactly one matching occurrence
+  ---
+  duration_ms: 4.61234
+  type: 'test'
+  ...
+# Subtest: create-only write never overwrites an existing file
+ok 81 - create-only write never overwrites an existing file
+  ---
+  duration_ms: 5.39985
+  type: 'test'
+  ...
+# Subtest: hash check detects a file changed during approval
+ok 82 - hash check detects a file changed during approval
+  ---
+  duration_ms: 5.839901
+  type: 'test'
+  ...
+# Subtest: native directory creation obeys write permissions
+ok 83 - native directory creation obeys write permissions
+  ---
+  duration_ms: 7.660117
+  type: 'test'
+  ...
+# Subtest: process execution requires explicit per-command approval
+ok 84 - process execution requires explicit per-command approval
+  ---
+  duration_ms: 4.767796
+  type: 'test'
+  ...
+# Subtest: approved local process returns actual exit status and output
+ok 85 - approved local process returns actual exit status and output
+  ---
+  duration_ms: 58.65673
+  type: 'test'
+  ...
+# Subtest: process environment does not receive the Gateway API key
+ok 86 - process environment does not receive the Gateway API key
+  ---
+  duration_ms: 55.385621
+  type: 'test'
+  ...
+# Subtest: interrupting a process keeps its effect journal unresolved
+ok 87 - interrupting a process keeps its effect journal unresolved
+  ---
+  duration_ms: 94.401113
+  type: 'test'
+  ...
+# Subtest: journal remains pending if a completed write cannot record its observation
+ok 88 - journal remains pending if a completed write cannot record its observation
+  ---
+  duration_ms: 15.304066
+  type: 'test'
+  ...
+# Subtest: session locking prevents concurrent controllers
+ok 89 - session locking prevents concurrent controllers
+  ---
+  duration_ms: 3.142772
+  type: 'test'
+  ...
+# Subtest: state corruption is rejected on resume
+ok 90 - state corruption is rejected on resume
+  ---
+  duration_ms: 3.021553
+  type: 'test'
+  ...
+# Subtest: trace chain detects an altered record
+ok 91 - trace chain detects an altered record
+  ---
+  duration_ms: 1.537826
+  type: 'test'
+  ...
+# Subtest: partial trace tails fail closed rather than being silently discarded
+ok 92 - partial trace tails fail closed rather than being silently discarded
+  ---
+  duration_ms: 2.085476
+  type: 'test'
+  ...
+# Subtest: configuration rejects silently ignored permission/config typos
+ok 93 - configuration rejects silently ignored permission/config typos
+  ---
+  duration_ms: 0.362869
+  type: 'test'
+  ...
+# Subtest: configuration requires a separate text-model slot
+ok 94 - configuration requires a separate text-model slot
+  ---
+  duration_ms: 0.72474
+  type: 'test'
+  ...
+1..94
+# tests 94
+# suites 0
+# pass 94
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1018.121641

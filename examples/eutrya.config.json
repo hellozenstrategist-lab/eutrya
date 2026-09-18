@@ -1,0 +1,18 @@
+{
+  "mainProvider": "openrouter",
+  "mainBaseUrl": "",
+  "mainKeyEnv": "",
+  "jsonMode": true,
+  "mainModel": "REPLACE_WITH_PROVIDER/TEXT_MODEL_ID",
+  "jevModel": "typesafe-ai/jev",
+  "maxSteps": 24,
+  "maxCalls": 150,
+  "maxPromptChars": 48000,
+  "maxOutputTokens": 6144,
+  "timeoutMs": 90000,
+  "retries": 1,
+  "autoWrite": false,
+  "allowExec": false,
+  "maxKnownCostUsd": null,
+  "jevZeroDataRetention": false
+}

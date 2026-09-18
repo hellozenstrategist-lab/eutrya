@@ -1,0 +1,16 @@
+{
+  "name": "eutrya-jev-compaction-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Archive-first Jev context pruning for existing Eutrya runtimes",
+  "engines": {"node": ">=22"},
+  "exports": {".": "./src/index.mjs", "./native": "./integration/native-v02.mjs"},
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts/check.mjs",
+    "demo": "node examples/demo.mjs",
+    "verify:native": "node scripts/verify-native.mjs"
+  },
+  "license": "MIT"
+}

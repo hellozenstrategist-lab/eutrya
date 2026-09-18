@@ -1,0 +1,46 @@
+{
+  "name": "eutrya-native",
+  "version": "0.2.0",
+  "description": "Jev-native standalone agent with providers, messaging, memory, skills and scheduling",
+  "type": "module",
+  "bin": {
+    "eutrya": "bin/eutrya.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node bin/eutrya.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts-check.mjs",
+    "demo": "node bin/eutrya.mjs demo",
+    "doctor": "node bin/eutrya.mjs doctor",
+    "gateway": "node bin/eutrya.mjs gateway start",
+    "setup": "node bin/eutrya.mjs setup"
+  },
+  "dependencies": {
+    "ai": "^7.0.105"
+  },
+  "license": "MIT",
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "tests",
+    "examples",
+    "extensions",
+    "scripts-check.mjs",
+    "README.md",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    ".env.example"
+  ],
+  "optionalDependencies": {
+    "discord.js": "14.22.1",
+    "@slack/socket-mode": "^2.0.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.0.0",
+    "ajv": "^8.17.1"
+  }
+}

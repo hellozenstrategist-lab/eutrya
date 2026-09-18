@@ -1,0 +1,107 @@
+{
+  "project": "Eutrya Native",
+  "version": "0.1.0",
+  "generated_at_utc": "2026-09-18T00:08:17.032950+00:00",
+  "environment": {
+    "node": "v22.16.0",
+    "platform": "Linux",
+    "external_sdk_installed": false
+  },
+  "tests": {
+    "command": "npm test",
+    "passed": 94,
+    "failed": 0,
+    "skipped": 0,
+    "kind": "offline regression and mocked provider-contract tests",
+    "evidence": "test-results.tap"
+  },
+  "syntax": {
+    "command": "npm run check",
+    "modules_checked": 21,
+    "passed": true,
+    "type_check_performed": false,
+    "note": "Pure JavaScript source; syntax and runtime tests, not a TypeScript typecheck."
+  },
+  "interactive_terminal": {
+    "passed": true,
+    "actions": [
+      "submit puzzle task",
+      "wait for VERIFIED",
+      "/status",
+      "/compact",
+      "/quit"
+    ],
+    "exit_code": 0,
+    "evidence": "repl-transcript.txt"
+  },
+  "seeded_fixtures": {
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "verified": 20,
+    "total": 20,
+    "real_models": false,
+    "comparison": false,
+    "evidence": "seeded-fixtures.json"
+  },
+  "live_provider_validation": {
+    "performed": false,
+    "real_jev_calls": 0,
+    "real_text_model_calls": 0,
+    "blocking_conditions": [
+      "No AI_GATEWAY_API_KEY supplied for live inference.",
+      "npm registry/Gateway DNS unavailable in the build container; actual ai dependency installation did not complete."
+    ],
+    "contract_review": [
+      {
+        "title": "Vercel AI Gateway: Evaluation",
+        "url": "https://vercel.com/docs/ai-gateway/modalities/evaluation",
+        "used_for": "Typed evaluation API, AI SDK 7+, Jev model ID, question/answer schemas, batched shared state, reported usage."
+      },
+      {
+        "title": "Vercel AI SDK: evaluate implementation",
+        "url": "https://raw.githubusercontent.com/vercel/ai/main/packages/ai/src/evaluate/evaluate.ts",
+        "used_for": "Actual evaluate function options, including maxRetries and abortSignal. Source inspection is not installed-package execution."
+      },
+      {
+        "title": "Vercel AI Gateway: OpenAI-compatible Chat Completions",
+        "url": "https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions",
+        "used_for": "Separate text-generation endpoint, bearer authentication, model catalog, and structured output compatibility."
+      }
+    ]
+  },
+  "claims_not_established": [
+    "Real Jev decision accuracy",
+    "Real text-model compatibility with the configured account",
+    "Improved success compared with the same model without Jev",
+    "Net API-cost savings",
+    "Audited operating-system isolation",
+    "Exactly-once external side effects"
+  ],
+  "distribution": {
+    "zip": "eutrya-native-v0.1.0.zip",
+    "fresh_extraction_tests_passed": true,
+    "fresh_extraction_syntax_passed": true,
+    "fresh_extraction_offline_demo_verified": true,
+    "evidence": "distribution-check.txt"
+  }
+}

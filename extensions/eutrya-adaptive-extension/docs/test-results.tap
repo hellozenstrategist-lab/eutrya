@@ -1,0 +1,596 @@
+
+> @eutrya/adaptive-extension@0.1.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: registered residents are sleeping and cost nothing at startup
+ok 1 - registered residents are sleeping and cost nothing at startup
+  ---
+  duration_ms: 5.555978
+  type: 'test'
+  ...
+# Subtest: one authorized resident wakes without activating peers
+ok 2 - one authorized resident wakes without activating peers
+  ---
+  duration_ms: 7.294393
+  type: 'test'
+  ...
+# Subtest: dispatch lets Jev select one eligible existing resident
+ok 3 - dispatch lets Jev select one eligible existing resident
+  ---
+  duration_ms: 3.704776
+  type: 'test'
+  ...
+# Subtest: Jev sleep answer invokes no resident
+ok 4 - Jev sleep answer invokes no resident
+  ---
+  duration_ms: 2.953895
+  type: 'test'
+  ...
+# Subtest: event filter avoids evaluator spend and wakeups
+ok 5 - event filter avoids evaluator spend and wakeups
+  ---
+  duration_ms: 1.39788
+  type: 'test'
+  ...
+# Subtest: manual-only member requires authenticated direct request and still consults Jev
+ok 6 - manual-only member requires authenticated direct request and still consults Jev
+  ---
+  duration_ms: 3.847308
+  type: 'test'
+  ...
+# Subtest: disabled residents cannot be force-woken by direct request
+ok 7 - disabled residents cannot be force-woken by direct request
+  ---
+  duration_ms: 1.15472
+  type: 'test'
+  ...
+# Subtest: resident may invoke a Jev-gated temporary subagent and retain identity
+ok 8 - resident may invoke a Jev-gated temporary subagent and retain identity
+  ---
+  duration_ms: 7.209968
+  type: 'test'
+  ...
+# Subtest: delegation capability expires when parent sleeps
+ok 9 - delegation capability expires when parent sleeps
+  ---
+  duration_ms: 3.712578
+  type: 'test'
+  ...
+# Subtest: child cannot escalate permission envelope
+ok 10 - child cannot escalate permission envelope
+  ---
+  duration_ms: 3.564729
+  type: 'test'
+  ...
+# Subtest: unconfigured child templates are denied before model request
+ok 11 - unconfigured child templates are denied before model request
+  ---
+  duration_ms: 3.418843
+  type: 'test'
+  ...
+# Subtest: shared root activation cap counts declined requests
+ok 12 - shared root activation cap counts declined requests
+  ---
+  duration_ms: 2.47116
+  type: 'test'
+  ...
+# Subtest: parent child-attempt cap is not reset between requests
+ok 13 - parent child-attempt cap is not reset between requests
+  ---
+  duration_ms: 5.465274
+  type: 'test'
+  ...
+# Subtest: bounded recursive subagents stop at maxDepth
+ok 14 - bounded recursive subagents stop at maxDepth
+  ---
+  duration_ms: 5.407127
+  type: 'test'
+  ...
+# Subtest: concurrency cap rejects extra dispatch instead of waiting in a deadlock
+ok 15 - concurrency cap rejects extra dispatch instead of waiting in a deadlock
+  ---
+  duration_ms: 2.965782
+  type: 'test'
+  ...
+# Subtest: same resident cannot be concurrently reentered
+ok 16 - same resident cannot be concurrently reentered
+  ---
+  duration_ms: 3.109856
+  type: 'test'
+  ...
+# Subtest: policy change while Jev evaluates invalidates activation
+ok 17 - policy change while Jev evaluates invalidates activation
+  ---
+  duration_ms: 3.156455
+  type: 'test'
+  ...
+# Subtest: task version change while Jev evaluates invalidates activation
+ok 18 - task version change while Jev evaluates invalidates activation
+  ---
+  duration_ms: 2.655302
+  type: 'test'
+  ...
+# Subtest: ordinary learning updates do not stop active agent
+ok 19 - ordinary learning updates do not stop active agent
+  ---
+  duration_ms: 4.488457
+  type: 'test'
+  ...
+# Subtest: interrupted active callback leaves review record and blocks replay
+ok 20 - interrupted active callback leaves review record and blocks replay
+  ---
+  duration_ms: 3.55175
+  type: 'test'
+  ...
+# Subtest: activation timeout quarantines an uncooperative host callback
+ok 21 - activation timeout quarantines an uncooperative host callback
+  ---
+  duration_ms: 104.90479
+  type: 'test'
+  ...
+# Subtest: root permissions cannot be escalated by supplying unknown runResident fields
+ok 22 - root permissions cannot be escalated by supplying unknown runResident fields
+  ---
+  duration_ms: 2.928116
+  type: 'test'
+  ...
+# Subtest: closed roots reject future activation and may be explicitly archived
+ok 23 - closed roots reject future activation and may be explicitly archived
+  ---
+  duration_ms: 2.18049
+  type: 'test'
+  ...
+# Subtest: persisted RUNNING jobs become NEEDS_REVIEW after restart without automatic replay
+ok 24 - persisted RUNNING jobs become NEEDS_REVIEW after restart without automatic replay
+  ---
+  duration_ms: 4.575426
+  type: 'test'
+  ...
+# Subtest: style correction steers through host callback without shutting down resident
+ok 25 - style correction steers through host callback without shutting down resident
+  ---
+  duration_ms: 5.72607
+  type: 'test'
+  ...
+# Subtest: deterministic selector is invariant to candidate order
+ok 26 - deterministic selector is invariant to candidate order
+  ---
+  duration_ms: 6.198069
+  type: 'test'
+  ...
+# Subtest: canonical actions do not depend on object property order
+ok 27 - canonical actions do not depend on object property order
+  ---
+  duration_ms: 2.215681
+  type: 'test'
+  ...
+# Subtest: exact tie is stable across candidate order
+ok 28 - exact tie is stable across candidate order
+  ---
+  duration_ms: 1.796
+  type: 'test'
+  ...
+# Subtest: hysteresis retains a near-equal previously selected strategy
+ok 29 - hysteresis retains a near-equal previously selected strategy
+  ---
+  duration_ms: 1.828418
+  type: 'test'
+  ...
+# Subtest: clear new evidence overcomes hysteresis
+ok 30 - clear new evidence overcomes hysteresis
+  ---
+  duration_ms: 1.982256
+  type: 'test'
+  ...
+# Subtest: ineligible candidates cannot be revived by history
+ok 31 - ineligible candidates cannot be revived by history
+  ---
+  duration_ms: 1.929338
+  type: 'test'
+  ...
+# Subtest: all ineligible means no selection
+ok 32 - all ineligible means no selection
+  ---
+  duration_ms: 1.164134
+  type: 'test'
+  ...
+# Subtest: duplicate IDs and non-finite scores are rejected
+ok 33 - duplicate IDs and non-finite scores are rejected
+  ---
+  duration_ms: 0.921715
+  type: 'test'
+  ...
+# Subtest: minimum independent outcomes needed before learned bias
+ok 34 - minimum independent outcomes needed before learned bias
+  ---
+  duration_ms: 5.211057
+  type: 'test'
+  ...
+# Subtest: experience produces bounded persistent policy bias
+ok 35 - experience produces bounded persistent policy bias
+  ---
+  duration_ms: 17.864256
+  type: 'test'
+  ...
+# Subtest: outcomes from another task class do not transfer
+ok 36 - outcomes from another task class do not transfer
+  ---
+  duration_ms: 6.010792
+  type: 'test'
+  ...
+# Subtest: negative checked outcomes reduce strategy bias
+ok 37 - negative checked outcomes reduce strategy bias
+  ---
+  duration_ms: 7.524573
+  type: 'test'
+  ...
+# Subtest: outcomes are idempotent and contradictory duplicates rejected
+ok 38 - outcomes are idempotent and contradictory duplicates rejected
+  ---
+  duration_ms: 3.052
+  type: 'test'
+  ...
+# Subtest: unknown decisions cannot be used as learning evidence
+ok 39 - unknown decisions cannot be used as learning evidence
+  ---
+  duration_ms: 0.991238
+  type: 'test'
+  ...
+# Subtest: freeze does not erase preferences or experience
+ok 40 - freeze does not erase preferences or experience
+  ---
+  duration_ms: 3.325164
+  type: 'test'
+  ...
+# Subtest: feedback adapts style without a language-model request
+ok 41 - feedback adapts style without a language-model request
+  ---
+  duration_ms: 1.740267
+  type: 'test'
+  ...
+# Subtest: ordinary corrections are preserved as preference notes
+ok 42 - ordinary corrections are preserved as preference notes
+  ---
+  duration_ms: 1.457919
+  type: 'test'
+  ...
+# Subtest: forgetting a correction reconstructs previous preference
+ok 43 - forgetting a correction reconstructs previous preference
+  ---
+  duration_ms: 2.484259
+  type: 'test'
+  ...
+# Subtest: corrections cannot mutate permissions
+ok 44 - corrections cannot mutate permissions
+  ---
+  duration_ms: 1.591116
+  type: 'test'
+  ...
+# Subtest: wrong user and model-origin correction denied
+ok 45 - wrong user and model-origin correction denied
+  ---
+  duration_ms: 0.712495
+  type: 'test'
+  ...
+# Subtest: reset and undo verified experience are explicit and reversible
+ok 46 - reset and undo verified experience are explicit and reversible
+  ---
+  duration_ms: 2.351112
+  type: 'test'
+  ...
+# Subtest: saved preference survives close and reopening
+ok 47 - saved preference survives close and reopening
+  ---
+  duration_ms: 1.453382
+  type: 'test'
+  ...
+# Subtest: scope isolation separates two users in same directory
+ok 48 - scope isolation separates two users in same directory
+  ---
+  duration_ms: 1.24246
+  type: 'test'
+  ...
+# Subtest: a second controller cannot own the same state directory
+ok 49 - a second controller cannot own the same state directory
+  ---
+  duration_ms: 0.664995
+  type: 'test'
+  ...
+# Subtest: stored preference parsing has explicit common corrections
+ok 50 - stored preference parsing has explicit common corrections
+  ---
+  duration_ms: 0.095361
+  type: 'test'
+  ...
+# Subtest: configuration rejects unknown fields and unreasonable limits
+ok 51 - configuration rejects unknown fields and unreasonable limits
+  ---
+  duration_ms: 0.318421
+  type: 'test'
+  ...
+# Subtest: mock evaluator cannot be enabled accidentally in live configuration
+ok 52 - mock evaluator cannot be enabled accidentally in live configuration
+  ---
+  duration_ms: 0.930849
+  type: 'test'
+  ...
+# Subtest: selector receipt binds incumbent policy state, not just candidate scores
+ok 53 - selector receipt binds incumbent policy state, not just candidate scores
+  ---
+  duration_ms: 1.175852
+  type: 'test'
+  ...
+# Subtest: native disable setting removes history bias and retention
+ok 54 - native disable setting removes history bias and retention
+  ---
+  duration_ms: 2.083535
+  type: 'test'
+  ...
+# Subtest: native bridge uses runtime metering for Jev and text separately
+ok 55 - native bridge uses runtime metering for Jev and text separately
+  ---
+  duration_ms: 1.298653
+  type: 'test'
+  ...
+# Subtest: native selector delegates all hard eligibility to existing selector
+ok 56 - native selector delegates all hard eligibility to existing selector
+  ---
+  duration_ms: 5.608787
+  type: 'test'
+  ...
+# Subtest: native context retains original host context and adds scoped preferences
+ok 57 - native context retains original host context and adds scoped preferences
+  ---
+  duration_ms: 2.617806
+  type: 'test'
+  ...
+# Subtest: bridge refuses hosts without a typed evaluator instead of changing APIs
+ok 58 - bridge refuses hosts without a typed evaluator instead of changing APIs
+  ---
+  duration_ms: 0.397008
+  type: 'test'
+  ...
+# Subtest: simple explanation makes one Jev request and one text request
+ok 59 - simple explanation makes one Jev request and one text request
+  ---
+  duration_ms: 9.684863
+  type: 'test'
+  ...
+# Subtest: fast text call has no tool or swarm interface
+ok 60 - fast text call has no tool or swarm interface
+  ---
+  duration_ms: 4.094333
+  type: 'test'
+  ...
+# Subtest: work routing preserves host full deliberation path
+ok 61 - work routing preserves host full deliberation path
+  ---
+  duration_ms: 2.441436
+  type: 'test'
+  ...
+# Subtest: host requiresTools flag blocks fast lane before model spend
+ok 62 - host requiresTools flag blocks fast lane before model spend
+  ---
+  duration_ms: 0.922727
+  type: 'test'
+  ...
+# Subtest: host needsFreshFacts flag blocks fast lane before model spend
+ok 63 - host needsFreshFacts flag blocks fast lane before model spend
+  ---
+  duration_ms: 0.986501
+  type: 'test'
+  ...
+# Subtest: host highStakes flag blocks fast lane before model spend
+ok 64 - host highStakes flag blocks fast lane before model spend
+  ---
+  duration_ms: 0.797671
+  type: 'test'
+  ...
+# Subtest: host unresolvedReferences flag blocks fast lane before model spend
+ok 65 - host unresolvedReferences flag blocks fast lane before model spend
+  ---
+  duration_ms: 0.890398
+  type: 'test'
+  ...
+# Subtest: host requiresVerification flag blocks fast lane before model spend
+ok 66 - host requiresVerification flag blocks fast lane before model spend
+  ---
+  duration_ms: 0.854005
+  type: 'test'
+  ...
+# Subtest: host forceWork flag blocks fast lane before model spend
+ok 67 - host forceWork flag blocks fast lane before model spend
+  ---
+  duration_ms: 1.333615
+  type: 'test'
+  ...
+# Subtest: low Jev tool-free confidence goes to work
+ok 68 - low Jev tool-free confidence goes to work
+  ---
+  duration_ms: 2.249642
+  type: 'test'
+  ...
+# Subtest: bad Jev result fails closed
+ok 69 - bad Jev result fails closed
+  ---
+  duration_ms: 1.882358
+  type: 'test'
+  ...
+# Subtest: Jev outage never becomes ordinary text generation
+ok 70 - Jev outage never becomes ordinary text generation
+  ---
+  duration_ms: 1.918301
+  type: 'test'
+  ...
+# Subtest: reply permit cannot be reused or fabricated
+ok 71 - reply permit cannot be reused or fabricated
+  ---
+  duration_ms: 2.753478
+  type: 'test'
+  ...
+# Subtest: correction invalidates a prepared fast reply
+ok 72 - correction invalidates a prepared fast reply
+  ---
+  duration_ms: 2.565609
+  type: 'test'
+  ...
+# Subtest: correction while Jev is routing forces a fresh decision
+ok 73 - correction while Jev is routing forces a fresh decision
+  ---
+  duration_ms: 1.887676
+  type: 'test'
+  ...
+# Subtest: learned outcomes do not invalidate an unrelated prepared text envelope
+ok 74 - learned outcomes do not invalidate an unrelated prepared text envelope
+  ---
+  duration_ms: 4.614013
+  type: 'test'
+  ...
+# Subtest: stream usage is metered and unknown price remains unknown
+ok 75 - stream usage is metered and unknown price remains unknown
+  ---
+  duration_ms: 2.432152
+  type: 'test'
+  ...
+# Subtest: provider-attempt cap cannot be bypassed by switching lanes
+ok 76 - provider-attempt cap cannot be bypassed by switching lanes
+  ---
+  duration_ms: 2.048424
+  type: 'test'
+  ...
+# Subtest: text output must match streamed text
+ok 77 - text output must match streamed text
+  ---
+  duration_ms: 2.27561
+  type: 'test'
+  ...
+# Subtest: owner correction propagates into next reply instructions
+ok 78 - owner correction propagates into next reply instructions
+  ---
+  duration_ms: 3.405634
+  type: 'test'
+  ...
+# Subtest: abort during text generation stops waiting even when adapter ignores signal
+ok 79 - abort during text generation stops waiting even when adapter ignores signal
+  ---
+  duration_ms: 2.439232
+  type: 'test'
+  ...
+# Subtest: CLI command bridge handles feedback, freeze and admin config
+ok 80 - CLI command bridge handles feedback, freeze and admin config
+  ---
+  duration_ms: 1.894055
+  type: 'test'
+  ...
+# Subtest: large context conservatively falls back instead of silently truncating
+ok 81 - large context conservatively falls back instead of silently truncating
+  ---
+  duration_ms: 0.750482
+  type: 'test'
+  ...
+# Subtest: plain corrections can be captured without turning quoted task text into feedback
+ok 82 - plain corrections can be captured without turning quoted task text into feedback
+  ---
+  duration_ms: 1.602243
+  type: 'test'
+  ...
+# Subtest: SSE handles byte-split Unicode, comments, usage and DONE
+ok 83 - SSE handles byte-split Unicode, comments, usage and DONE
+  ---
+  duration_ms: 5.721584
+  type: 'test'
+  ...
+# Subtest: SSE supports CRLF delimiters
+ok 84 - SSE supports CRLF delimiters
+  ---
+  duration_ms: 1.179146
+  type: 'test'
+  ...
+# Subtest: SSE malformed JSON fails explicitly
+ok 85 - SSE malformed JSON fails explicitly
+  ---
+  duration_ms: 0.842708
+  type: 'test'
+  ...
+# Subtest: SSE ignores reasoning text rather than emitting it
+ok 86 - SSE ignores reasoning text rather than emitting it
+  ---
+  duration_ms: 1.080821
+  type: 'test'
+  ...
+# Subtest: SSE native tool call is rejected without dispatch
+ok 87 - SSE native tool call is rejected without dispatch
+  ---
+  duration_ms: 1.921996
+  type: 'test'
+  ...
+# Subtest: SSE missing DONE is incomplete even after a stop marker
+ok 88 - SSE missing DONE is incomplete even after a stop marker
+  ---
+  duration_ms: 0.727537
+  type: 'test'
+  ...
+# Subtest: SSE DONE without finish reason is incomplete
+ok 89 - SSE DONE without finish reason is incomplete
+  ---
+  duration_ms: 1.305373
+  type: 'test'
+  ...
+# Subtest: SSE length finish reason fails instead of pretending complete
+ok 90 - SSE length finish reason fails instead of pretending complete
+  ---
+  duration_ms: 0.598276
+  type: 'test'
+  ...
+# Subtest: SSE error frame is not an answer
+ok 91 - SSE error frame is not an answer
+  ---
+  duration_ms: 1.018819
+  type: 'test'
+  ...
+# Subtest: provider request cannot override tool-free contract
+ok 92 - provider request cannot override tool-free contract
+  ---
+  duration_ms: 0.371871
+  type: 'test'
+  ...
+# Subtest: provider endpoint restrictions prevent accidental credential forwarding
+ok 93 - provider endpoint restrictions prevent accidental credential forwarding
+  ---
+  duration_ms: 0.22296
+  type: 'test'
+  ...
+# Subtest: Jev cannot be sent to chat-completions endpoint
+ok 94 - Jev cannot be sent to chat-completions endpoint
+  ---
+  duration_ms: 0.105016
+  type: 'test'
+  ...
+# Subtest: HTTP error does not print remote body or API key
+ok 95 - HTTP error does not print remote body or API key
+  ---
+  duration_ms: 0.342137
+  type: 'test'
+  ...
+# Subtest: real loopback HTTP transport streams using original provider fields
+ok 96 - real loopback HTTP transport streams using original provider fields
+  ---
+  duration_ms: 37.246536
+  type: 'test'
+  ...
+# Subtest: stream strips terminal control bytes before forwarding text
+ok 97 - stream strips terminal control bytes before forwarding text
+  ---
+  duration_ms: 0.787827
+  type: 'test'
+  ...
+1..97
+# tests 97
+# suites 0
+# pass 97
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 280.657613

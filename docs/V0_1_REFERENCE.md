@@ -1,3 +1,5 @@
+# Historical v0.1 reference — superseded by the root README
+
 # Eutrya Native
 
 **A standalone terminal agent with Jev in its decision loop.**
@@ -113,52 +115,11 @@ Process execution uses an executable and argument array, not an implicit shell. 
 | Ordinary text while busy | The same as steering. It does not create a competing run. |
 | `/stop` or Ctrl+C | Cancel an in-flight model request or interrupt an approved process. |
 | `/continue` | Resume with a new decision cycle and another step-limited burst. The session's request budget is not reset. |
-| `/compact` | Run Jev relevance pruning while idle. Exact originals remain in the event/archive store and usage is retained. |
+| `/compact` | Deterministically reduce recent context while retaining the observation archive and metering. Available while idle. |
 | `/trace` | Recent attention and candidate-selection records. These are decision summaries, not private thought transcripts. |
 | `/model provider/model` | Change the text model for this session while idle. |
-| `/swarm` | Display live swarm organization status, agent roles, active tasks, and blockers. |
-| `/agents` | List all swarm agent profiles, specializations, tools, and models. |
-| `/agent NAME` | Switch direct interactive focus to a specific specialist agent. |
-| `/agent rename ID NEW_NAME` | Rename an existing swarm agent. |
-| `/agent remove ID` | Remove a swarm agent. |
-| `/tasks` | List shared workspace tasks and backlog. |
-| `/findings` | List shared organizational findings. |
-| `/template [NAME]` | View or apply an organization template (default, engineering, startup, legal, research). |
-| `/thinking [on\|off]` | Toggle display of candidate thinking/summary (hidden by default). |
-| `/reload` | Save the current session and restart the harness with updated code while preserving conversation history. |
 | `/resolve INSPECTION_NOTE` | Reconcile an uncertain effect **after** inspecting what actually happened. |
 | `/quit` | Stop and leave the session saved. |
-
-## Native Swarm Architecture
-
-Eutrya is designed as a persistent organization of specialized AI agents, not a single chatbot with subagents:
-
-1. **Five Default Persistent Profiles**:
-   - **Admin / Chief of Staff** (`admin`): Primary orchestrator that interacts with the user, decomposes objectives, delegates tasks, and synthesizes final results.
-   - **Engineer** (`engineer`): Software engineering, systems architecture, debugging, infrastructure, and technical implementation.
-   - **Legal / Policy Analyst** (`legal`): Contracts, regulation, compliance, liability risk identification, and structured legal argumentation.
-   - **Finance / Business Analyst** (`finance`): Financial modeling, unit economics, market analysis, pricing, and cost auditing.
-   - **Researcher / Strategist** (`researcher`): Deep research, information synthesis, competitive intelligence, and long-horizon strategy.
-
-2. **Jev as the Cognitive Layer**:
-   Jev sits underneath every agent in the swarm. Before taking actions, proposals and attention modes are continuously evaluated through Jev to ensure actions are grounded, productive, non-repetitive, and appropriate for the agent's role.
-
-3. **Swarm Communication & Event-Driven Routing**:
-   Targeted events (`TASK_ASSIGNED`, `IMPLEMENTATION_REQUIRED`, `RESEARCH_REQUIRED`, `LEGAL_REVIEW_REQUIRED`, `FINANCIAL_ANALYSIS_REQUIRED`, `CANDIDATE_RESULT`, `BLOCKED`, `TASK_COMPLETE`) wake only the relevant specialist agent, keeping token consumption bounded.
-
-4. **Shared Workspace**:
-   Agents collaborate through structured organizational memory (`tasks`, `findings`, `decisions`, `artifacts`, `messages`, `evidence`, `openQuestions`, `blockers`, `agentStatus`) rather than unbounded group chat histories.
-
-5. **Direct Conversations**:
-   Users can address any specialist directly using `@AgentName <task>` (e.g. `@Engineer Fix the parser` or `@Finance Calculate the unit margin`) or switch focus using `/agent <name>`.
-
-6. **Dynamic Organization Templates**:
-   Easily switch templates using `/template <name>`:
-   - `default`: Admin, Engineer, Legal, Finance, Researcher
-   - `engineering`: Architect, Backend Engineer, Frontend Engineer, QA, Researcher
-   - `startup`: CEO, Engineer, Product, Finance, Growth
-   - `legal`: Lead Counsel, Contracts Reviewer, Compliance Officer, Evidence Analyst, Researcher
-   - `research`: Principal Investigator, Experimentalist, Literature Specialist, Skeptic, Synthesizer
 
 Steering takes effect at decision boundaries. It cannot undo an already-completed write or guarantee reversal of a process's partial effects.
 
@@ -217,8 +178,6 @@ Defaults:
 
 Requests are reserved to disk before dispatch. A crashed attempt remains counted; a new session is required to start an independent budget. `/compact`, `/continue`, and process restart do not reset the existing meter.
 
-Jev auto-compaction is active by default at full-work model-request boundaries. It replaces the old last-12 packet slice, result clipping, and >48/last24 observation eviction for attached runtimes. Jev evaluates completed read-only call/result pairs through the existing `runtime.call('jev.compaction', ...)` budget path; retained text stays exact, and full originals are archived under each session's private state directory. Use `--no-compaction` or `jevCompaction: false` only as an explicit rollback to the legacy bounded window. Small adaptive fast replies do not start the full-work compactor.
-
 Usage displays distinguish reported input/output tokens, missing usage, known reported API cost, and unpriced attempts. **Unknown cost is not reported as zero cost.** Provider-side work can continue after local cancellation, and an aborted request may be billable. Configured dollar thresholds cannot bound unreported charges.
 
 There is no claim yet that adding Jev makes the selected text model smarter or cheaper. The additional evaluations have a cost; their net value needs a controlled live comparison.
@@ -253,8 +212,7 @@ src/providers/gateway.mjs Real Vercel text-model adapter; no native tool dispatc
 src/providers/mock.mjs   Explicit offline fixtures only
 src/tools.mjs            Workspace actions, permissions, process runner
 src/store.mjs            Session snapshots, locking, trace, observation archive
-src/memory.mjs           Legacy bounded context used only when Jev compaction is explicitly disabled
-extensions/eutrya-jev-compaction-extension/  Active archive-backed Jev context pruning
+src/memory.mjs           Bounded context and deterministic compaction
 src/puzzle.mjs           Local switchboard and independent checker
 src/ui.mjs               Terminal events and one-action approvals
 tests/                   Offline regression and contract tests

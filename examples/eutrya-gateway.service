@@ -1,0 +1,18 @@
+# Illustrative Linux USER service. Edit absolute paths and review before enabling.
+# This file is not installed or started automatically.
+[Unit]
+Description=Eutrya Native messaging gateway
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/REPLACE/WITH/EUTRYA/DIRECTORY
+ExecStart=/usr/bin/node /REPLACE/WITH/EUTRYA/DIRECTORY/bin/eutrya.mjs gateway start --profile messaging
+Restart=on-failure
+RestartSec=10
+UMask=0077
+TimeoutStopSec=60
+# Deliberately no Environment=... secrets. Eutrya loads the profile's private .env.
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,506 @@
+
+> eutrya-jev-compaction-extension@0.1.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: below-trigger histories incur zero network requests
+ok 1 - below-trigger histories incur zero network requests
+  ---
+  duration_ms: 7.43021
+  type: 'test'
+  ...
+# Subtest: auto mode activates at context pressure
+ok 2 - auto mode activates at context pressure
+  ---
+  duration_ms: 16.275465
+  type: 'test'
+  ...
+# Subtest: unchanged all-kept history does not cause repeated paid attempts
+ok 3 - unchanged all-kept history does not cause repeated paid attempts
+  ---
+  duration_ms: 6.553316
+  type: 'test'
+  ...
+# Subtest: goal change invalidates the no-repeat fingerprint
+ok 4 - goal change invalidates the no-repeat fingerprint
+  ---
+  duration_ms: 12.102952
+  type: 'test'
+  ...
+# Subtest: full original snapshot is archived before Jev runs
+ok 5 - full original snapshot is archived before Jev runs
+  ---
+  duration_ms: 7.839197
+  type: 'test'
+  ...
+# Subtest: archive can be reopened after restart with exact original text
+ok 6 - archive can be reopened after restart with exact original text
+  ---
+  duration_ms: 4.674092
+  type: 'test'
+  ...
+# Subtest: scope isolation prevents another resident reading an archive
+ok 7 - scope isolation prevents another resident reading an archive
+  ---
+  duration_ms: 4.961353
+  type: 'test'
+  ...
+# Subtest: scope isolation prevents another authenticated user reading an archive
+ok 8 - scope isolation prevents another authenticated user reading an archive
+  ---
+  duration_ms: 4.896421
+  type: 'test'
+  ...
+# Subtest: a mismatched archive/controller scope is rejected
+ok 9 - a mismatched archive/controller scope is rejected
+  ---
+  duration_ms: 1.30272
+  type: 'test'
+  ...
+# Subtest: archive corruption is detected on restore
+ok 10 - archive corruption is detected on restore
+  ---
+  duration_ms: 6.488647
+  type: 'test'
+  ...
+# Subtest: private modes are used for directory and snapshot
+ok 11 - private modes are used for directory and snapshot
+  ---
+  duration_ms: 4.704619
+  type: 'test'
+  ...
+# Subtest: archive traversal IDs are rejected
+ok 12 - archive traversal IDs are rejected
+  ---
+  duration_ms: 1.031204
+  type: 'test'
+  ...
+# Subtest: symlinked archive directories are rejected
+ok 13 - symlinked archive directories are rejected
+  ---
+  duration_ms: 0.99359
+  type: 'test'
+  ...
+# Subtest: archive failure makes zero provider requests and preserves input
+ok 14 - archive failure makes zero provider requests and preserves input
+  ---
+  duration_ms: 3.224802
+  type: 'test'
+  ...
+# Subtest: failure writing decision report does not return a pruned history
+ok 15 - failure writing decision report does not return a pruned history
+  ---
+  duration_ms: 4.566879
+  type: 'test'
+  ...
+# Subtest: partial or malformed response cannot remove any context
+ok 16 - partial or malformed response cannot remove any context
+  ---
+  duration_ms: 4.115045
+  type: 'test'
+  ...
+# Subtest: partial or malformed response cannot remove any context
+ok 17 - partial or malformed response cannot remove any context
+  ---
+  duration_ms: 4.576089
+  type: 'test'
+  ...
+# Subtest: partial or malformed response cannot remove any context
+ok 18 - partial or malformed response cannot remove any context
+  ---
+  duration_ms: 3.930969
+  type: 'test'
+  ...
+# Subtest: timeout leaves original history unchanged
+ok 19 - timeout leaves original history unchanged
+  ---
+  duration_ms: 19.392193
+  type: 'test'
+  ...
+# Subtest: abort can interrupt evaluation without applying late answers
+ok 20 - abort can interrupt evaluation without applying late answers
+  ---
+  duration_ms: 15.229614
+  type: 'test'
+  ...
+# Subtest: pre-aborted request dispatches nothing
+ok 21 - pre-aborted request dispatches nothing
+  ---
+  duration_ms: 0.910159
+  type: 'test'
+  ...
+# Subtest: concurrent compaction on same controller is refused
+ok 22 - concurrent compaction on same controller is refused
+  ---
+  duration_ms: 19.934506
+  type: 'test'
+  ...
+# Subtest: batch limit rejects BEFORE any request
+ok 23 - batch limit rejects BEFORE any request
+  ---
+  duration_ms: 2.888641
+  type: 'test'
+  ...
+# Subtest: batches have bounded concurrency and complete decisions
+ok 24 - batches have bounded concurrency and complete decisions
+  ---
+  duration_ms: 20.694353
+  type: 'test'
+  ...
+# Subtest: protected context too large fails before paid evaluation
+ok 25 - protected context too large fails before paid evaluation
+  ---
+  duration_ms: 2.773022
+  type: 'test'
+  ...
+# Subtest: message-only overflow does not delete user text or invent a summary
+ok 26 - message-only overflow does not delete user text or invent a summary
+  ---
+  duration_ms: 1.13784
+  type: 'test'
+  ...
+# Subtest: custom token counter and reserve are used in reported limits
+ok 27 - custom token counter and reserve are used in reported limits
+  ---
+  duration_ms: 7.865035
+  type: 'test'
+  ...
+# Subtest: invalid async/nonnumeric context measure fails before inference
+ok 28 - invalid async/nonnumeric context measure fails before inference
+  ---
+  duration_ms: 3.334265
+  type: 'test'
+  ...
+# Subtest: production mode refuses mock evaluator
+ok 29 - production mode refuses mock evaluator
+  ---
+  duration_ms: 0.759857
+  type: 'test'
+  ...
+# Subtest: native adapter meters compaction under Jev and returns current boolean schema
+ok 30 - native adapter meters compaction under Jev and returns current boolean schema
+  ---
+  duration_ms: 0.389713
+  type: 'test'
+  ...
+# Subtest: adaptive typed adapter shares the existing evaluator without importing SDK
+ok 31 - adaptive typed adapter shares the existing evaluator without importing SDK
+  ---
+  duration_ms: 0.214495
+  type: 'test'
+  ...
+# Subtest: deterministic fixture decisions repeat for identical input and policy
+ok 32 - deterministic fixture decisions repeat for identical input and policy
+  ---
+  duration_ms: 9.974703
+  type: 'test'
+  ...
+# Subtest: status output is serializable and does not include transcript text
+ok 33 - status output is serializable and does not include transcript text
+  ---
+  duration_ms: 4.277252
+  type: 'test'
+  ...
+# Subtest: short-result no-op reports zero actual result truncations
+ok 34 - short-result no-op reports zero actual result truncations
+  ---
+  duration_ms: 3.294715
+  type: 'test'
+  ...
+# Subtest: low-relevance result cannot cause its still-pinned call to disappear
+ok 35 - low-relevance result cannot cause its still-pinned call to disappear
+  ---
+  duration_ms: 2.651441
+  type: 'test'
+  ...
+# Subtest: archive snapshot does not silently override an existing different file
+ok 36 - archive snapshot does not silently override an existing different file
+  ---
+  duration_ms: 7.792107
+  type: 'test'
+  ...
+# Subtest: instructions embedded in a tool output do not alter the hard pin policy
+ok 37 - instructions embedded in a tool output do not alter the hard pin policy
+  ---
+  duration_ms: 3.514726
+  type: 'test'
+  ...
+# Subtest: low relevance removes old completed pairs; user text and recent pairs survive
+ok 38 - low relevance removes old completed pairs; user text and recent pairs survive
+  ---
+  duration_ms: 20.427758
+  type: 'test'
+  ...
+# Subtest: recent preservation considers both call and result positions
+ok 39 - recent preservation considers both call and result positions
+  ---
+  duration_ms: 4.159566
+  type: 'test'
+  ...
+# Subtest: first message tool is pinned
+ok 40 - first message tool is pinned
+  ---
+  duration_ms: 4.57314
+  type: 'test'
+  ...
+# Subtest: high result score preserves call even with a low call score
+ok 41 - high result score preserves call even with a low call score
+  ---
+  duration_ms: 5.192715
+  type: 'test'
+  ...
+# Subtest: call retained with preview and archive pointer when only output is stale
+ok 42 - call retained with preview and archive pointer when only output is stale
+  ---
+  duration_ms: 5.830502
+  type: 'test'
+  ...
+# Subtest: short results are not enlarged by adding archive notices
+ok 43 - short results are not enlarged by adding archive notices
+  ---
+  duration_ms: 4.714193
+  type: 'test'
+  ...
+# Subtest: threshold equality keeps rather than drops
+ok 44 - threshold equality keeps rather than drops
+  ---
+  duration_ms: 4.924005
+  type: 'test'
+  ...
+# Subtest: pending call remains even without a result
+ok 45 - pending call remains even without a result
+  ---
+  duration_ms: 3.660404
+  type: 'test'
+  ...
+# Subtest: non-eligible write is protected
+ok 46 - non-eligible write is protected
+  ---
+  duration_ms: 4.771811
+  type: 'test'
+  ...
+# Subtest: non-eligible edit is protected
+ok 47 - non-eligible edit is protected
+  ---
+  duration_ms: 3.70711
+  type: 'test'
+  ...
+# Subtest: non-eligible run is protected
+ok 48 - non-eligible run is protected
+  ---
+  duration_ms: 4.140689
+  type: 'test'
+  ...
+# Subtest: non-eligible mkdir is protected
+ok 49 - non-eligible mkdir is protected
+  ---
+  duration_ms: 4.037014
+  type: 'test'
+  ...
+# Subtest: non-eligible mcp is protected
+ok 50 - non-eligible mcp is protected
+  ---
+  duration_ms: 3.383664
+  type: 'test'
+  ...
+# Subtest: non-eligible spawn is protected
+ok 51 - non-eligible spawn is protected
+  ---
+  duration_ms: 3.812177
+  type: 'test'
+  ...
+# Subtest: non-eligible note is protected
+ok 52 - non-eligible note is protected
+  ---
+  duration_ms: 3.920667
+  type: 'test'
+  ...
+# Subtest: non-eligible finish is protected
+ok 53 - non-eligible finish is protected
+  ---
+  duration_ms: 4.721273
+  type: 'test'
+  ...
+# Subtest: error observations are protected by default
+ok 54 - error observations are protected by default
+  ---
+  duration_ms: 3.956292
+  type: 'test'
+  ...
+# Subtest: an explicit pin overrides a zero Jev score
+ok 55 - an explicit pin overrides a zero Jev score
+  ---
+  duration_ms: 3.73424
+  type: 'test'
+  ...
+# Subtest: a pin for an absent call is rejected rather than silently ignored
+ok 56 - a pin for an absent call is rejected rather than silently ignored
+  ---
+  duration_ms: 1.311389
+  type: 'test'
+  ...
+# Subtest: all user, assistant and system text stays exact and in order
+ok 57 - all user, assistant and system text stays exact and in order
+  ---
+  duration_ms: 4.339013
+  type: 'test'
+  ...
+# Subtest: arbitrary message and result metadata survive reconstruction
+ok 58 - arbitrary message and result metadata survive reconstruction
+  ---
+  duration_ms: 5.816443
+  type: 'test'
+  ...
+# Subtest: system/developer tool calls are never candidates
+ok 59 - system/developer tool calls are never candidates
+  ---
+  duration_ms: 6.481362
+  type: 'test'
+  ...
+# Subtest: orphan is rejected before inference
+ok 60 - orphan is rejected before inference
+  ---
+  duration_ms: 1.391493
+  type: 'test'
+  ...
+# Subtest: duplicate-call is rejected before inference
+ok 61 - duplicate-call is rejected before inference
+  ---
+  duration_ms: 3.370276
+  type: 'test'
+  ...
+# Subtest: duplicate-result is rejected before inference
+ok 62 - duplicate-result is rejected before inference
+  ---
+  duration_ms: 1.32869
+  type: 'test'
+  ...
+# Subtest: result-before-call is rejected before inference
+ok 63 - result-before-call is rejected before inference
+  ---
+  duration_ms: 0.852662
+  type: 'test'
+  ...
+# Subtest: inline-output is rejected before inference
+ok 64 - inline-output is rejected before inference
+  ---
+  duration_ms: 0.800527
+  type: 'test'
+  ...
+# Subtest: unknown configuration keys fail explicitly
+ok 65 - unknown configuration keys fail explicitly
+  ---
+  duration_ms: 0.259948
+  type: 'test'
+  ...
+# Subtest: invalid option {"keepThreshold":null}
+ok 66 - invalid option {"keepThreshold":null}
+  ---
+  duration_ms: 0.173448
+  type: 'test'
+  ...
+# Subtest: invalid option {"keepThreshold":1}
+ok 67 - invalid option {"keepThreshold":1}
+  ---
+  duration_ms: 0.683757
+  type: 'test'
+  ...
+# Subtest: invalid option {"maxConcurrency":100}
+ok 68 - invalid option {"maxConcurrency":100}
+  ---
+  duration_ms: 0.120977
+  type: 'test'
+  ...
+# Subtest: invalid option {"maxBatches":0}
+ok 69 - invalid option {"maxBatches":0}
+  ---
+  duration_ms: 0.068937
+  type: 'test'
+  ...
+# Subtest: invalid option {"targetRatio":0.8}
+ok 70 - invalid option {"targetRatio":0.8}
+  ---
+  duration_ms: 0.154473
+  type: 'test'
+  ...
+# Subtest: invalid option {"eligibleTools":["read","read"]}
+ok 71 - invalid option {"eligibleTools":["read","read"]}
+  ---
+  duration_ms: 0.080966
+  type: 'test'
+  ...
+# Subtest: invalid option {"preserveRecentMessages":-1}
+ok 72 - invalid option {"preserveRecentMessages":-1}
+  ---
+  duration_ms: 0.062227
+  type: 'test'
+  ...
+# Subtest: token estimator handles digits, symbols and Unicode without claiming exact tokens
+ok 73 - token estimator handles digits, symbols and Unicode without claiming exact tokens
+  ---
+  duration_ms: 0.205777
+  type: 'test'
+  ...
+# Subtest: malformed roles and non-JSON values fail validation
+ok 74 - malformed roles and non-JSON values fail validation
+  ---
+  duration_ms: 0.360158
+  type: 'test'
+  ...
+# Subtest: evaluator state can shrink while output conversation text remains untouched
+ok 75 - evaluator state can shrink while output conversation text remains untouched
+  ---
+  duration_ms: 11.631752
+  type: 'test'
+  ...
+# Subtest: invalid probability -0.01 is rejected
+ok 76 - invalid probability -0.01 is rejected
+  ---
+  duration_ms: 0.152063
+  type: 'test'
+  ...
+# Subtest: invalid probability 1.01 is rejected
+ok 77 - invalid probability 1.01 is rejected
+  ---
+  duration_ms: 0.05774
+  type: 'test'
+  ...
+# Subtest: invalid probability NaN is rejected
+ok 78 - invalid probability NaN is rejected
+  ---
+  duration_ms: 0.049297
+  type: 'test'
+  ...
+# Subtest: invalid probability Infinity is rejected
+ok 79 - invalid probability Infinity is rejected
+  ---
+  duration_ms: 0.181793
+  type: 'test'
+  ...
+# Subtest: invalid probability 0.9 is rejected
+ok 80 - invalid probability 0.9 is rejected
+  ---
+  duration_ms: 0.108007
+  type: 'test'
+  ...
+# Subtest: invalid probability null is rejected
+ok 81 - invalid probability null is rejected
+  ---
+  duration_ms: 0.126929
+  type: 'test'
+  ...
+# Subtest: raw TypeSafe noul response cannot be confused with Vercel boolean response
+ok 82 - raw TypeSafe noul response cannot be confused with Vercel boolean response
+  ---
+  duration_ms: 0.116137
+  type: 'test'
+  ...
+1..82
+# tests 82
+# suites 0
+# pass 82
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 304.753364

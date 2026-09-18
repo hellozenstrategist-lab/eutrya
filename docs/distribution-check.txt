@@ -1,0 +1,1154 @@
+Eutrya Native v0.2.0 distribution verification
+Fresh source ZIP extracted into a separate directory; no npm install.
+
+
+> eutrya-native@0.2.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: CLI help documents the standalone loop and controls
+ok 1 - CLI help documents the standalone loop and controls
+  ---
+  duration_ms: 297.877446
+  type: 'test'
+  ...
+# Subtest: offline CLI demo works with no installed SDK and no key
+ok 2 - offline CLI demo works with no installed SDK and no key
+  ---
+  duration_ms: 380.754222
+  type: 'test'
+  ...
+# Subtest: live run without credentials fails instead of silently running fixtures
+ok 3 - live run without credentials fails instead of silently running fixtures
+  ---
+  duration_ms: 340.63711
+  type: 'test'
+  ...
+# Subtest: doctor does not make paid requests by default
+ok 4 - doctor does not make paid requests by default
+  ---
+  duration_ms: 317.572267
+  type: 'test'
+  ...
+# Subtest: CLI session listing and trace inspection work after a demo
+ok 5 - CLI session listing and trace inspection work after a demo
+  ---
+  duration_ms: 1034.045128
+  type: 'test'
+  ...
+# Subtest: benchmark results label fixtures and do not claim model performance
+ok 6 - benchmark results label fixtures and do not claim model performance
+  ---
+  duration_ms: 527.198992
+  type: 'test'
+  ...
+# Subtest: gate accepts exactly one execution for an issued decision
+ok 7 - gate accepts exactly one execution for an issued decision
+  ---
+  duration_ms: 7.678595
+  type: 'test'
+  ...
+# Subtest: gate rejects missing tickets
+ok 8 - gate rejects missing tickets
+  ---
+  duration_ms: 0.523043
+  type: 'test'
+  ...
+# Subtest: gate rejects a copied ticket even with a correct nonce and hashes
+ok 9 - gate rejects a copied ticket even with a correct nonce and hashes
+  ---
+  duration_ms: 0.541957
+  type: 'test'
+  ...
+# Subtest: gate rejects a modified action
+ok 10 - gate rejects a modified action
+  ---
+  duration_ms: 0.987093
+  type: 'test'
+  ...
+# Subtest: gate rejects a changed state revision
+ok 11 - gate rejects a changed state revision
+  ---
+  duration_ms: 1.830004
+  type: 'test'
+  ...
+# Subtest: gate rejects changed evidence even if revision was not incremented
+ok 12 - gate rejects changed evidence even if revision was not incremented
+  ---
+  duration_ms: 0.565935
+  type: 'test'
+  ...
+# Subtest: tickets do not survive a new controller process
+ok 13 - tickets do not survive a new controller process
+  ---
+  duration_ms: 0.343932
+  type: 'test'
+  ...
+# Subtest: ticket expiry requires a new evaluation
+ok 14 - ticket expiry requires a new evaluation
+  ---
+  duration_ms: 0.50722
+  type: 'test'
+  ...
+# Subtest: revocation invalidates all pending tickets
+ok 15 - revocation invalidates all pending tickets
+  ---
+  duration_ms: 0.979097
+  type: 'test'
+  ...
+# Subtest: gate rejects mismatched evaluator selections
+ok 16 - gate rejects mismatched evaluator selections
+  ---
+  duration_ms: 0.950236
+  type: 'test'
+  ...
+# Subtest: probability distributions require complete outcomes
+ok 17 - probability distributions require complete outcomes
+  ---
+  duration_ms: 0.399837
+  type: 'test'
+  ...
+# Subtest: probability distributions reject negative mass and NaN
+ok 18 - probability distributions reject negative mass and NaN
+  ---
+  duration_ms: 0.320193
+  type: 'test'
+  ...
+# Subtest: probabilities cannot have an unnormalized large mass
+ok 19 - probabilities cannot have an unnormalized large mass
+  ---
+  duration_ms: 0.193873
+  type: 'test'
+  ...
+# Subtest: score is computed from absolute rung probabilities
+ok 20 - score is computed from absolute rung probabilities
+  ---
+  duration_ms: 0.356238
+  type: 'test'
+  ...
+# Subtest: score must agree with its distribution
+ok 21 - score must agree with its distribution
+  ---
+  duration_ms: 0.165747
+  type: 'test'
+  ...
+# Subtest: attention selection is validated
+ok 22 - attention selection is validated
+  ---
+  duration_ms: 0.339607
+  type: 'test'
+  ...
+# Subtest: attention rejects a claimed choice contradicted by its probabilities
+ok 23 - attention rejects a claimed choice contradicted by its probabilities
+  ---
+  duration_ms: 0.210837
+  type: 'test'
+  ...
+# Subtest: Jev scoring can select the second candidate over the main-model ordering
+ok 24 - Jev scoring can select the second candidate over the main-model ordering
+  ---
+  duration_ms: 0.787588
+  type: 'test'
+  ...
+# Subtest: disabled tool cannot win regardless of score
+ok 25 - disabled tool cannot win regardless of score
+  ---
+  duration_ms: 0.450189
+  type: 'test'
+  ...
+# Subtest: unsupported finish is excluded instead of marking completion
+ok 26 - unsupported finish is excluded instead of marking completion
+  ---
+  duration_ms: 0.371644
+  type: 'test'
+  ...
+# Subtest: proposal parser rejects missing candidate IDs
+ok 27 - proposal parser rejects missing candidate IDs
+  ---
+  duration_ms: 0.513219
+  type: 'test'
+  ...
+# Subtest: proposal parser rejects duplicate IDs
+ok 28 - proposal parser rejects duplicate IDs
+  ---
+  duration_ms: 1.0126
+  type: 'test'
+  ...
+# Subtest: proposal rejects invented evidence references
+ok 29 - proposal rejects invented evidence references
+  ---
+  duration_ms: 0.287121
+  type: 'test'
+  ...
+# Subtest: proposal does not accept embedded instructions around JSON
+ok 30 - proposal does not accept embedded instructions around JSON
+  ---
+  duration_ms: 0.536064
+  type: 'test'
+  ...
+# Subtest: proposal accepts a single JSON code fence but still validates its contents
+ok 31 - proposal accepts a single JSON code fence but still validates its contents
+  ---
+  duration_ms: 1.571559
+  type: 'test'
+  ...
+# Subtest: unknown tool types and batched nested calls are rejected
+ok 32 - unknown tool types and batched nested calls are rejected
+  ---
+  duration_ms: 0.198772
+  type: 'test'
+  ...
+# Subtest: write requires create-only null or a file SHA-256
+ok 33 - write requires create-only null or a file SHA-256
+  ---
+  duration_ms: 0.241886
+  type: 'test'
+  ...
+# Subtest: Jev uses the typed evaluation entrypoint with the configured model
+ok 34 - Jev uses the typed evaluation entrypoint with the configured model
+  ---
+  duration_ms: 3.432764
+  type: 'test'
+  ...
+# Subtest: candidate criteria are independent, atomic questions with retained score distributions
+ok 35 - candidate criteria are independent, atomic questions with retained score distributions
+  ---
+  duration_ms: 0.80663
+  type: 'test'
+  ...
+# Subtest: Jev returns its actual answers without text parsing or heuristic replacement
+ok 36 - Jev returns its actual answers without text parsing or heuristic replacement
+  ---
+  duration_ms: 0.511576
+  type: 'test'
+  ...
+# Subtest: Jev errors propagate without falling back to mock
+ok 37 - Jev errors propagate without falling back to mock
+  ---
+  duration_ms: 1.065716
+  type: 'test'
+  ...
+# Subtest: text adapter uses Gateway chat completions, not Jev evaluation
+ok 38 - text adapter uses Gateway chat completions, not Jev evaluation
+  ---
+  duration_ms: 53.575264
+  type: 'test'
+  ...
+# Subtest: text adapter refuses native tool_calls from a provider
+ok 39 - text adapter refuses native tool_calls from a provider
+  ---
+  duration_ms: 1.444541
+  type: 'test'
+  ...
+# Subtest: text adapter refuses truncated output
+ok 40 - text adapter refuses truncated output
+  ---
+  duration_ms: 1.892739
+  type: 'test'
+  ...
+# Subtest: HTTP errors carry a status but do not echo provider error secrets
+ok 41 - HTTP errors carry a status but do not echo provider error secrets
+  ---
+  duration_ms: 2.33165
+  type: 'test'
+  ...
+# Subtest: text model slot cannot silently select Jev
+ok 42 - text model slot cannot silently select Jev
+  ---
+  duration_ms: 2.08943
+  type: 'test'
+  ...
+# Subtest: text-model context labels untrusted summaries and constrains its action vocabulary
+ok 43 - text-model context labels untrusted summaries and constrains its action vocabulary
+  ---
+  duration_ms: 0.92652
+  type: 'test'
+  ...
+# Subtest: model catalog is fetched rather than guessed from a hardcoded list
+ok 44 - model catalog is fetched rather than guessed from a hardcoded list
+  ---
+  duration_ms: 18.913946
+  type: 'test'
+  ...
+# Subtest: unknown usage and cost remain null, not invented zero
+ok 45 - unknown usage and cost remain null, not invented zero
+  ---
+  duration_ms: 0.262079
+  type: 'test'
+  ...
+# Subtest: known environment secrets are redacted from strings and structured logs
+ok 46 - known environment secrets are redacted from strings and structured logs
+  ---
+  duration_ms: 0.825995
+  type: 'test'
+  ...
+# Subtest: untrusted terminal text cannot emit ANSI/OSC control sequences
+ok 47 - untrusted terminal text cannot emit ANSI/OSC control sequences
+  ---
+  duration_ms: 0.813476
+  type: 'test'
+  ...
+# Subtest: model discovery authenticates when a Gateway key is configured
+ok 48 - model discovery authenticates when a Gateway key is configured
+  ---
+  duration_ms: 1.391997
+  type: 'test'
+  ...
+# Subtest: runtime calls Jev before the model and before execution without voluntary invocation
+ok 49 - runtime calls Jev before the model and before execution without voluntary invocation
+  ---
+  duration_ms: 26.300908
+  type: 'test'
+  ...
+# Subtest: runtime enforces a different evaluator-selected candidate
+ok 50 - runtime enforces a different evaluator-selected candidate
+  ---
+  duration_ms: 11.959503
+  type: 'test'
+  ...
+# Subtest: control failure blocks main-model calls and all actions
+ok 51 - control failure blocks main-model calls and all actions
+  ---
+  duration_ms: 3.990298
+  type: 'test'
+  ...
+# Subtest: rank failure blocks execution after a main-model proposal
+ok 52 - rank failure blocks execution after a main-model proposal
+  ---
+  duration_ms: 5.978722
+  type: 'test'
+  ...
+# Subtest: malformed evaluation is fail-closed
+ok 53 - malformed evaluation is fail-closed
+  ---
+  duration_ms: 4.876157
+  type: 'test'
+  ...
+# Subtest: malformed proposal does not execute a tool
+ok 54 - malformed proposal does not execute a tool
+  ---
+  duration_ms: 6.148456
+  type: 'test'
+  ...
+# Subtest: hard provider-attempt budget counts calls before dispatch
+ok 55 - hard provider-attempt budget counts calls before dispatch
+  ---
+  duration_ms: 5.82511
+  type: 'test'
+  ...
+# Subtest: HTTP retries consume separate budget reservations
+ok 56 - HTTP retries consume separate budget reservations
+  ---
+  duration_ms: 159.556808
+  type: 'test'
+  ...
+# Subtest: timeout is not retried and cannot execute a delayed result
+ok 57 - timeout is not retried and cannot execute a delayed result
+  ---
+  duration_ms: 37.091952
+  type: 'test'
+  ...
+# Subtest: stop cancels an in-flight evaluation and pauses
+ok 58 - stop cancels an in-flight evaluation and pauses
+  ---
+  duration_ms: 20.844573
+  type: 'test'
+  ...
+# Subtest: steering received during a proposal discards that proposal before action
+ok 59 - steering received during a proposal discards that proposal before action
+  ---
+  duration_ms: 18.372345
+  type: 'test'
+  ...
+# Subtest: the actual selected attention mode is supplied to the main model
+ok 60 - the actual selected attention mode is supplied to the main model
+  ---
+  duration_ms: 9.17643
+  type: 'test'
+  ...
+# Subtest: generic answers are never automatically VERIFIED
+ok 61 - generic answers are never automatically VERIFIED
+  ---
+  duration_ms: 11.262454
+  type: 'test'
+  ...
+# Subtest: independent puzzle checker rejects a confident but premature finish
+ok 62 - independent puzzle checker rejects a confident but premature finish
+  ---
+  duration_ms: 10.163475
+  type: 'test'
+  ...
+# Subtest: offline switchboard demo learns through observations and reaches verified completion
+ok 63 - offline switchboard demo learns through observations and reaches verified completion
+  ---
+  duration_ms: 82.741687
+  type: 'test'
+  ...
+# Subtest: hidden puzzle state never enters a model/evaluator packet
+ok 64 - hidden puzzle state never enters a model/evaluator packet
+  ---
+  duration_ms: 2.336103
+  type: 'test'
+  ...
+# Subtest: compaction preserves metering and full observation archive
+ok 65 - compaction preserves metering and full observation archive
+  ---
+  duration_ms: 4.229735
+  type: 'test'
+  ...
+# Subtest: state/usage persist across a session restart
+ok 66 - state/usage persist across a session restart
+  ---
+  duration_ms: 8.506413
+  type: 'test'
+  ...
+# Subtest: pending effects prevent automatic replay on resume
+ok 67 - pending effects prevent automatic replay on resume
+  ---
+  duration_ms: 3.302951
+  type: 'test'
+  ...
+# Subtest: human reconciliation records an assertion rather than verified evidence
+ok 68 - human reconciliation records an assertion rather than verified evidence
+  ---
+  duration_ms: 3.259901
+  type: 'test'
+  ...
+# Subtest: denied writes produce an observation without creating files
+ok 69 - denied writes produce an observation without creating files
+  ---
+  duration_ms: 7.816188
+  type: 'test'
+  ...
+# Subtest: approved writes create a durable result, backup, and cleared journal
+ok 70 - approved writes create a durable result, backup, and cleared journal
+  ---
+  duration_ms: 8.136794
+  type: 'test'
+  ...
+# Subtest: repeated identical action/result pairs stop a loop
+ok 71 - repeated identical action/result pairs stop a loop
+  ---
+  duration_ms: 13.624708
+  type: 'test'
+  ...
+# Subtest: a disabled process is rejected even when the model proposes it
+ok 72 - a disabled process is rejected even when the model proposes it
+  ---
+  duration_ms: 6.828639
+  type: 'test'
+  ...
+# Subtest: workspace paths reject traversal and absolute paths
+ok 73 - workspace paths reject traversal and absolute paths
+  ---
+  duration_ms: 17.178536
+  type: 'test'
+  ...
+# Subtest: private files and state directories are not accessible through tools
+ok 74 - private files and state directories are not accessible through tools
+  ---
+  duration_ms: 6.56488
+  type: 'test'
+  ...
+# Subtest: symlinks and dangling symlinks are rejected
+ok 75 - symlinks and dangling symlinks are rejected
+  ---
+  duration_ms: 3.453724
+  type: 'test'
+  ...
+# Subtest: hard-linked files are rejected
+ok 76 - hard-linked files are rejected
+  ---
+  duration_ms: 2.441099
+  type: 'test'
+  ...
+# Subtest: read results preserve line ranges and source hashes
+ok 77 - read results preserve line ranges and source hashes
+  ---
+  duration_ms: 18.580479
+  type: 'test'
+  ...
+# Subtest: binary file reads are rejected
+ok 78 - binary file reads are rejected
+  ---
+  duration_ms: 8.093826
+  type: 'test'
+  ...
+# Subtest: literal search does not treat regex syntax as instructions
+ok 79 - literal search does not treat regex syntax as instructions
+  ---
+  duration_ms: 8.753928
+  type: 'test'
+  ...
+# Subtest: file edits require exactly one matching occurrence
+ok 80 - file edits require exactly one matching occurrence
+  ---
+  duration_ms: 7.920705
+  type: 'test'
+  ...
+# Subtest: create-only write never overwrites an existing file
+ok 81 - create-only write never overwrites an existing file
+  ---
+  duration_ms: 8.130358
+  type: 'test'
+  ...
+# Subtest: hash check detects a file changed during approval
+ok 82 - hash check detects a file changed during approval
+  ---
+  duration_ms: 7.681534
+  type: 'test'
+  ...
+# Subtest: native directory creation obeys write permissions
+ok 83 - native directory creation obeys write permissions
+  ---
+  duration_ms: 10.594565
+  type: 'test'
+  ...
+# Subtest: process execution requires explicit per-command approval
+ok 84 - process execution requires explicit per-command approval
+  ---
+  duration_ms: 12.644919
+  type: 'test'
+  ...
+# Subtest: approved local process returns actual exit status and output
+ok 85 - approved local process returns actual exit status and output
+  ---
+  duration_ms: 199.816298
+  type: 'test'
+  ...
+# Subtest: process environment does not receive the Gateway API key
+ok 86 - process environment does not receive the Gateway API key
+  ---
+  duration_ms: 178.599121
+  type: 'test'
+  ...
+# Subtest: interrupting a process keeps its effect journal unresolved
+ok 87 - interrupting a process keeps its effect journal unresolved
+  ---
+  duration_ms: 86.357971
+  type: 'test'
+  ...
+# Subtest: journal remains pending if a completed write cannot record its observation
+ok 88 - journal remains pending if a completed write cannot record its observation
+  ---
+  duration_ms: 7.688676
+  type: 'test'
+  ...
+# Subtest: session locking prevents concurrent controllers
+ok 89 - session locking prevents concurrent controllers
+  ---
+  duration_ms: 5.125112
+  type: 'test'
+  ...
+# Subtest: state corruption is rejected on resume
+ok 90 - state corruption is rejected on resume
+  ---
+  duration_ms: 3.154163
+  type: 'test'
+  ...
+# Subtest: trace chain detects an altered record
+ok 91 - trace chain detects an altered record
+  ---
+  duration_ms: 3.96459
+  type: 'test'
+  ...
+# Subtest: partial trace tails fail closed rather than being silently discarded
+ok 92 - partial trace tails fail closed rather than being silently discarded
+  ---
+  duration_ms: 1.753164
+  type: 'test'
+  ...
+# Subtest: configuration rejects silently ignored permission/config typos
+ok 93 - configuration rejects silently ignored permission/config typos
+  ---
+  duration_ms: 1.816351
+  type: 'test'
+  ...
+# Subtest: configuration requires a separate text-model slot
+ok 94 - configuration requires a separate text-model slot
+  ---
+  duration_ms: 0.188221
+  type: 'test'
+  ...
+# Subtest: Telegram translates thread IDs, directed commands and bot flags
+ok 95 - Telegram translates thread IDs, directed commands and bot flags
+  ---
+  duration_ms: 2.616304
+  type: 'test'
+  ...
+# Subtest: Telegram marks unsupported media without claiming it read it
+ok 96 - Telegram marks unsupported media without claiming it read it
+  ---
+  duration_ms: 0.279794
+  type: 'test'
+  ...
+# Subtest: Telegram outgoing text is plain, bounded and routed into topic
+ok 97 - Telegram outgoing text is plain, bounded and routed into topic
+  ---
+  duration_ms: 11.724639
+  type: 'test'
+  ...
+# Subtest: Telegram refuses polling when another webhook is configured
+ok 98 - Telegram refuses polling when another webhook is configured
+  ---
+  duration_ms: 8.038347
+  type: 'test'
+  ...
+# Subtest: Discord normalizer isolates threads and strips only leading bot mentions
+ok 99 - Discord normalizer isolates threads and strips only leading bot mentions
+  ---
+  duration_ms: 0.518945
+  type: 'test'
+  ...
+# Subtest: Discord outgoing messages suppress pings and embed previews
+ok 100 - Discord outgoing messages suppress pings and embed previews
+  ---
+  duration_ms: 2.670836
+  type: 'test'
+  ...
+# Subtest: Discord injected client receives events through normalizer
+ok 101 - Discord injected client receives events through normalizer
+  ---
+  duration_ms: 10.131264
+  type: 'test'
+  ...
+# Subtest: Slack edit and bot events do not create duplicate tasks
+ok 102 - Slack edit and bot events do not create duplicate tasks
+  ---
+  duration_ms: 0.508753
+  type: 'test'
+  ...
+# Subtest: Slack Socket Mode acknowledges after accepting normalized message
+ok 103 - Slack Socket Mode acknowledges after accepting normalized message
+  ---
+  duration_ms: 4.157013
+  type: 'test'
+  ...
+# Subtest: Slack output uses plain-text blocks rather than interpreting model markup
+ok 104 - Slack output uses plain-text blocks rather than interpreting model markup
+  ---
+  duration_ms: 1.803027
+  type: 'test'
+  ...
+# Subtest: Matrix normalizer skips encrypted events and edits
+ok 105 - Matrix normalizer skips encrypted events and edits
+  ---
+  duration_ms: 0.670671
+  type: 'test'
+  ...
+# Subtest: Matrix never falls back to plaintext in an encrypted room
+ok 106 - Matrix never falls back to plaintext in an encrypted room
+  ---
+  duration_ms: 1.483088
+  type: 'test'
+  ...
+# Subtest: Matrix plain-text sending checks room encryption and has idempotent transaction IDs
+ok 107 - Matrix plain-text sending checks room encryption and has idempotent transaction IDs
+  ---
+  duration_ms: 3.793311
+  type: 'test'
+  ...
+# Subtest: Signal direct messages normalize, group messages are not treated as DMs
+ok 108 - Signal direct messages normalize, group messages are not treated as DMs
+  ---
+  duration_ms: 0.330089
+  type: 'test'
+  ...
+# Subtest: Signal output targets the linked bridge account and exact recipient
+ok 109 - Signal output targets the linked bridge account and exact recipient
+  ---
+  duration_ms: 1.161805
+  type: 'test'
+  ...
+# Subtest: WhatsApp normalization accepts text only for the configured phone ID
+ok 110 - WhatsApp normalization accepts text only for the configured phone ID
+  ---
+  duration_ms: 0.381054
+  type: 'test'
+  ...
+# Subtest: signed webhook loopback end-to-end reaches mandatory Jev runtime and an outbox
+ok 111 - signed webhook loopback end-to-end reaches mandatory Jev runtime and an outbox
+  ---
+  duration_ms: 121.51306
+  type: 'test'
+  ...
+# Subtest: WhatsApp loopback verifies challenge and raw-body signature before processing
+ok 112 - WhatsApp loopback verifies challenge and raw-body signature before processing
+  ---
+  duration_ms: 26.100615
+  type: 'test'
+  ...
+# Subtest: WhatsApp configured Graph version and token are used only for its own send endpoint
+ok 113 - WhatsApp configured Graph version and token are used only for its own send endpoint
+  ---
+  duration_ms: 0.771076
+  type: 'test'
+  ...
+# Subtest: setup creates distinct OpenRouter and Vercel configuration without storing credentials
+ok 114 - setup creates distinct OpenRouter and Vercel configuration without storing credentials
+  ---
+  duration_ms: 633.542661
+  type: 'test'
+  ...
+# Subtest: gateway CLI creates explicit sender allowlists without contacting platforms
+ok 115 - gateway CLI creates explicit sender allowlists without contacting platforms
+  ---
+  duration_ms: 652.593537
+  type: 'test'
+  ...
+# Subtest: CLI memory and skills persist, remain reviewable and show exact contents
+ok 116 - CLI memory and skills persist, remain reviewable and show exact contents
+  ---
+  duration_ms: 1703.420301
+  type: 'test'
+  ...
+# Subtest: CLI jobs accept IANA timezone and a bounded local task
+ok 117 - CLI jobs accept IANA timezone and a bounded local task
+  ---
+  duration_ms: 644.274003
+  type: 'test'
+  ...
+# Subtest: CLI MCP template is disabled and does not auto-start an untrusted executable
+ok 118 - CLI MCP template is disabled and does not auto-start an untrusted executable
+  ---
+  duration_ms: 558.589146
+  type: 'test'
+  ...
+# Subtest: CLI doctor distinguishes missing SDK from a live provider check
+ok 119 - CLI doctor distinguishes missing SDK from a live provider check
+  ---
+  duration_ms: 596.594839
+  type: 'test'
+  ...
+# Subtest: demo still verifies independently, and exported trace contains mandatory decisions
+ok 120 - demo still verifies independently, and exported trace contains mandatory decisions
+  ---
+  duration_ms: 910.378166
+  type: 'test'
+  ...
+# Subtest: OpenRouter uses its own key/endpoint, not the Vercel evaluator key
+ok 121 - OpenRouter uses its own key/endpoint, not the Vercel evaluator key
+  ---
+  duration_ms: 51.404823
+  type: 'test'
+  ...
+# Subtest: OpenRouter key cannot substitute for the Jev key
+ok 122 - OpenRouter key cannot substitute for the Jev key
+  ---
+  duration_ms: 0.760435
+  type: 'test'
+  ...
+# Subtest: Ollama local text needs no text key, but Jev still does
+ok 123 - Ollama local text needs no text key, but Jev still does
+  ---
+  duration_ms: 0.645316
+  type: 'test'
+  ...
+# Subtest: compatible server can omit JSON response_format explicitly
+ok 124 - compatible server can omit JSON response_format explicitly
+  ---
+  duration_ms: 2.075859
+  type: 'test'
+  ...
+# Subtest: named providers cannot leak their key to a custom URL
+ok 125 - named providers cannot leak their key to a custom URL
+  ---
+  duration_ms: 0.469665
+  type: 'test'
+  ...
+# Subtest: remote plaintext/custom URL credentials are rejected
+ok 126 - remote plaintext/custom URL credentials are rejected
+  ---
+  duration_ms: 0.508823
+  type: 'test'
+  ...
+# Subtest: model discovery uses the selected provider catalog
+ok 127 - model discovery uses the selected provider catalog
+  ---
+  duration_ms: 1.118221
+  type: 'test'
+  ...
+# Subtest: ZDR is absent by default, explicit opt-in only
+ok 128 - ZDR is absent by default, explicit opt-in only
+  ---
+  duration_ms: 0.590169
+  type: 'test'
+  ...
+# Subtest: env parsing is literal, allowlisted, and never imports Nous credentials
+ok 129 - env parsing is literal, allowlisted, and never imports Nous credentials
+  ---
+  duration_ms: 1.348064
+  type: 'test'
+  ...
+# Subtest: profile path names cannot escape their config directory
+ok 130 - profile path names cannot escape their config directory
+  ---
+  duration_ms: 1.109212
+  type: 'test'
+  ...
+# Subtest: private env storage and explicit loading preserve existing environment values
+ok 131 - private env storage and explicit loading preserve existing environment values
+  ---
+  duration_ms: 5.501428
+  type: 'test'
+  ...
+# Subtest: env file symlinks rejected
+ok 132 - env file symlinks rejected
+  ---
+  duration_ms: 1.257618
+  type: 'test'
+  ...
+# Subtest: atomic state transactions persist and reject async mutation
+ok 133 - atomic state transactions persist and reject async mutation
+  ---
+  duration_ms: 2.766793
+  type: 'test'
+  ...
+# Subtest: local state lock fails closed on concurrent owners
+ok 134 - local state lock fails closed on concurrent owners
+  ---
+  duration_ms: 0.911377
+  type: 'test'
+  ...
+# Subtest: process locks reject a second live process owner
+ok 135 - process locks reject a second live process owner
+  ---
+  duration_ms: 1.016766
+  type: 'test'
+  ...
+# Subtest: memory requires explicit approval and remains namespace-isolated
+ok 136 - memory requires explicit approval and remains namespace-isolated
+  ---
+  duration_ms: 6.257199
+  type: 'test'
+  ...
+# Subtest: memory deletion is exact and secrets are redacted
+ok 137 - memory deletion is exact and secrets are redacted
+  ---
+  duration_ms: 2.564406
+  type: 'test'
+  ...
+# Subtest: draft skills do not become active before operator review
+ok 138 - draft skills do not become active before operator review
+  ---
+  duration_ms: 3.689419
+  type: 'test'
+  ...
+# Subtest: skill path traversal and oversized skill imports rejected
+ok 139 - skill path traversal and oversized skill imports rejected
+  ---
+  duration_ms: 2.115869
+  type: 'test'
+  ...
+# Subtest: root AGENTS context and persona remain lower-trust references
+ok 140 - root AGENTS context and persona remain lower-trust references
+  ---
+  duration_ms: 2.459166
+  type: 'test'
+  ...
+# Subtest: new knowledge tools still pass mandatory Jev tickets and approval
+ok 141 - new knowledge tools still pass mandatory Jev tickets and approval
+  ---
+  duration_ms: 30.123859
+  type: 'test'
+  ...
+# Subtest: chunking never splits a Unicode codepoint
+ok 142 - chunking never splits a Unicode codepoint
+  ---
+  duration_ms: 0.34576
+  type: 'test'
+  ...
+# Subtest: HTTP error text is not echoed into logs
+ok 143 - HTTP error text is not echoed into logs
+  ---
+  duration_ms: 0.809479
+  type: 'test'
+  ...
+# Subtest: gateway is disabled and deny-by-default
+ok 144 - gateway is disabled and deny-by-default
+  ---
+  duration_ms: 2.866838
+  type: 'test'
+  ...
+# Subtest: wildcard user access cannot be enabled
+ok 145 - wildcard user access cannot be enabled
+  ---
+  duration_ms: 1.343162
+  type: 'test'
+  ...
+# Subtest: sender, conversation, thread, platform all affect route identity
+ok 146 - sender, conversation, thread, platform all affect route identity
+  ---
+  duration_ms: 1.504561
+  type: 'test'
+  ...
+# Subtest: bot and unmentioned group text ignored, explicit addressed text accepted
+ok 147 - bot and unmentioned group text ignored, explicit addressed text accepted
+  ---
+  duration_ms: 0.610819
+  type: 'test'
+  ...
+# Subtest: HMAC binds raw body, timestamp, path and HTTP method
+ok 148 - HMAC binds raw body, timestamp, path and HTTP method
+  ---
+  duration_ms: 1.42542
+  type: 'test'
+  ...
+# Subtest: approval is bound to exact route and consumed once
+ok 149 - approval is bound to exact route and consumed once
+  ---
+  duration_ms: 16.992261
+  type: 'test'
+  ...
+# Subtest: approval expires without authorizing anything
+ok 150 - approval expires without authorizing anything
+  ---
+  duration_ms: 10.537723
+  type: 'test'
+  ...
+# Subtest: stop aborts an outstanding approval
+ok 151 - stop aborts an outstanding approval
+  ---
+  duration_ms: 1.088026
+  type: 'test'
+  ...
+# Subtest: unallowed and invalid messages make no provider calls
+ok 152 - unallowed and invalid messages make no provider calls
+  ---
+  duration_ms: 8.350623
+  type: 'test'
+  ...
+# Subtest: gateway turn invokes Jev twice without an optional consult tool
+ok 153 - gateway turn invokes Jev twice without an optional consult tool
+  ---
+  duration_ms: 35.615896
+  type: 'test'
+  ...
+# Subtest: message replay deduplicates before starting another turn
+ok 154 - message replay deduplicates before starting another turn
+  ---
+  duration_ms: 17.312138
+  type: 'test'
+  ...
+# Subtest: separate senders never share memory or working directory
+ok 155 - separate senders never share memory or working directory
+  ---
+  duration_ms: 37.660708
+  type: 'test'
+  ...
+# Subtest: ordinary turns serialize per route while other routes may run
+ok 156 - ordinary turns serialize per route while other routes may run
+  ---
+  duration_ms: 76.707749
+  type: 'test'
+  ...
+# Subtest: remote writes require in-chat approval and stop interrupts the wait
+ok 157 - remote writes require in-chat approval and stop interrupts the wait
+  ---
+  duration_ms: 25.393094
+  type: 'test'
+  ...
+# Subtest: new session retains only the route-approved memory
+ok 158 - new session retains only the route-approved memory
+  ---
+  duration_ms: 27.507166
+  type: 'test'
+  ...
+# Subtest: gateway request budget persists across new sessions
+ok 159 - gateway request budget persists across new sessions
+  ---
+  duration_ms: 26.030044
+  type: 'test'
+  ...
+# Subtest: rate limits reject excess ordinary turns but not stop controls
+ok 160 - rate limits reject excess ordinary turns but not stop controls
+  ---
+  duration_ms: 18.149464
+  type: 'test'
+  ...
+# Subtest: delivery errors do not cause another inference run
+ok 161 - delivery errors do not cause another inference run
+  ---
+  duration_ms: 20.323368
+  type: 'test'
+  ...
+# Subtest: restart flags interrupted work rather than re-executing it
+ok 162 - restart flags interrupted work rather than re-executing it
+  ---
+  duration_ms: 3.287506
+  type: 'test'
+  ...
+# Subtest: scheduled delivery rechecks current allowlists and never evaluates a new task
+ok 163 - scheduled delivery rechecks current allowlists and never evaluates a new task
+  ---
+  duration_ms: 16.556282
+  type: 'test'
+  ...
+# Subtest: daily budget rolls over by explicit UTC date
+ok 164 - daily budget rolls over by explicit UTC date
+  ---
+  duration_ms: 2.617074
+  type: 'test'
+  ...
+# Subtest: cron supports numeric ranges, lists and steps
+ok 165 - cron supports numeric ranges, lists and steps
+  ---
+  duration_ms: 4.988904
+  type: 'test'
+  ...
+# Subtest: cron validates ranges and number of fields
+ok 166 - cron validates ranges and number of fields
+  ---
+  duration_ms: 0.831557
+  type: 'test'
+  ...
+# Subtest: cron is timezone-aware rather than using the machine timezone
+ok 167 - cron is timezone-aware rather than using the machine timezone
+  ---
+  duration_ms: 49.874301
+  type: 'test'
+  ...
+# Subtest: cron combines restricted day-of-month and weekday with OR
+ok 168 - cron combines restricted day-of-month and weekday with OR
+  ---
+  duration_ms: 0.770457
+  type: 'test'
+  ...
+# Subtest: one-shot schedule requires an explicit timezone and future date
+ok 169 - one-shot schedule requires an explicit timezone and future date
+  ---
+  duration_ms: 4.847177
+  type: 'test'
+  ...
+# Subtest: scheduler durably claims before execution and does not repeat the same minute
+ok 170 - scheduler durably claims before execution and does not repeat the same minute
+  ---
+  duration_ms: 10.436772
+  type: 'test'
+  ...
+# Subtest: interrupted scheduled work requires review and is never automatically replayed
+ok 171 - interrupted scheduled work requires review and is never automatically replayed
+  ---
+  duration_ms: 15.025835
+  type: 'test'
+  ...
+# Subtest: stopped scheduler does not start queued due tasks
+ok 172 - stopped scheduler does not start queued due tasks
+  ---
+  duration_ms: 6.207151
+  type: 'test'
+  ...
+# Subtest: scheduled run uses Jev with no process tool and writes a result artifact
+ok 173 - scheduled run uses Jev with no process tool and writes a result artifact
+  ---
+  duration_ms: 21.52011
+  type: 'test'
+  ...
+# Subtest: parallel team has one shared request cap, not a cap per child
+ok 174 - parallel team has one shared request cap, not a cap per child
+  ---
+  duration_ms: 20.915257
+  type: 'test'
+  ...
+# Subtest: all team workspaces are validated before any child starts
+ok 175 - all team workspaces are validated before any child starts
+  ---
+  duration_ms: 0.915907
+  type: 'test'
+  ...
+# Subtest: MCP starts only explicitly trusted servers and exact allowed tools
+ok 176 - MCP starts only explicitly trusted servers and exact allowed tools
+  ---
+  duration_ms: 2.523321
+  type: 'test'
+  ...
+# Subtest: MCP child process receives only explicit environment credentials
+ok 177 - MCP child process receives only explicit environment credentials
+  ---
+  duration_ms: 0.397018
+  type: 'test'
+  ...
+# Subtest: MCP argument validation happens before external call
+ok 178 - MCP argument validation happens before external call
+  ---
+  duration_ms: 0.632815
+  type: 'test'
+  ...
+# Subtest: MCP model action cannot execute without Jev and operator approval
+ok 179 - MCP model action cannot execute without Jev and operator approval
+  ---
+  duration_ms: 12.517637
+  type: 'test'
+  ...
+1..179
+# tests 179
+# suites 0
+# pass 179
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7209.159473
+
+> eutrya-native@0.2.0 check
+> node scripts-check.mjs
+
+Syntax checked 41 JavaScript modules.
+
+E U T R Y A  ·  Jev-native CLI 0.2.0
+OFFLINE FIXTURES — no real models and no paid calls
+Workspace: <temporary-release-workspace>
+Session: 0dc52ad1-b45b-4a5b-9b8b-be41699070b4
+Trace: <temporary-release-workspace>/sessions/a4cce0b20b072a6e/0dc52ad1-b45b-4a5b-9b8b-be41699070b4/events.jsonl
+
+  MOCK  observe  · choice mass 100%
+  AI    1 candidate(s) · Offline fixture planner responding to attention=observe; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  look → o1
+        lamps: ○ ○ ○ ●
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 0 → o2
+        lamps: ○ ● ○ ○
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 1 → o3
+        lamps: ○ ● ● ○
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 2 → o4
+        lamps: ● ○ ● ●
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 3 → o5
+        lamps: ● ○ ○ ○
+  MOCK  deepen  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=deepen; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  press 0 → o6
+        lamps: ● ● ○ ●
+  MOCK  deepen  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=deepen; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  press 1 → o7
+        lamps: ● ● ● ●
+  MOCK  verify  · choice mass 100%
+  AI    1 candidate(s) · Offline fixture planner responding to attention=verify; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  finish → o8
+
+All four lamps are lit. The independent switchboard checker can verify the result.
+
+[VERIFIED]
+
+Session 0dc52ad1-b45b-4a5b-9b8b-be41699070b4
+VERIFIED · 8 executed/denied steps
+24 reserved provider attempts (16 evaluator, 8 text)
+Reported tokens: 0 input / 0 output; missing on 0 attempts
+Known reported API cost: $0.000000; 0 attempts unpriced (not zero-cost)
+Attention: verify
+

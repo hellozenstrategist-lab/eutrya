@@ -1,0 +1,8 @@
+{
+  "nativeVersionTested": "0.2.0",
+  "inference": "MOCK",
+  "realRuntimeCall": true,
+  "realBaseSelector": true,
+  "hostProviderAttempts": 2,
+  "status": "PASS"
+}

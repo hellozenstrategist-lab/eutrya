@@ -1,0 +1,90 @@
+ACTUAL OFFLINE PSEUDO-TERMINAL RUN. ANSI positioning sequences removed.
+Paths identify the temporary build environment, not an installed user workspace.
+
+
+E U T R Y A  ·  Jev-native CLI 0.1.0
+OFFLINE FIXTURES — no real models and no paid calls
+Workspace: /tmp/eutrya-repl-bqittvg7
+Session: d014d88f-9528-48d9-bc1f-79c858a369f9
+Trace: /tmp/eutrya-repl-bqittvg7/sessions/45d870d6e124e924/d014d88f-9528-48d9-bc1f-79c858a369f9/events.jsonl
+
+Enter a task. During a run, ordinary messages or /steer TEXT redirect the next decision.
+/status                 Show attention, session, request and usage counters
+/trace                  Show recent mode and candidate-selection records
+/compact                Retain a small recent context; full observations remain in the trace
+/continue               Continue a paused task with a fresh Jev decision cycle
+/stop                   Cancel an in-flight model call or local process
+/steer TEXT             Queue guidance; discard obsolete plans before execution
+/resolve NOTE           Reconcile a pending effect AFTER inspecting the workspace
+/model provider/model   Change the text model while idle (session setting only)
+/quit                   Stop and exit; the session remains saved
+eutrya › Solve the switchboard.
+Solve the switchboard.
+
+  MOCK  observe  · choice mass 100%
+  AI    1 candidate(s) · Offline fixture planner responding to attention=observe; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  look → o1
+        lamps: ○ ○ ○ ●
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 0 → o2
+        lamps: ○ ● ○ ○
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 1 → o3
+        lamps: ○ ● ● ○
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 2 → o4
+        lamps: ● ○ ● ●
+  MOCK  explore  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=explore; learned only from public observations.
+  Pick  next · policy value 0.883 · grounded 1.00 [fixture]
+  Tool  press 3 → o5
+        lamps: ● ○ ○ ○
+  MOCK  deepen  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=deepen; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  press 0 → o6
+        lamps: ● ● ○ ●
+  MOCK  deepen  · choice mass 100%
+  AI    2 candidate(s) · Offline fixture planner responding to attention=deepen; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  press 1 → o7
+        lamps: ● ● ● ●
+  MOCK  verify  · choice mass 100%
+  AI    1 candidate(s) · Offline fixture planner responding to attention=verify; learned only from public observations.
+  Pick  next · policy value 0.950 · grounded 1.00 [fixture]
+  Tool  finish → o8
+
+All four lamps are lit. The independent switchboard checker can verify the result.
+
+[VERIFIED]
+
+Session d014d88f-9528-48d9-bc1f-79c858a369f9
+VERIFIED · 8 executed/denied steps
+24 reserved provider attempts (16 evaluator, 8 text)
+Reported tokens: 0 input / 0 output; missing on 0 attempts
+Known reported API cost: $0.000000; 0 attempts unpriced (not zero-cost)
+Attention: verify
+
+eutrya › /status
+/status
+
+Session d014d88f-9528-48d9-bc1f-79c858a369f9
+VERIFIED · 8 executed/denied steps
+24 reserved provider attempts (16 evaluator, 8 text)
+Reported tokens: 0 input / 0 output; missing on 0 attempts
+Known reported API cost: $0.000000; 0 attempts unpriced (not zero-cost)
+Attention: verify
+eutrya › /compact
+/compact
+
+Context compacted; observation archive and budget retained.
+eutrya › /quit
+/quit
+

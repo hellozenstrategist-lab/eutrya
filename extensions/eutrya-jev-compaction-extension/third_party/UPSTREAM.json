@@ -1,0 +1,13 @@
+{
+  "repository": "https://github.com/tamaratran/fast-jev-compaction",
+  "commit": "e3f262a7f4d42bd8dd32ced30d26176f7cb545b0",
+  "license": "MIT",
+  "integration": "modified ESM adaptation; not an installed npm dependency",
+  "reviewed_source_blob_sha": {
+    "src/compact.ts": "bc04bb890638b109a6fcd246edffca3c590ff707",
+    "src/state.ts": "a1b517ec18a46ea81c8a505be840894c274de64a",
+    "src/request.ts": "db030b0b77ac2cbd9e8f40f6cb93c191de367d16",
+    "LICENSE": "b77bf2ab726c6e7cb5a81a9d3b7dc38266ebfd3d"
+  },
+  "live_api_reference": "https://vercel.com/docs/ai-gateway/modalities/evaluation"
+}

@@ -36,6 +36,16 @@ export function candidateQuestions(proposal) {
   });
   return questions;
 }
+
+export function researchQuestions(candidates) {
+  const criteria=Object.fromEntries(candidates.map(c=>[c.id,`${c.summary} Expected evidence: ${c.expected}. Action: ${JSON.stringify(c.action)}`]));
+  return {
+    next:{type:'choice',instructions:'Choose exactly one local read-only code research action that best reduces uncertainty for the current strategist objective. Prefer discriminating evidence over broad repetition. Structural anomalies are leads, not proof of a vulnerability.',criteria},
+    escalate:{type:'boolean',instructions:'Should the local research loop return to the strategist now because the evidence materially changes the global picture, strongly supports or weakens a hypothesis, or the remaining choice requires broader reasoning?',criteria:{true:'Return the evidence packet to the strategist now.',false:'Another bounded local code lookup is likely to add useful evidence first.'}},
+    stagnation:{type:'boolean',instructions:'Is the local research frontier mostly repeating already explored symbols or failing to add relevant evidence?',criteria:{true:'The micro-loop is stagnating.',false:'There are still distinct evidence-producing local actions.'}}
+  };
+}
+
 export class GatewayJev {
   constructor(config,{evaluate=null}={}) { this.config=config; this.source='jev'; this.injectedEvaluate=evaluate; }
   async evaluator() {
@@ -55,6 +65,9 @@ export class GatewayJev {
   control(packet,signal) { return this.evaluate({taskState:packet},attentionQuestions(),signal); }
   rank(packet,attention,proposal,signal) {
     return this.evaluate({taskState:packet,attention:{mode:attention.mode},proposal},candidateQuestions(proposal),signal);
+  }
+  research(packet,candidates,signal) {
+    return this.evaluate({researchState:packet,candidates},researchQuestions(candidates),signal);
   }
 }
 export function oneHotChoice(choice, allowed = MODES) {

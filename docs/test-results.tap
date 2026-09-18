@@ -15,3 +15,4 @@ ok 1 - complete local release test suite
 # NOTE: Compact repository summary of the local v0.3.1 verification run.
 # Security role routing, adaptive runtime identity, resident compaction identity,
 # and the existing Jev research lane were included in the passing suite.
+# Default swarm: Admin, Auditor, Operator, Sentinel, Analyst

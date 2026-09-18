@@ -2,6 +2,8 @@
 
 ## 0.4.0 — Jev-routed hunt Kanban
 
+Unified the former desktop-frontend branch into the main v0.4 codebase. The Tauri desktop now launches the same root NativeSwarm backend as the CLI, uses the security-specialist profiles, exposes hunt-board state through its bridge, and installs as `eutrya-desktop` without replacing the `eutrya` CLI command.
+
 Added persistent hunt boards that store the authorized program page, normalized rules, scope, exclusions, testing constraints, and bounded hunt cards. Admin can create boards/cards through native tools after reviewing the user-supplied hunt page and rules.
 
 Added availability-aware Jev routing. Busy, blocked, or otherwise non-idle specialists are excluded from the next assignment choice, so work is routed among the remaining Auditor, Operator, Sentinel, and Analyst residents rather than queued behind one agent. Ready work moves through active execution and independent review; review avoids the original worker when another specialist is available.

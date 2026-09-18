@@ -6,7 +6,7 @@ Hardened the shared chat persistence boundary so no agent/backend path can write
 
 Desktop health data now exposes the active runtime root alongside the bridge version, making stale installed runtime snapshots immediately diagnosable.
 
-# Changelog
+Fixed a CLI/Jev compaction failure where `previousTasks` grew without bound whenever Jev compaction was enabled. Active packets now carry a deterministic recent-task handoff window while durable history remains stored, and runtime state keeps a bounded recent history so long-lived CLI sessions do not eventually fail before a new task begins.
 
 ## 0.4.4 — Substantive completion responses
 

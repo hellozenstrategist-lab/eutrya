@@ -451,11 +451,7 @@ export class NativeSwarm {
     }
     this.runtimes.clear();
 
-    return {
-      maxPromptChars:this.config.maxPromptChars,
-      jevCompaction:this.config.jevCompaction,
-      allowExec:this.config.allowExec
-    };
+    return Object.fromEntries(Object.keys(patch).map(k=>[k,this.config[k]]));
   }
 
   async setProviderAndModel(provider, model) {

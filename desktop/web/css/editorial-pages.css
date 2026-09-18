@@ -49,14 +49,15 @@
 .editorial-hero-main:after{
   content:"";
   position:absolute;
-  right:2%;
-  top:-14%;
-  width:48%;
-  height:128%;
+  right:0;
+  top:0;
+  width:68%;
+  height:100%;
   z-index:-1;
-  background:url("../assets/eutrya-bloom.svg") right center/contain no-repeat;
-  opacity:.40;
-  filter:grayscale(1) contrast(1.12);
+  background:url("../assets/editorial-wide.svg") right center/cover no-repeat;
+  opacity:.52;
+  filter:grayscale(1) contrast(1.08);
+  mix-blend-mode:multiply;
 }
 .editorial-hero-kicker{
   font:700 8px "Geist Mono",ui-monospace,monospace;
@@ -407,9 +408,12 @@
     background-position:center;
   }
   .editorial-hero-main:after{
-    width:54%;
-    right:-2%;
-    opacity:.34;
+    width:60%;
+    right:0;
+    opacity:.48;
+    background-image:url("../assets/editorial-compact.svg");
+    background-size:cover;
+    background-position:center;
   }
   .editorial-hero-title{font-size:64px}
   .editorial-hero-subtitle{max-width:58%;font-size:8px}

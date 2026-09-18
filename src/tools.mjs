@@ -294,7 +294,7 @@ export class Toolbox {
     }
     if(!html) {
       const res=await fetch(url,{
-        headers:{'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Eutrya/0.3.0'},
+        headers:{'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Eutrya/0.3.1'},
         signal:signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000)
       });
       insist(res.ok,`HTTP ${res.status} ${res.statusText}`);

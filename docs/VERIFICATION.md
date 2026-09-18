@@ -1,4 +1,4 @@
-# Eutrya Native 0.3.0 — verification record
+# Eutrya Native 0.3.1 — verification record
 
 Build date: **September 18, 2026, America/Phoenix**. Environment: **Linux, Node.js v22.16.0**.
 
@@ -9,7 +9,7 @@ Build date: **September 18, 2026, America/Phoenix**. Environment: **Linux, Node.
 | Offline/local tests | **220 passed, 0 failed, 0 skipped** | `test-results.tap` |
 | JavaScript syntax | **52 modules passed** | `syntax-check.txt` |
 | Package dry-run | **Passed**; research runtime/code/schema are included | npm `pack --dry-run` during release verification |
-| CLI help | **Passed**; reports 0.3.0 and documents `eutrya research` | release verification command |
+| CLI help | **Passed**; reports 0.3.1 and documents `eutrya research` | release verification command |
 | Research semantic tools | **Passed** on a local Solidity fixture | `tests/research.test.mjs` |
 | Strategist/Jev boundary loop | **Passed** with deterministic providers: 2 strategist calls, 3 Jev-driven local steps | `tests/research.test.mjs` |
 | Browser content test | **Passed hermetically** against a local HTTP fixture | `tests/tools-store.test.mjs` |

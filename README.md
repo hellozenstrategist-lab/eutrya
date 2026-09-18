@@ -28,7 +28,7 @@ State-bound, single-use decision ticket + tool permission
 Execute → record observation → repeat
 ```
 
-Version: **0.3.0**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
+Version: **0.3.1**. Node.js **22+**. Linux-first; tested here on Linux with Node 22.16.0.
 
 
 ## Jev research lane
@@ -151,30 +151,30 @@ Process execution uses an executable and argument array, not an implicit shell. 
 Eutrya is designed as a persistent organization of specialized AI agents, not a single chatbot with subagents:
 
 1. **Five Default Persistent Profiles**:
-   - **Admin / Chief of Staff** (`admin`): Primary orchestrator that interacts with the user, decomposes objectives, delegates tasks, and synthesizes final results.
-   - **Engineer** (`engineer`): Software engineering, systems architecture, debugging, infrastructure, and technical implementation.
-   - **Legal / Policy Analyst** (`legal`): Contracts, regulation, compliance, liability risk identification, and structured legal argumentation.
-   - **Finance / Business Analyst** (`finance`): Financial modeling, unit economics, market analysis, pricing, and cost auditing.
-   - **Researcher / Strategist** (`researcher`): Deep research, information synthesis, competitive intelligence, and long-horizon strategy.
+   - **Admin** (`admin`): Security swarm orchestrator, scope controller, delegation layer, and user front door.
+   - **Auditor** (`auditor`): Vulnerability discovery, smart-contract/application review, invariant analysis, authorization review, and evidence-backed candidate generation.
+   - **Operator** (`operator`): Controlled reproduction, local validation, fuzzing, security tooling, test execution, and bounded implementation work.
+   - **Sentinel** (`sentinel`): Independent verification, false-positive reduction, scope/duplicate review, severity discipline, and evidence quality control.
+   - **Analyst** (`analyst`): Threat modeling, architecture analysis, protocol/security research, synthesis, and report-ready explanations.
 
 2. **Jev as the Cognitive Layer**:
    Jev sits underneath every agent in the swarm. Before taking actions, proposals and attention modes are continuously evaluated through Jev to ensure actions are grounded, productive, non-repetitive, and appropriate for the agent's role.
 
 3. **Swarm Communication & Event-Driven Routing**:
-   Targeted events (`TASK_ASSIGNED`, `IMPLEMENTATION_REQUIRED`, `RESEARCH_REQUIRED`, `LEGAL_REVIEW_REQUIRED`, `FINANCIAL_ANALYSIS_REQUIRED`, `CANDIDATE_RESULT`, `BLOCKED`, `TASK_COMPLETE`) wake only the relevant specialist agent, keeping token consumption bounded.
+   Targeted events (`TASK_ASSIGNED`, `SECURITY_AUDIT_REQUIRED`, `OPERATION_REQUIRED`, `SENTINEL_REVIEW_REQUIRED`, `ANALYSIS_REQUIRED`, `CANDIDATE_RESULT`, `BLOCKED`, `TASK_COMPLETE`) wake only the relevant security specialist, keeping token consumption bounded. Legacy event names remain accepted for compatibility and route into the closest security role.
 
 4. **Shared Workspace**:
    Agents collaborate through structured organizational memory (`tasks`, `findings`, `decisions`, `artifacts`, `messages`, `evidence`, `openQuestions`, `blockers`, `agentStatus`) rather than unbounded group chat histories.
 
 5. **Direct Conversations**:
-   Users can address any specialist directly using `@AgentName <task>` (e.g. `@Engineer Fix the parser` or `@Finance Calculate the unit margin`) or switch focus using `/agent <name>`.
+   Users can address any specialist directly using `@AgentName <task>` (e.g. `@Auditor Review the withdrawal invariant` or `@Sentinel Verify the evidence independently`) or switch focus using `/agent <name>`.
 
 6. **Dynamic Organization Templates**:
    Easily switch templates using `/template <name>`:
-   - `default`: Admin, Engineer, Legal, Finance, Researcher
-   - `engineering`: Architect, Backend Engineer, Frontend Engineer, QA, Researcher
-   - `startup`: CEO, Engineer, Product, Finance, Growth
-   - `legal`: Lead Counsel, Contracts Reviewer, Compliance Officer, Evidence Analyst, Researcher
+   - `default`: Admin, Auditor, Operator, Sentinel, Analyst
+   - `engineering`: Architect, Backend Engineer, Frontend Engineer, QA, Analyst
+   - `startup`: CEO, Operator, Product, Analyst, Growth
+   - `legal`: Lead Counsel, Contracts Reviewer, Compliance Officer, Evidence Analyst, Analyst
    - `research`: Principal Investigator, Experimentalist, Literature Specialist, Skeptic, Synthesizer
 
 Steering takes effect at decision boundaries. It cannot undo an already-completed write or guarantee reversal of a process's partial effects.

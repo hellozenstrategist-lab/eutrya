@@ -59,7 +59,7 @@ export class NativeSwarm {
           role: prof.role,
           manualOnly: false,
           allowedEvents: ['TASK_ASSIGNED', 'REVIEW_REQUIRED'],
-          canDelegate: id === 'admin' || id === 'engineer',
+          canDelegate: id === 'admin' || id === 'operator',
           allowedTemplates: ['helper', 'analyst', 'verifier']
         };
       }
@@ -563,7 +563,7 @@ export class NativeSwarm {
     const questions = {
       lead_profile: {
         type: 'choice',
-        instructions: 'Which agent profile in the organization is best suited to lead or handle this task? Select admin for cross-functional or multi-step coordination, engineer for software/systems, legal for contracts/compliance, finance for financial/business metrics, researcher for research/strategy.',
+        instructions: 'Which security agent profile is best suited to lead this authorized task? Select admin for cross-workstream coordination, auditor for vulnerability discovery and code/security review, operator for controlled reproduction/tool execution/local validation, sentinel for independent verification/triage/scope and severity review, and analyst for threat modeling, architecture research, synthesis, and reporting.',
         criteria
       },
       orchestration_needed: {
@@ -606,7 +606,7 @@ export class NativeSwarm {
     let targetAgentId = null;
     let actualTask = text;
 
-    // Check for direct mention: @Engineer ... or @legal ...
+    // Check for direct mention: @Auditor ... or @sentinel ...
     const mentionMatch = text.match(/^@([a-zA-Z0-9_-]+)\s+([\s\S]+)$/);
     if (mentionMatch) {
       const requested = mentionMatch[1].toLowerCase();
@@ -625,8 +625,8 @@ export class NativeSwarm {
       if (this.activeAgentId === this.primaryAgent) {
         // Fast tool-free response lane check before entering full multi-agent planning
         const requiresTools = /(?:write|edit|create\s+file|delete|run|npm|test|bash|shell|exec|search\s+in|list\s+dir|browse|fetch\s+url)/i.test(actualTask);
-        const highStakes = /(?:legal|contract|liability|compliance|regulatory|finance|financial|tax|invest)/i.test(actualTask);
-        const requiresVerification = /(?:audit|verify|independent|checker)/i.test(actualTask);
+        const highStakes = /(?:security|vulnerability|exploit|audit|authorization|access control|smart contract|web3|scope|triage|severity|production|credential|secret)/i.test(actualTask);
+        const requiresVerification = /(?:verify|independent|checker|triage|reproduce|false positive|duplicate|severity)/i.test(actualTask);
         const flags = {
           requiresTools,
           highStakes,

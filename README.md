@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/eutrya-banner.webp" alt="Eutrya Agent" width="100%"></p>
+
 # Eutrya Native
 
 **A standalone terminal agent with Jev in its decision loop.**

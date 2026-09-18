@@ -1,36 +1,34 @@
 {
-  "version": "0.3.1",
+  "version": "0.4.0",
   "built_at": "2026-09-18",
   "environment": {
-    "os": "Linux",
-    "node": "22.16.0"
+    "ci": "GitHub Actions",
+    "os": "Ubuntu",
+    "node": "22"
   },
   "tests": {
-    "total": 220,
-    "passed": 220,
+    "total": 226,
+    "passed": 226,
     "failed": 0,
     "skipped": 0,
-    "mode": "offline/local"
+    "mode": "offline/local CI"
   },
   "syntax": {
-    "modules": 52,
-    "passed": 52,
+    "modules": 53,
+    "passed": 53,
     "typecheck": false
   },
+  "hunt_board": {
+    "persistence": "pass",
+    "busy_agent_exclusion": "pass",
+    "independent_review": "pass",
+    "multi_card_distribution": "pass",
+    "dependency_promotion": "pass",
+    "jev_router": true
+  },
   "research_lane": {
-    "strategist_boundary_test": "pass",
-    "jev_microstep_test": "pass",
-    "semantic_code_tools": "pass",
-    "read_only": true,
-    "live_models": false
-  },
-  "browser_fixture": {
     "status": "pass",
-    "external_network_dependency": false
-  },
-  "package_dry_run": {
-    "status": "pass",
-    "research_files_included": true
+    "read_only": true
   },
   "live_inference": false,
   "paid_calls": 0

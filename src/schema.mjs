@@ -5,6 +5,12 @@ export const ACTION_HELP = {
   list: 'List a workspace directory: {type:"list",path:"."}',
   read: 'Read text and its current SHA-256: {type:"read",path:"src/file.js",startLine:1,endLine:160}',
   search: 'Literal case-insensitive text search, not regex: {type:"search",path:".",text:"TODO"}',
+  code_surface: 'Map local code structure and externally reachable functions: {type:"code_surface",path:"."}',
+  code_symbol: 'Find definitions and mentions of a code symbol: {type:"code_symbol",path:".",query:"withdraw"}',
+  code_references: 'Find references and enclosing callers for a symbol: {type:"code_references",path:".",symbol:"withdraw"}',
+  code_inspect: 'Inspect one function/modifier and extract calls, modifiers and state writes: {type:"code_inspect",path:"contracts/Vault.sol",symbol:"withdraw"}',
+  code_state: 'Trace reads and writes of a state-like symbol: {type:"code_state",path:".",symbol:"totalAssets"}',
+  code_compare: 'Compare functions in one file structurally: {type:"code_compare",path:"contracts/Vault.sol",symbols:["withdraw","redeem"]}',
   mkdir: 'Create one workspace directory (parent must exist): {type:"mkdir",path:"src"}',
   write: 'Create/replace text: {type:"write",path:"file.js",content:"...",expectedSha256:null}. null means create ONLY. Existing files require the hash from read.',
   edit: 'Replace exactly one occurrence: {type:"edit",path:"file.js",oldText:"...",newText:"...",expectedSha256:"64 hex chars"}',
@@ -33,6 +39,7 @@ const fields = {
   remember:['type','text'], memory_search:['type','query'], skill:['type','name'], skill_draft:['type','name','content'],
   mcp:['type','server','tool','arguments'],
   list: ['type','path'], read: ['type','path','startLine','endLine'], search: ['type','path','text'],
+  code_surface:['type','path'], code_symbol:['type','path','query'], code_references:['type','path','symbol'], code_inspect:['type','path','symbol'], code_state:['type','path','symbol'], code_compare:['type','path','symbols'],
   mkdir: ['type','path'], write: ['type','path','content','expectedSha256'], edit: ['type','path','oldText','newText','expectedSha256'],
   run: ['type','program','args'], shell: ['type','command'], browser: ['type','url'], note: ['type','text'], recall: ['type','observationId'],
   ask: ['type','question'], finish: ['type','answer'], look: ['type'], press: ['type','switch'],
@@ -47,6 +54,9 @@ export function validateAction(value) {
   if ('path' in a) string(a.path, 'path', 512);
   if (a.type === 'read') { integer(a.startLine,'startLine',1,1000000); integer(a.endLine,'endLine',a.startLine,a.startLine+399); }
   if (a.type === 'search') string(a.text, 'search text', 200);
+  if (a.type === 'code_symbol') string(a.query,'code query',120);
+  if (['code_references','code_inspect','code_state'].includes(a.type)) string(a.symbol,'code symbol',120);
+  if (a.type === 'code_compare') insist(Array.isArray(a.symbols)&&a.symbols.length>=2&&a.symbols.length<=8&&a.symbols.every(x=>typeof x==='string'&&x.length>=1&&x.length<=120),'code_compare requires 2..8 symbols');
   if (a.type === 'write') { insist(typeof a.content === 'string' && a.content.length <= 32000, 'write content exceeds 32000 characters'); }
   if (['write','edit'].includes(a.type)) {
     insist((a.type === 'write' && a.expectedSha256 === null) || /^[a-f0-9]{64}$/.test(a.expectedSha256), 'Expected a SHA-256 hash (or null for a NEW file)');

@@ -1,0 +1,42 @@
+name: Install README banner
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.banner-bootstrap/**'
+      - '.github/workflows/banner-bootstrap.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install banner and update README
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          cat .banner-bootstrap/part-* > /tmp/banner.b64
+          base64 -d /tmp/banner.b64 > assets/eutrya-banner.webp
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("README.md")
+          s = p.read_text()
+          marker = '<p align="center"><img src="assets/eutrya-banner.webp" alt="Eutrya Agent" width="100%"></p>'
+          if not s.startswith(marker):
+              p.write_text(marker + "\n\n" + s)
+          PY
+          rm -rf .banner-bootstrap .github/workflows/banner-bootstrap.yml
+          rmdir .github/workflows 2>/dev/null || true
+          rmdir .github 2>/dev/null || true
+          git add -A
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: add Eutrya Agent banner"
+          git push origin HEAD:main

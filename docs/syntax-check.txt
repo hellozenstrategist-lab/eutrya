@@ -1,5 +1,4 @@
-
-> eutrya-native@0.3.0 check
+> eutrya-native@0.3.1 check
 > node scripts-check.mjs
 
 Syntax checked 52 JavaScript modules.

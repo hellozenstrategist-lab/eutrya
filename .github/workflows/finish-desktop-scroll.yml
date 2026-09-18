@@ -1,0 +1,29 @@
+name: Finish desktop scroll integration
+on:
+  push:
+    branches: [feat/desktop-hunt-review-v0.4.1]
+    paths: [.github/workflows/finish-desktop-scroll.yml]
+permissions:
+  contents: write
+jobs:
+  finish:
+    if: github.repository == 'hellozenstrategist-lab/eutrya'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/finish-desktop-scroll.mjs
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run check
+      - run: npm test
+      - name: Commit tested interface edit only
+        run: |
+          git rm scripts/finish-desktop-scroll.mjs .github/workflows/finish-desktop-scroll.yml
+          git add desktop/web/hunts.js desktop/web/css/hunts.css
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix: keep Kanban viewport stable and reveal edited cards'
+          git push origin HEAD:feat/desktop-hunt-review-v0.4.1

@@ -433,6 +433,29 @@ export class NativeSwarm {
     return this.setProviderAndModel(this.config.mainProvider, model);
   }
 
+  async applyRuntimeSettings(patch = {}) {
+    insist(patch && typeof patch === 'object' && !Array.isArray(patch), 'Runtime settings patch must be an object');
+    const allowed=new Set(['maxPromptChars','jevCompaction']);
+    insist(Object.keys(patch).every(k=>allowed.has(k)), 'Unsupported live runtime setting');
+    if(Object.hasOwn(patch,'maxPromptChars')) {
+      insist(Number.isInteger(patch.maxPromptChars) && patch.maxPromptChars>=4000 && patch.maxPromptChars<=200000, 'maxPromptChars must be 4000..200000');
+    }
+    if(Object.hasOwn(patch,'jevCompaction')) insist(typeof patch.jevCompaction==='boolean','jevCompaction must be boolean');
+    insist(Array.from(this.runtimes.values()).every(r=>!r.busy), 'Wait for running agents to become idle before changing runtime context settings');
+
+    Object.assign(this.config,patch);
+    for(const runtime of this.runtimes.values()) {
+      try { runtime.store.save(); } catch {}
+      try { runtime.store.close(); } catch {}
+    }
+    this.runtimes.clear();
+
+    return {
+      maxPromptChars:this.config.maxPromptChars,
+      jevCompaction:this.config.jevCompaction
+    };
+  }
+
   async setProviderAndModel(provider, model) {
     insist(['vercel','chatgpt','openrouter','compatible','ollama'].includes(provider), 'Unsupported model provider');
     insist(typeof model === 'string' && model.length > 0 && model.length <= 200 && !/\s/.test(model), 'Provide one provider/model ID');

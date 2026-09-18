@@ -33,7 +33,11 @@ export const ACTION_HELP = {
   publish_finding: 'Publish a finding to the shared workspace: {type:"publish_finding",topic:"...",content:"..."}',
   record_decision: 'Record a major organizational decision: {type:"record_decision",title:"...",rationale:"..."}',
   update_task: 'Update the status of a shared task: {type:"update_task",taskId:"task-1",status:"completed"}',
-  consult_swarm: 'Query the shared workspace (tasks, findings, agent status): {type:"consult_swarm",query:"all"}'
+  consult_swarm: 'Query the shared workspace (tasks, findings, agent status): {type:"consult_swarm",query:"all"}',
+  hunt_create: 'Create a persistent hunt board after reviewing the authorized hunt page/rules: {type:"hunt_create",title:"Program hunt",pageUrl:"https://...",rules:"normalized rules",scope:["*.example.com"],exclusions:["..."],testingRules:["..." ]}',
+  hunt_card: 'Add a scoped Kanban card for Jev routing: {type:"hunt_card",huntId:"hunt-...",title:"Review auth boundaries",objective:"...",priority:"high",preferredRoles:["auditor"],dependsOn:[]}',
+  hunt_board: 'Inspect a hunt Kanban board: {type:"hunt_board",huntId:"hunt-..."}',
+  hunt_route: 'Ask Jev to route and run currently ready/review hunt cards across available agents: {type:"hunt_route",huntId:"hunt-..."}'
 };
 const fields = {
   remember:['type','text'], memory_search:['type','query'], skill:['type','name'], skill_draft:['type','name','content'],
@@ -44,7 +48,10 @@ const fields = {
   run: ['type','program','args'], shell: ['type','command'], browser: ['type','url'], note: ['type','text'], recall: ['type','observationId'],
   ask: ['type','question'], finish: ['type','answer'], look: ['type'], press: ['type','switch'],
   delegate: ['type','to','task'], send_message: ['type','to','message'], publish_finding: ['type','topic','content'],
-  record_decision: ['type','title','rationale'], update_task: ['type','taskId','status'], consult_swarm: ['type','query']
+  record_decision: ['type','title','rationale'], update_task: ['type','taskId','status'], consult_swarm: ['type','query'],
+  hunt_create: ['type','title','pageUrl','rules','scope','exclusions','testingRules'],
+  hunt_card: ['type','huntId','title','objective','priority','preferredRoles','dependsOn'],
+  hunt_board: ['type','huntId'], hunt_route: ['type','huntId']
 };
 export function validateAction(value) {
   const a = object(value, 'action');
@@ -96,6 +103,20 @@ export function validateAction(value) {
     insist(['backlog','in_progress','review','blocked','completed'].includes(a.status), 'Invalid task status');
   }
   if (a.type === 'consult_swarm') string(a.query, 'query', 200);
+  if (a.type === 'hunt_create') {
+    string(a.title,'hunt title',300); string(a.pageUrl,'hunt pageUrl',2048); string(a.rules,'hunt rules',12000);
+    insist(/^https?:\/\//i.test(a.pageUrl),'Hunt pageUrl must start with http:// or https://');
+    for (const [name,max,count] of [['scope',300,80],['exclusions',300,80],['testingRules',500,80]]) {
+      insist(Array.isArray(a[name]) && a[name].length <= count && a[name].every(x => typeof x === 'string' && x.length <= max), `Invalid hunt ${name}`);
+    }
+  }
+  if (a.type === 'hunt_card') {
+    string(a.huntId,'huntId',64); string(a.title,'hunt card title',400); string(a.objective,'hunt card objective',5000);
+    insist(['critical','high','medium','low'].includes(a.priority),'Invalid hunt card priority');
+    insist(Array.isArray(a.preferredRoles) && a.preferredRoles.length <= 8 && a.preferredRoles.every(x => typeof x === 'string' && /^[a-z0-9_-]{1,32}$/.test(x)), 'Invalid preferredRoles');
+    insist(Array.isArray(a.dependsOn) && a.dependsOn.length <= 20 && a.dependsOn.every(x => typeof x === 'string' && /^card-[a-zA-Z0-9_-]{1,32}$/.test(x)), 'Invalid dependsOn');
+  }
+  if (['hunt_board','hunt_route'].includes(a.type)) string(a.huntId,'huntId',64);
   return structuredClone(a);
 }
 export function validateProposal(raw, knownEvidence = null) {

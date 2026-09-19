@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.9 — Scrollable CLI conversation event feed
+
+Added bounded scrollback for the interactive conversation/event feed.
+
+- PageUp and PageDown browse the feed without stopping an active agent run.
+- `/feed`, `/feed up`, `/feed down`, `/feed top`, and `/feed bottom` provide explicit navigation; `/scroll` is an alias.
+- While viewing older events, new agent events continue to accumulate without forcing the view back to the bottom.
+- Returning to the bottom resumes the live feed.
+- Scrollback is bounded in memory and does not alter durable session history or model context.
+
 ## 0.4.8 — Session-only YOLO execution mode
 
 Added `/yolo [on|off]` to interactive CLI sessions.

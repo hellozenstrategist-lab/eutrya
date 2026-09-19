@@ -14,6 +14,7 @@ import { GatewayJev } from '../src/providers/jev.mjs';
 import { DemoCortex, MockJev } from '../src/providers/mock.mjs';
 import { PUZZLE_TASK, makePuzzle } from '../src/puzzle.mjs';
 import { Terminal, renderEvent, statusText, swarmStatusText, huntBoardText } from '../src/ui.mjs';
+import { EventFeed } from '../src/event-feed.mjs';
 import { NativeSwarm } from '../src/swarm/swarm.mjs';
 import { TEMPLATES } from '../src/swarm/profile.mjs';
 import { deadline, redactor, safeTerminal, insist, clip, digest } from '../src/util.mjs';
@@ -94,7 +95,7 @@ Chat commands: /help /status /trace /compact /continue /stop /steer TEXT
                /resolve NOTE /model ID /new /memory /skills /usage /swarm /agents
                /agent NAME /tasks /findings /hunt [ID|run ID|pause ID|resume ID] /template [NAME]
                /context [N|64k] /autocompact [on|off] /yolo [on|off] /queue [clear]
-               /thinking [on|off] /reload /quit
+               /feed [up|down|top|bottom] /thinking [on|off] /reload /quit
 `;
 
 const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to a specialist.
@@ -119,6 +120,10 @@ const CHAT_HELP=`Enter a task for Admin, or use @AgentName to speak directly to 
 /yolo [on|off]          Session-only auto-approval for local run/shell commands
 /queue                  Show follow-up messages waiting behind the active turn
 /queue clear            Clear queued follow-up messages
+/feed                   Show the current conversation/event feed page
+/feed up|down           Scroll the event feed one page
+/feed top|bottom        Jump to oldest events or return to live
+/scroll ...             Alias for /feed ...
 /stop                   Interrupt active resident run(s)
 /steer TEXT             Inject guidance at the next decision boundary
 /continue               Continue a paused task with a fresh Jev decision cycle
@@ -171,8 +176,16 @@ if(values['no-compaction'])overrides.jevCompaction=false;
 const config=loadConfig(configFile,overrides);
 const cwd=fs.realpathSync(values.cwd??process.cwd());
 const command=positionals[0]??'chat';
+let activeEventFeed=null;
 
-function emit(row) {if(values.json)console.log(JSON.stringify(row));else renderEvent(row,print,{showThinking});}
+function emit(row) {
+  if(values.json){console.log(JSON.stringify(row));return;}
+  if(!activeEventFeed){renderEvent(row,print,{showThinking});return;}
+  renderEvent(row,text=>{
+    activeEventFeed.push(text);
+    if(activeEventFeed.live) print(text);
+  },{showThinking});
+}
 function engine(store,{demo=false,approve=async()=>false,quiet=false,mcp=null}={}) {
   const cortex=demo?(store.state.environment?new DemoCortex():new EchoFixtureCortex()):new GatewayCortex(config);
   const jev=demo?new MockJev():new GatewayJev(config);
@@ -284,6 +297,8 @@ async function runAgent() {
   }
 
   // Native Swarm Mode (Default for chat and tasks)
+  const eventFeed=command==='chat'?new EventFeed({limit:2000,pageSize:20}):null;
+  activeEventFeed=eventFeed;
   if(!explicitDemo) requireLive();
   let yoloExec=false;
   let yoloRestoreAllowExec=null;
@@ -386,6 +401,19 @@ Type / for available commands.
     const queueSummary=()=>followups.length
       ? followups.map((text,i)=>`${i+1}. ${clip(text,120)}`).join('\n')
       : 'Queue is empty.';
+    const showFeed=(action='show')=>{
+      if(!eventFeed){print('Event feed is available in interactive chat mode.');return;}
+      if(action==='up')eventFeed.scrollUp();
+      else if(action==='down')eventFeed.scrollDown();
+      else if(action==='top')eventFeed.top();
+      else if(action==='bottom')eventFeed.bottom();
+      else if(action!=='show')throw new Error('Use /feed, /feed up, /feed down, /feed top, or /feed bottom');
+      print('\n'+eventFeed.render());
+    };
+    if(terminal) terminal.onPage=direction=>{
+      showFeed(direction);
+      finish();
+    };
     const drainFollowups=async()=>{
       if(workActive||quitting)return;
       workActive=true;
@@ -426,7 +454,12 @@ Type / for available commands.
           }
           if(line==='/queue') {print(queueSummary());finish();return;}
           if(line==='/queue clear') {followups.splice(0);print('Queued follow-ups cleared.');finish();return;}
+          if(line==='/feed'||line.startsWith('/feed ')||line==='/scroll'||line.startsWith('/scroll ')) {
+            const raw=(line.startsWith('/scroll')?line.slice(7):line.slice(5)).trim().toLowerCase();
+            showFeed(raw||'show');finish();return;
+          }
           if(line && !line.startsWith('/')) {
+            eventFeed?.push(`[You] ${line}`);
             followups.push(line);
             print(`Queued follow-up #${followups.length}: ${clip(line,100)}`);
             finish();return;
@@ -610,6 +643,11 @@ Type / for available commands.
         }
         if(line==='/queue'){print(queueSummary());finish();return;}
         if(line==='/queue clear'){followups.splice(0);print('Queued follow-ups cleared.');finish();return;}
+        if(line==='/feed'||line.startsWith('/feed ')||line==='/scroll'||line.startsWith('/scroll ')){
+          const raw=(line.startsWith('/scroll')?line.slice(7):line.slice(5)).trim().toLowerCase();
+          try {showFeed(raw||'show');} catch(e) {print(e.message);}
+          finish();return;
+        }
         if(line==='/stop'){
           const stopped=swarm.stopActiveRuns();
           print(stopped.length?`Stop requested for: ${stopped.map(x=>'@'+x.name).join(', ')}`:'No active resident run.');
@@ -692,12 +730,15 @@ Type / for available commands.
 
         if(line.startsWith('/')){print('Unknown command. Use /help.');finish();return;}
 
+        eventFeed?.bottom();
+        eventFeed?.push(`[You] ${line}`);
         enqueueFollowup(line);
         finish();
       };
       finish();
     });
   } finally {
+    activeEventFeed=null;
     terminal?.close();
     await swarm.close();
   }

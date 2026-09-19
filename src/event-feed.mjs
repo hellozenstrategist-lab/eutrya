@@ -18,7 +18,7 @@ export class EventFeed {
     if(this.lines.length>this.limit) {
       const removed=this.lines.length-this.limit;
       this.lines.splice(0,removed);
-      if(this.end!==null)this.end=Math.max(0,this.end-removed);
+      if(this.end!==null)this.end=Math.max(Math.min(this.pageSize,this.lines.length),this.end-removed);
     }
   }
 

@@ -117,7 +117,7 @@ export class Terminal {
     this.approval=null;this.onLine=()=>{};this.onInterrupt=()=>{};this.onPage=()=>{};
     readline.emitKeypressEvents(process.stdin,this.rl);
     this.keypressHandler=(str,key)=>{
-      if(this.approval)return;
+      if(this.approval||this.rl.line)return;
       if(key?.name==='pageup'){this.onPage('up');return;}
       if(key?.name==='pagedown'){this.onPage('down');return;}
     };

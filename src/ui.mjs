@@ -112,9 +112,16 @@ export function statusText(s) {
 }
 export class Terminal {
   constructor() {
-    const commands=['/help','/status','/trace','/compact','/context','/autocompact','/yolo','/queue','/continue','/stop','/steer','/resolve','/model','/new','/memory','/remember','/skills','/usage','/swarm','/agents','/agent','/tasks','/findings','/template','/thinking','/reload','/quit'];
+    const commands=['/help','/status','/trace','/compact','/context','/autocompact','/yolo','/queue','/feed','/scroll','/continue','/stop','/steer','/resolve','/model','/new','/memory','/remember','/skills','/usage','/swarm','/agents','/agent','/tasks','/findings','/template','/thinking','/reload','/quit'];
     this.rl=readline.createInterface({input:process.stdin,output:process.stdout,terminal:Boolean(process.stdin.isTTY),historySize:500,completer:line=>{const hits=commands.filter(c=>c.startsWith(line));return [hits.length?hits:commands,line];}});
-    this.approval=null;this.onLine=()=>{};this.onInterrupt=()=>{};
+    this.approval=null;this.onLine=()=>{};this.onInterrupt=()=>{};this.onPage=()=>{};
+    readline.emitKeypressEvents(process.stdin,this.rl);
+    this.keypressHandler=(str,key)=>{
+      if(this.approval)return;
+      if(key?.name==='pageup'){this.onPage('up');return;}
+      if(key?.name==='pagedown'){this.onPage('down');return;}
+    };
+    process.stdin.on('keypress',this.keypressHandler);
     this.rl.on('line',line=>{
       const text=line.trim();
       if(this.approval && /^(y|yes|n|no)$/i.test(text)) {this.finishApproval(/^y/i.test(text));return;}
@@ -136,5 +143,5 @@ export class Terminal {
     });
   }
   finishApproval(value) {if(this.approval){const a=this.approval;this.approval=null;a.signal?.removeEventListener('abort',a.abort);a.resolve(value);}}
-  close(){this.finishApproval(false);this.rl.close();}
+  close(){this.finishApproval(false);process.stdin.off('keypress',this.keypressHandler);this.rl.close();}
 }
